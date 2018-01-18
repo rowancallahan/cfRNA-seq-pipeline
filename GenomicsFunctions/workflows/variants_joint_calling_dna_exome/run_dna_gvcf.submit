@@ -1,0 +1,13 @@
+common_dir=/home/exacloud/lustre1/BioCoders/ProjectCollaborations/sjkim_rop/analysis
+executable=$(common_dir)/scripts/run_dna_gvcf.sh
+output=$(common_dir)/logs/$(Cluster).$(Process).out
+error=$(common_dir)/logs/$(Cluster).$(Process).err
+log=$(common_dir)/logs/$(Cluster).$(Process).log
+request_cpus = 24
+request_memory = 60 GB
+notify_user = letaw@ohsu.edu
+notification = Error
+getenv=True
+
+arguments=
+queue 1
