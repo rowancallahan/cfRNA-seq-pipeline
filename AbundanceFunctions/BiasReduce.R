@@ -45,6 +45,7 @@ function(tag, raw.mat, expt.design=NULL,
          depth.est = list(upper.quartile=0.75, max=1), 
          bkgdFUN=fittedBkgd, 
          addBkgdToLogRaw_log = F,
+         logged_B = F,
          fileData_ls = list(fileDir="./", fileBase=""))
          {
   # apply bias reduction functions to abundance data
@@ -73,6 +74,7 @@ function(tag, raw.mat, expt.design=NULL,
   #     fittedBkgd - (DEFAULT) uses Lin et al. 2008 paper to determine appropriate background
   # AddBkgdToLogRaw_log - logical indicating if "alograw" should add 1 (FALSE) or result of bkgdFUN (TRUE) to raw.mat values before logging.
   #     NOTE: should always use default of 1, unless you're using alograw for something other than comparing it to BR results.
+  # logged_b: If data has already been log2 normed. Disregard addition of background.
   # fileData_ls: a list similar to plotdata in SummaryPlots.R summary.plots() that enables file saving. Contains three elements:
   #   fileDir:  normalized csv files destination directory
   #   fileBase:  base filename for normalized csv files
@@ -94,8 +96,9 @@ function(tag, raw.mat, expt.design=NULL,
     cat( sprintf(signif(sapply(1:ncol(raw.mat),function(x){quantile(raw.mat[,x],probs=depth.est[[mystat]],na.rm=TRUE)}),2),fmt='%1.1e'), "\n")
   }
   # set background adjustment
-  bkgd = bkgdFUN(raw.mat)
-  message(sprintf("Set values: min = %1.2f, background = %1.2f", min(raw.mat), bkgd))
+  if(!(logged_B)){
+      bkgd = bkgdFUN(raw.mat)
+      message(sprintf("Set values: min = %1.2f, background = %1.2f", min(raw.mat), bkgd))}
 
   # normalizations used for microarray RNA expression data
   # add background to raw data for logging and low-end noise amelioration
@@ -108,8 +111,12 @@ function(tag, raw.mat, expt.design=NULL,
     message(sprintf("Adding background of %s to counts before logging.", bkgd))
     LoM.norm[[mynorm]] = log2(raw.mat+bkgd)
   } else {
-    message(sprintf("Add default of 1 to counts before logging."))
-    LoM.norm[[mynorm]] = log2(raw.mat+1)
+    if (logged_B){
+        message(sprintf("Values have already been log2 normed."))
+        LoM.norm[[mynorm]] = raw.mat
+    } else{
+        message(sprintf("Add default of 1 to counts before logging."))
+        LoM.norm[[mynorm]] = log2(raw.mat+1)}
   } # fi
 
 ###  for( i in 1:length(normvec) ){

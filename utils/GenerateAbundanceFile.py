@@ -1,4 +1,13 @@
 # coding=utf-8
+"""Frameworks for applying QC functions to -omics datasets.
+
+This file contains functions used to generate SLURM submission scripts,
+generate Rscripts to assess quality of omic datasets.
+
+Author: Joey Estabrook <estabroj@exacloud.ohsu.edu>
+
+"""
+
 import os
 import sys
 import textwrap
@@ -10,9 +19,12 @@ from abundance_models import *
 
 
 def generate_meta_file(read_dir, sample_meta_data_list, select_meta_data_list, split_hyphen=None):
-    """
-    Generates a meta_file
-    by column orientation
+    """Generate meta file from sample directory by column orientation based on IGL data formatting
+     -- Deprecated --
+
+    Args:
+        read_dir (str): Abs path to data directory
+        sample_meta_data_list (str): 
     """
     sample_meta_data_list = sample_meta_data_list.strip().split(',')
     select_meta_data_list = select_meta_data_list.strip().split(',')
@@ -47,11 +59,17 @@ def generate_meta_file(read_dir, sample_meta_data_list, select_meta_data_list, s
     else:
         for i in select_meta_data_list:
             if i not in sample_meta_data_list:
-                print (i)
+                print(i)
         sys.exit(1)
 
 
 def generate_slurm_submit_script(project_title, read_dir):
+    """Generates SLURM submission script
+    
+    Args:
+        project_title (str): Label for experiment directory and plot titles
+        read_dir (str): Abs path to data directory
+    """
     log = '/'.join(read_dir.split('/')[:-3])+'/logs'
     submit = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
     out_f = open(os.path.join(submit, project_title + '_analysis.submit'), 'w')
@@ -75,6 +93,12 @@ Rscript {submit}/{project_title}_analysis.R
 
 
 def launch_slurm_submit_script(project_title, read_dir):
+    """Launch generated SLURM script
+
+    Args:
+        project_title (str): Label for experiment directory and plot titles
+        read_dir (str): Abs path to data directory
+    """
     log = '/'.join(read_dir.split('/')[:-2])+'/analysis_code'
     sub_script = "%s_analysis.submit" % (project_title)
     analysis_script = "%s_analysis.R" % (project_title)
@@ -94,7 +118,22 @@ def generate_abundance_script(read_dir, meta_file, code_dir, taxID, gtfFile, pro
                               lmBy="ID_Group", gtf_feature="gene", read_pattern="*", useme_cols="*",
                               label_from_colname="*", path_type="gene.counts",
                               path_norms="loess", covariate=False, annColplotme=None, load_table=False, dataset_path=None,
-                              deseq=False):
+                              deseq=False,logged_B='F'):
+    """Generate QC -omics dataset Rscript
+
+    Args:
+        read_dir (str): Abs path to data directory
+        meta_file (str): Abs path to associated metafile for -omics dataset
+        code_dir (str): Abs path to code directory
+        taxID (int): Taxa ID
+        gtfFile (str): Abs path to gtf file for associated omics dataset samples
+        project_title (str): Label for experiment directory and plot titles
+        baseline (str): Baseline factor level to generate linear model
+        SampleID (str): Column header in [meta_file] with sample ids to be reported in results table
+        mart_dataset (str): Query for Biomart to map genomic feature id to ensemble or Hugo gene id
+        lmBy (str): Column header in [meta_file] with factor level [baseline]
+        gtf_feature (str):
+    """
     if annColplotme == None:
         annColplotme = lmBy
 
@@ -107,7 +146,7 @@ def generate_abundance_script(read_dir, meta_file, code_dir, taxID, gtfFile, pro
                     "gtf_read_dir": gtf_read_dir, "read_dir": read_dir, "read_pattern": read_pattern,
                     "useme_cols": useme_cols, "lmBy": lmBy, "baseline": baseline, "path_type": path_type,
                     "path_norms": path_norms, "mart_dataset": mart_dataset, "label_from_colname": label_from_colname,
-                    "annColplotme": annColplotme, "results":results, "dataset":dataset_path}
+                    "annColplotme": annColplotme, "results":results, "dataset":dataset_path, "logged_B":logged_B}
 
     if not covariate:
         contrast_str = """contr_ls = list("{lmBy}" = list(baseline="{baseline}", contr.FUN = "contr.treatment"))""".format(**code_context)
@@ -188,7 +227,7 @@ def main():
     abundancegroup.add_argument("-g", "--gtfFile", type=str, help="Absolute path to gtf used for alignment", default="/home/exacloud/lustre1/BioCoders/DataResources/Genomes/hg19/release-75/gtf/Homo_sapiens.GRCh37.75.gtf")
     abundancegroup.add_argument("-p", "--project_title", type=str, help="Project title associated with abundance dataset. (Will be incorporated into base file name of plots)")
     abundancegroup.add_argument("-b", "--baseline", type=str, help="Baseline to generate contrasts against when generating lm", default=False)
-
+    abundancegroup.add_argument("-lb", "--logged_B", type=str, help="R Boolean flag to log2 raw matrix F|T", default="F")
     optabundancegroup = parser.add_argument_group('Optional Abundance script generation arguments')
     optabundancegroup.add_argument("-da", "--data_file_path", type=str, help="Absolute path to dataset matrix")
     optabundancegroup.add_argument("-co", "--covariate", type=str, help="Covariates to generate contrasts against when generating lm")
@@ -212,7 +251,7 @@ def main():
                                   args.baseline, args.SampleID, args.mart_dataset,
                                   args.lmBy, args.gtf_feature, args.read_pattern, args.useme_cols,
                                   args.label_from_colname, args.path_type,
-                                  args.path_norms, args.covariate, args.plot_me, args.load_table, args.data_file_path, args.deseq)
+                                  args.path_norms, args.covariate, args.plot_me, args.load_table, args.data_file_path, args.deseq, args.logged_B)
         if args.launch_job:
             generate_slurm_submit_script(args.project_title, args.read_dir)
             launch_slurm_submit_script(args.project_title, args.read_dir)

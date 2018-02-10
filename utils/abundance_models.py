@@ -1084,6 +1084,7 @@ annCol.label = "{label_from_colname}"
 
 print("Read in Abundance data")
 
+logged_B = {logged_B}
 
 filt_pattern = str_replace_all(readpattern,'[.*]','')
 tep_mat = as.matrix(read.table("{dataset}",check.names=F))
@@ -1126,11 +1127,11 @@ for(tag in names(STAR.data$LoM.raw))
 {{
   if( length(STAR.data$LoM.raw[[tag]])>1 )
   {{
-    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[myreads]],fileData_ls=list(fileDir='{project_title}/tables/',fileBase='{project_title}'))
+    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[myreads]],fileData_ls=list(fileDir='{project_title}/tables/',fileBase='{project_title}'),logged_B=logged_B)
   }}
   else
   {{
-    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[1]],fileData_ls=list(fileDir='{project_title}/tables/',fileBase='{project_title}'))
+    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[1]],fileData_ls=list(fileDir='{project_title}/tables/',fileBase='{project_title}'), logged_B=logged_B)
   }}
 }}
 
