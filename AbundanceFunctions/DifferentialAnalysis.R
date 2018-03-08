@@ -256,7 +256,7 @@ function(normmat, expt.design, lm_expression,
     plotDesc = 'p.value_histogram'
     png(filename = sprintf('%s%s_%s_%s.png', plotdata$plotdir, plotID, plotdata$plotbase, plotDesc),
         width=5,height=5.4,units="in",res=300)
-    hist(p_mat, nclass=histbins, main=plotdata$plottitle, xlab = "p-value")
+    hist(p_mat[,2], nclass=histbins, main=plotdata$plottitle, xlab = "p-value")
     mtext(lm_expression)
     dev.off()
 
