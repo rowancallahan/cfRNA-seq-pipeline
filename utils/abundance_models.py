@@ -25,7 +25,7 @@ oneclass = {oneclass}
 # constants
 # max data rows for hclust
 hclust.limit = 2^16
-annCol.lmBy = {annCollmBy}
+annCol.lm_by = {annCollm_by}
 # quantile of data distribution reqd in one group's worth of data if too many rows for hclust()
 hc.frac.cut = 0.75;
 SJ.counts.na.frac = 0.25;
@@ -39,14 +39,14 @@ do.not.regress = "alograw" # control norm not to be used for regression stats
 # plotting colors
 colors.rgb = c(rgb(0,0,0),rgb(0.1,0.1,1),rgb(0,.7,.7),rgb(0,.7,0),rgb(.7,1,0),rgb(.7,0,.7))
 md.file = "{meta_file}"
-md.orientation = "byRow" # sampleIDs are in @ row. alt:byCol (IDs in @ col)
-md.IDcol = "{SampleID}" # reqd if md.orientation is byRow; byCol==headers are IDs
+md.orientation = "byRow" # sample_ids are in @ row. alt:byCol (IDs in @ col)
+md.IDcol = "{sample_id}" # reqd if md.orientation is byRow; byCol==headers are IDs
 
 # gene annotation
-taxID = {taxID}
+taxID = {tax_id}
 gene2ENSfile = "/home/exacloud/lustre1/BioCoders/DataResources/AnnotationSources/ncbi/gene2ensembl.gz"
 gene2ENS.col = c("taxID","EntrezID","Gene","RefSeqTranscript","EnsemblTranscript","RefSeqProtein","EnsemblProtein")
-gtfFile = "{gtfFile}"
+gtf_file = "{gtf_file}"
 gtf.feature = "{gtf_feature}"
 gtf.orig.col = c("gene_id","gene_name","gene_biotype")
 gtf.col = c("Gene","Symbol","biotype")
@@ -69,7 +69,7 @@ annCol.label = "{label_from_colname}"
 
 print("Read in Abundance data")
 
-STAR.data = read_STAR(readir=readir,useme.cols=useme.cols,label.from.colname=label.from.colname,annCol.label=annCol.label,annCol.names=annCol.names,annCol.normBy=NULL,annCol.lmBy=annCol.lmBy, readpattern=readpattern,outypes=list(gene.counts='Gene.out.tab'), unstranded.col=list(gene.counts=c(1:4)),outkey=list(gene.counts=1),outcol=list(gene.counts=c("Gene","Reads","FwdReads","RevReads")),outsum=list(gene.counts = c("N_ambiguous","N_multimapping","N_noFeature","N_unmapped")))
+STAR.data = read_STAR(readir=readir,useme.cols=useme.cols,label.from.colname=label.from.colname,annCol.label=annCol.label,annCol.names=annCol.names,annCol.normBy=NULL,annCol.lm_by=annCol.lm_by, readpattern=readpattern,outypes=list(gene.counts='Gene.out.tab'), unstranded.col=list(gene.counts=c(1:4)),outkey=list(gene.counts=1),outcol=list(gene.counts=c("Gene","Reads","FwdReads","RevReads")),outsum=list(gene.counts = c("N_ambiguous","N_multimapping","N_noFeature","N_unmapped")))
 
 print("Read in Abundance data : Complete")
 
@@ -89,7 +89,7 @@ print("Filter SJ.counts data")
 print("Filtering SJ.counts : Complete")
 save.image("./{project_title}.RData")
 
-gtf = readENSgtf(filename=gtfFile)
+gtf = readENSgtf(filename=gtf_file)
 genes.gtf = gtf[feature==gtf.feature, mget(gtf.orig.col)]
 names(genes.gtf) = gtf.col
 setkeyv(genes.gtf,gtf.col[1])
@@ -205,9 +205,9 @@ print("Evaluation of meta-data : Complete")
 mytypes = names(LoM.norms)
 mynorms = names(LoM.norms[[1]])
 
-#grpBy = annCol[[annCol.lmBy]]
+#grpBy = annCol[[annCol.lm_by]]
 grpBy = annCol[[oneclass]]
-annCol.plotme = {annColplotme}
+annCol.plotme = {ann_colplotme}
 clim.pct=0.96
 histbins=20
 dir.create(file.path(getwd(),'{project_title}/summary.plotsPlots'),showWarnings=FALSE)
@@ -254,7 +254,6 @@ save.image("./{project_title}.RData")
 regress_lsls = vector(mode='list',length=length(STAR.data$LoM.raw))
 names(regress_lsls) = names(STAR.data$LoM.raw)
 
-#contr_ls = list("{lmBy}"=list(baseline="{baseline}",contr.FUN="contr.treatment"))
 contr_ls = {contr_ls}
 
 # set baseline for regression in parameter(s) of interest
@@ -296,7 +295,7 @@ for(i in 1:length(mytypes))
 
     # regression
 
-    regress_lsls[[mytypes[i]]][[mynorms[j]]] = regressMatrix(normmat[rowmask,], expt.design=annCol[annCol.lmBy], lm_expression=lm_expr, contr_list = contr_ls, plot2file = TRUE, plotdata = plotdata)
+    regress_lsls[[mytypes[i]]][[mynorms[j]]] = regressMatrix(normmat[rowmask,], expt.design=annCol[annCol.lm_by], lm_expression=lm_expr, contr_list = contr_ls, plot2file = TRUE, plotdata = plotdata)
   }}
 }}
 
@@ -325,7 +324,7 @@ for( i in 1:length(mytypes))
 #      The slow/steep rise in q-values in remaining plots depends on resolving power of data
 
 
-lmBy = annCol.lmBy
+lm_by = annCol.lm_by
 histbins=20
 select_lsmk = vector(mode='list',length=length(STAR.data$LoM.raw))
 names(select_lsmk) = names(STAR.data$LoM.raw)
@@ -348,7 +347,7 @@ for( i in 1:length(mytypes))
 
     plotdata = list(plotdir='./{project_title}/qcQvaluePlots',plotbase=paste(mynorms[j],mytypes[i],tmp,sep='.'),plottitle=proj.title)
 
-    ##for(fac in names(reg_ls$q_list)[grep(lmBy,names(reg_ls$q_list))])
+    ##for(fac in names(reg_ls$q_list)[grep(lm_by,names(reg_ls$q_list))])
 
     for(fac in names(reg_ls$q_list))
     {{
@@ -356,7 +355,7 @@ for( i in 1:length(mytypes))
       {{
         pdata = plotdata
         pdata$plotbase = paste(plotdata$plotbase,make.names(fac),sep='.')
-        ans = qcQvalues(norm_x=normmat[mymask,], pvalue_v=reg_ls$p_mat[,fac], obj_qvalue=reg_ls$q_list[[fac]], attribs=annCol[lmBy],
+        ans = qcQvalues(norm_x=normmat[mymask,], pvalue_v=reg_ls$p_mat[,fac], obj_qvalue=reg_ls$q_list[[fac]], attribs=annCol[lm_by],
         oneclass=oneclass, plotdata=pdata, colorspec=colors.rgb, histbins=histbins, plot2file=TRUE)
         select_lsmk[[mytypes[i]]][[mynorms[j]]][paste(fac)] = ans['rowmask']
       }}
@@ -376,14 +375,14 @@ save.image("./{project_title}.RData")
 
 
 ngene_v = c(200,500,1000) # q-value cuts by number; can also cut by q-value
-ratioby_ls = list("{lmBy}"=contr_ls${lmBy}$baseline)
+ratioby_ls = list("{lm_by}"=contr_ls${lm_by}$baseline)
 ratio_fold = 1.3
 intensity_fold = 2
 
 cut_ls = list(q_combine="OR", rcut_fold=ratio_fold, icut_fold=intensity_fold)
 
 # settings for heatmaps
-#annCol.plotme = annCol.lmBy # heatmap tracks
+#annCol.plotme = annCol.lm_by # heatmap tracks
 
 clustrowmin = 10 # min data rows for heatmap and MDS plots
 
@@ -408,7 +407,7 @@ for( i in 1:length(mytypes))
       # specifying defaults to fix "Gene" and Pos as colnames
       gtf.col = c("Gene","Symbol","Chr","start","stop")
       pos.col = "Pos"
-      mySJ_dt = mapSJ2feature(STAR.data$LoM.raw[[ mytypes[i] ]][[1]], pos.col=pos.col, gtf.col=gtf.col, gtf.file=gtfFile, gtf.Rdir=genome.func)
+      mySJ_dt = mapSJ2feature(STAR.data$LoM.raw[[ mytypes[i] ]][[1]], pos.col=pos.col, gtf.col=gtf.col, gtf.file=gtf_file, gtf.Rdir=genome.func)
       # min data rows for heatmap and MDS plots
       # map gene IDs back to data matrix using mapping built earlier
       # this enables include_ID to select rows
@@ -423,7 +422,7 @@ for( i in 1:length(mytypes))
     reg_ls = reg_ls[!grepl('Intercept',names(reg_ls))]
     plotdata = list(plotdir='./{project_title}/plotRatiosPlots',plotbase=paste(mynorms[j],sub('counts','ratios',mytypes[i]),'minratio',paste0(ratio_fold,'x'),'minexpr',round(min(normmat,na.rm=T)+log2(intensity_fold),1),sep='.'),plottitle=proj.title)
 
-    #for(fac in names(reg_ls)[grep(lmBy,names(reg_ls))])
+    #for(fac in names(reg_ls)[grep(lm_by,names(reg_ls))])
     for(fac in names(reg_ls))
     {{
         for( ngenes in ngene_v )
@@ -431,7 +430,7 @@ for( i in 1:length(mytypes))
           # calculate and plot ratios
           cut_ls$qcut = ngenes
           pdata = plotdata
-          pdata$plotbase = paste(plotdata$plotbase,'ratio.vs',ratioby_ls${lmBy},ngenes,sep='.')
+          pdata$plotbase = paste(plotdata$plotbase,'ratio.vs',ratioby_ls${lm_by},ngenes,sep='.')
 
           # this function makes the ratios and cuts
           ans = designRatios(normmat[mymask,], q_list=reg_ls[[fac]], attribs=annCol, ratioby_ls=ratioby_ls, cut_ls=cut_ls)
@@ -527,7 +526,7 @@ print("Generate Abundance and Ratio table with associated q-value and p-values")
 gtf.Rdir = "{gtf_read_dir}"
 
 out_norm_mat = LoM.norms$gene.counts$loess[rowmask_ls${path_type}${path_norms},]
-out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtfFile}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
+out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtf_file}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
 out_table = out_table[!duplicated(out_table$Gene),]
 
 write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","{path_norms}","Normed_with_Ratio_and_Abundance.csv", sep="_")),quote=FALSE,sep='\t')
@@ -564,7 +563,7 @@ oneclass = {oneclass}
 # constants
 # max data rows for hclust
 hclust.limit = 2^16
-annCol.lmBy = {annCollmBy}
+annCol.lm_by = {annCollm_by}
 
 # quantile of data distribution reqd in one group's worth of data if too many rows for hclust()
 hc.frac.cut = 0.75;
@@ -579,14 +578,14 @@ do.not.regress = "alograw" # control norm not to be used for regression stats
 # plotting colors
 colors.rgb = c(rgb(0,0,0),rgb(0.1,0.1,1),rgb(0,.7,.7),rgb(0,.7,0),rgb(.7,1,0),rgb(.7,0,.7))
 md.file = "{meta_file}"
-md.orientation = "byRow" # sampleIDs are in @ row. alt:byCol (IDs in @ col)
-md.IDcol = "{SampleID}" # reqd if md.orientation is byRow; byCol==headers are IDs
+md.orientation = "byRow" # sample_ids are in @ row. alt:byCol (IDs in @ col)
+md.IDcol = "{sample_id}" # reqd if md.orientation is byRow; byCol==headers are IDs
 
 # gene annotation
-taxID = {taxID}
+taxID = {tax_id}
 gene2ENSfile = "/home/exacloud/lustre1/BioCoders/DataResources/AnnotationSources/ncbi/gene2ensembl.gz"
 gene2ENS.col = c("taxID","EntrezID","Gene","RefSeqTranscript","EnsemblTranscript","RefSeqProtein","EnsemblProtein")
-gtfFile = "{gtfFile}"
+gtf_file = "{gtf_file}"
 gtf.feature = "{gtf_feature}"
 gtf.orig.col = c("gene_id","gene_name","gene_biotype")
 gtf.col = c("Gene","Symbol","biotype")
@@ -619,7 +618,7 @@ filt_mat = as.matrix(filt_dt[,samps,with=F])
 row.names(filt_mat) = row.names(tep_mat)
 STAR.data = list(LoM.raw=list(gene.counts=list(Reads=filt_mat)),expt.design=list(group=samps), myreads = 'Reads')
 attr(STAR.data$expt.design,'names')='group'
-attr(STAR.data$expt.design,'lmBy')=annCol.lmBy
+attr(STAR.data$expt.design,'lm_by')=annCol.lm_by
 
 myreads = STAR.data$myreads
 
@@ -719,7 +718,7 @@ mytypes = names(LoM.norms)
 mynorms = names(LoM.norms[[1]])
 
 grpBy = annCol[[oneclass]]
-annCol.plotme = {annColplotme}
+annCol.plotme = {ann_colplotme}
 clim.pct=0.96
 histbins=40
 dir.create(file.path(getwd(),'{project_title}/1'),showWarnings=FALSE)
@@ -806,7 +805,7 @@ for(i in 1:length(mytypes))
 
     # regression
 
-    regress_lsls[[mytypes[i]]][[mynorms[j]]] = regressMatrix(normmat[rowmask,], expt.design=annCol[annCol.lmBy], lm_expression=lm_expr, contr_list = contr_ls, plot2file = FALSE, plotdata = plotdata)
+    regress_lsls[[mytypes[i]]][[mynorms[j]]] = regressMatrix(normmat[rowmask,], expt.design=annCol[annCol.lm_by], lm_expression=lm_expr, contr_list = contr_ls, plot2file = FALSE, plotdata = plotdata)
   }}
 }}
 
@@ -835,7 +834,7 @@ for( i in 1:length(mytypes))
 #      The slow/steep rise in q-values in remaining plots depends on resolving power of data
 
 
-lmBy = annCol.lmBy
+lm_by = annCol.lm_by
 histbins=40
 select_lsmk = vector(mode='list',length=length(STAR.data$LoM.raw))
 names(select_lsmk) = names(STAR.data$LoM.raw)
@@ -858,7 +857,7 @@ for( i in 1:length(mytypes))
 
     plotdata = list(plotdir='./{project_title}/3',plotbase=paste(mynorms[j],mytypes[i],tmp,sep='.'),plottitle=proj.title)
 
-    ##for(fac in names(reg_ls$q_list)[grep(lmBy,names(reg_ls$q_list))])
+    ##for(fac in names(reg_ls$q_list)[grep(lm_by,names(reg_ls$q_list))])
 
     for(fac in names(reg_ls$q_list))
     {{
@@ -866,7 +865,7 @@ for( i in 1:length(mytypes))
       {{
         pdata = plotdata
         pdata$plotbase = paste(plotdata$plotbase,make.names(fac),sep='.')
-        ans = qcQvalues(norm_x=normmat[mymask,], pvalue_v=reg_ls$p_mat[,fac], obj_qvalue=reg_ls$q_list[[fac]], attribs=annCol[lmBy],
+        ans = qcQvalues(norm_x=normmat[mymask,], pvalue_v=reg_ls$p_mat[,fac], obj_qvalue=reg_ls$q_list[[fac]], attribs=annCol[lm_by],
         oneclass=oneclass, plotdata=pdata, colorspec=colors.rgb, histbins=histbins, plot2file=TRUE)
         select_lsmk[[mytypes[i]]][[mynorms[j]]][paste(fac)] = ans['rowmask']
       }}
@@ -886,7 +885,7 @@ save.image("./{project_title}.RData")
 
 
 ngene_v = c(200,500,1000) # q-value cuts by number; can also cut by q-value
-ratioby_ls = list("{lmBy}"=contr_ls${lmBy}$baseline)
+ratioby_ls = list("{lm_by}"=contr_ls${lm_by}$baseline)
 ratio_fold = 1.3
 intensity_fold = 2
 
@@ -915,7 +914,7 @@ for( i in 1:length(mytypes))
       # specifying defaults to fix "Gene" and Pos as colnames
       gtf.col = c("Gene","Symbol","Chr","start","stop")
       pos.col = "Pos"
-      mySJ_dt = mapSJ2feature(STAR.data$LoM.raw[[ mytypes[i] ]][[1]], pos.col=pos.col, gtf.col=gtf.col, gtf.file=gtfFile, gtf.Rdir=genome.func)
+      mySJ_dt = mapSJ2feature(STAR.data$LoM.raw[[ mytypes[i] ]][[1]], pos.col=pos.col, gtf.col=gtf.col, gtf.file=gtf_file, gtf.Rdir=genome.func)
       # min data rows for heatmap and MDS plots
       # map gene IDs back to data matrix using mapping built earlier
       # this enables include_ID to select rows
@@ -937,7 +936,7 @@ for( i in 1:length(mytypes))
           # calculate and plot ratios
           cut_ls$qcut = ngenes
           pdata = plotdata
-          pdata$plotbase = paste(plotdata$plotbase,'ratio.vs',ratioby_ls${lmBy},ngenes,sep='.')
+          pdata$plotbase = paste(plotdata$plotbase,'ratio.vs',ratioby_ls${lm_by},ngenes,sep='.')
 
           # this function makes the ratios and cuts
           ans = designRatios(normmat[mymask,], q_list=reg_ls[[fac]], attribs=annCol, ratioby_ls=ratioby_ls, cut_ls=cut_ls)
@@ -973,7 +972,7 @@ reg_ls = regress_lsls$gene.counts${path_norms}
 gtf.Rdir = "{gtf_read_dir}"
 
 out_norm_mat = LoM.norms$gene.counts$loess[rowmask_ls${path_type}${path_norms},]
-out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtfFile}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
+out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtf_file}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
 out_table = out_table[!duplicated(out_table$Gene),]
 
 write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","{path_norms}","Normed_with_Ratio_and_Abundance.csv", sep="_")),quote=FALSE,sep='\t')
@@ -1001,14 +1000,14 @@ cts = as.matrix(filt_dt[,samps,with=F])
 row.names(cts) = row.names(tep_mat)
 
 md.dt = read.csv("{meta_file}",row.names=1,sep="\t")
-md.dt = md.dt[,{annColplotme}]
+md.dt = md.dt[,{ann_colplotme}]
 coldata = md.dt[colnames(cts),]
 
 dds = DESeqDataSetFromMatrix(countData = cts,
                               colData = coldata,
-                              design = ~ {lmBy})
+                              design = ~ {lm_by})
 
-dds${lmBy} = relevel(dds${lmBy}, ref = "{baseline}")
+dds${lm_by} = relevel(dds${lm_by}, ref = "{baseline}")
 dds = DESeq(dds)
 vsd <- vst(dds, blind=FALSE)
 
@@ -1039,7 +1038,7 @@ oneclass = {oneclass}
 # constants
 # max data rows for hclust
 hclust.limit = 2^16
-annCol.lmBy = {annCollmBy}
+annCol.lm_by = {annCollm_by}
 
 # quantile of data distribution reqd in one group's worth of data if too many rows for hclust()
 hc.frac.cut = 0.75;
@@ -1054,14 +1053,14 @@ do.not.regress = "alograw" # control norm not to be used for regression stats
 # plotting colors
 colors.rgb = c(rgb(0,0,0),rgb(0.1,0.1,1),rgb(0,.7,.7),rgb(0,.7,0),rgb(.7,1,0),rgb(.7,0,.7))
 md.file = "{meta_file}"
-md.orientation = "byRow" # sampleIDs are in @ row. alt:byCol (IDs in @ col)
-md.IDcol = "{SampleID}" # reqd if md.orientation is byRow; byCol==headers are IDs
+md.orientation = "byRow" # sample_ids are in @ row. alt:byCol (IDs in @ col)
+md.IDcol = "{sample_id}" # reqd if md.orientation is byRow; byCol==headers are IDs
 
 # gene annotation
-taxID = {taxID}
+taxID = {tax_id}
 gene2ENSfile = "/home/exacloud/lustre1/BioCoders/DataResources/AnnotationSources/ncbi/gene2ensembl.gz"
 gene2ENS.col = c("taxID","EntrezID","Gene","RefSeqTranscript","EnsemblTranscript","RefSeqProtein","EnsemblProtein")
-gtfFile = "{gtfFile}"
+gtf_file = "{gtf_file}"
 gtf.feature = "{gtf_feature}"
 gtf.orig.col = c("gene_id","gene_name","gene_biotype")
 gtf.col = c("Gene","Symbol","biotype")
@@ -1095,7 +1094,7 @@ filt_mat = as.matrix(filt_dt[,samps,with=F])
 row.names(filt_mat) = row.names(tep_mat)
 STAR.data = list(LoM.raw=list(gene.counts=list(Reads=filt_mat)),expt.design=list(group=samps), myreads = 'Reads')
 attr(STAR.data$expt.design,'names')='group'
-attr(STAR.data$expt.design,'lmBy')=annCol.lmBy
+attr(STAR.data$expt.design,'lm_by')=annCol.lm_by
 
 myreads = STAR.data$myreads
 
@@ -1201,7 +1200,7 @@ mytypes = names(LoM.norms)
 mynorms = names(LoM.norms[[1]])
 
 grpBy = annCol[[oneclass]]
-annCol.plotme = {annColplotme}
+annCol.plotme = {ann_colplotme}
 clim.pct=0.96
 histbins=40
 dir.create(file.path(getwd(),'{project_title}/1'),showWarnings=FALSE)
@@ -1288,7 +1287,7 @@ for(i in 1:length(mytypes))
 
     # regression
 
-    regress_lsls[[mytypes[i]]][[mynorms[j]]] = regressMatrix(normmat[rowmask,], expt.design=annCol[annCol.lmBy], lm_expression=lm_expr, contr_list = contr_ls, plot2file = FALSE, plotdata = plotdata)
+    regress_lsls[[mytypes[i]]][[mynorms[j]]] = regressMatrix(normmat[rowmask,], expt.design=annCol[annCol.lm_by], lm_expression=lm_expr, contr_list = contr_ls, plot2file = FALSE, plotdata = plotdata)
   }}
 }}
 
@@ -1317,7 +1316,7 @@ for( i in 1:length(mytypes))
 #      The slow/steep rise in q-values in remaining plots depends on resolving power of data
 
 
-lmBy = annCol.lmBy
+lm_by = annCol.lm_by
 histbins=40
 select_lsmk = vector(mode='list',length=length(STAR.data$LoM.raw))
 names(select_lsmk) = names(STAR.data$LoM.raw)
@@ -1340,7 +1339,7 @@ for( i in 1:length(mytypes))
 
     plotdata = list(plotdir='./{project_title}/3',plotbase=paste(mynorms[j],mytypes[i],tmp,sep='.'),plottitle=proj.title)
 
-    ##for(fac in names(reg_ls$q_list)[grep(lmBy,names(reg_ls$q_list))])
+    ##for(fac in names(reg_ls$q_list)[grep(lm_by,names(reg_ls$q_list))])
 
     for(fac in names(reg_ls$q_list))
     {{
@@ -1348,7 +1347,7 @@ for( i in 1:length(mytypes))
       {{
         pdata = plotdata
         pdata$plotbase = paste(plotdata$plotbase,make.names(fac),sep='.')
-        ans = qcQvalues(norm_x=normmat[mymask,], pvalue_v=reg_ls$p_mat[,fac], obj_qvalue=reg_ls$q_list[[fac]], attribs=annCol[lmBy],
+        ans = qcQvalues(norm_x=normmat[mymask,], pvalue_v=reg_ls$p_mat[,fac], obj_qvalue=reg_ls$q_list[[fac]], attribs=annCol[lm_by],
         oneclass=oneclass, plotdata=pdata, colorspec=colors.rgb, histbins=histbins, plot2file=TRUE)
         select_lsmk[[mytypes[i]]][[mynorms[j]]][paste(fac)] = ans['rowmask']
       }}
@@ -1368,7 +1367,7 @@ save.image("./{project_title}.RData")
 
 
 ngene_v = c(200,500,1000) # q-value cuts by number; can also cut by q-value
-ratioby_ls = list("{lmBy}"=contr_ls${lmBy}$baseline)
+ratioby_ls = list("{lm_by}"=contr_ls${lm_by}$baseline)
 ratio_fold = 1.0
 intensity_fold = 1
 
@@ -1391,10 +1390,10 @@ for( i in 1:length(mytypes))
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
     colnames(normmat)=samp.labels
     groupdat = data.frame(annCol)
-    sampleid = groupdat$Sample
-    colorfactor= "{lmBy}"
+    sample_id = groupdat$Sample
+    colorfactor= "{lm_by}"
     #png(filename=paste("./{project_title}/4/", mynorms[j], "_PCA_Plot.png", sep=""))
-    gene_pcaplot(normmat, sampleid, groupdat=groupdat, colorfactor=colorfactor, shapefactor=NULL, plot_sampleids=TRUE, pcnum=1:2, plottitle = paste(mynorms[j]," PCA Plot",sep=""))
+    gene_pcaplot(normmat, sample_id, groupdat=groupdat, colorfactor=colorfactor, shapefactor=NULL, plot_sample_ids=TRUE, pcnum=1:2, plottitle = paste(mynorms[j]," PCA Plot",sep=""))
     ggsave(paste("./{project_title}/4/", mynorms[j], "_PCA_Plot.png", sep=""))
     if( grepl('SJ',mytypes[i]))
     {{#not the most robust way to find SJs
@@ -1402,7 +1401,7 @@ for( i in 1:length(mytypes))
       # specifying defaults to fix "Gene" and Pos as colnames
       gtf.col = c("Gene","Symbol","Chr","start","stop")
       pos.col = "Pos"
-      mySJ_dt = mapSJ2feature(STAR.data$LoM.raw[[ mytypes[i] ]][[1]], pos.col=pos.col, gtf.col=gtf.col, gtf.file=gtfFile, gtf.Rdir=genome.func)
+      mySJ_dt = mapSJ2feature(STAR.data$LoM.raw[[ mytypes[i] ]][[1]], pos.col=pos.col, gtf.col=gtf.col, gtf.file=gtf_file, gtf.Rdir=genome.func)
       # min data rows for heatmap and MDS plots
       # map gene IDs back to data matrix using mapping built earlier
       # this enables include_ID to select rows
@@ -1424,7 +1423,7 @@ for( i in 1:length(mytypes))
           # calculate and plot ratios
           cut_ls$qcut = ngenes
           pdata = plotdata
-          pdata$plotbase = paste(plotdata$plotbase,'ratio.vs',ratioby_ls${lmBy},ngenes,sep='.')
+          pdata$plotbase = paste(plotdata$plotbase,'ratio.vs',ratioby_ls${lm_by},ngenes,sep='.')
 
           # this function makes the ratios and cuts
           ans = designRatios(normmat[mymask,], q_list=reg_ls[[fac]], attribs=annCol, ratioby_ls=ratioby_ls, cut_ls=cut_ls)
@@ -1460,7 +1459,7 @@ reg_ls = regress_lsls$gene.counts${path_norms}
 gtf.Rdir = "{gtf_read_dir}"
 
 out_norm_mat = LoM.norms$gene.counts$loess[rowmask_ls${path_type}${path_norms},]
-out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtfFile}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
+out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtf_file}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
 out_table = out_table[!duplicated(out_table$Gene),]
 
 write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","{path_norms}","Normed_with_Ratio_and_Abundance.csv", sep="_")),quote=FALSE,sep='\t')
@@ -1483,17 +1482,17 @@ samps = sort(grep(filt_pattern, names(filt_dt),value=T))
 cts = as.matrix(filt_dt[,samps,with=F])
 
 md.dt = read.csv("{meta_file}",row.names=1,sep="    ")
-md.dt = md.dt[,{annColplotme}]
+md.dt = md.dt[,{ann_colplotme}]
 coldata = md.dt[colnames(cts),]
 
 dds = DESeqDataSetFromMatrix(countData = cts,
                               colData = coldata,
-                              design = ~ {lmBy})
+                              design = ~ {lm_by})
                               
 keep = rowSums(counts(dds)) >= 10
 dds = dds[keep,]
 
-dds${lmBy} = relevel(dds${lmBy}, ref = "{baseline}")
+dds${lm_by} = relevel(dds${lm_by}, ref = "{baseline}")
 dds = DESeq(dds)
 res = results(dds)
 
