@@ -22,10 +22,10 @@ def generate_meta_file(read_dir, sample_meta_data_list, select_meta_data_list, s
     """Generate meta file from sample directory by column orientation based on IGL data formatting
 
     Args:
-        split_hyphen:
+        split_hyphen (NoneType): Split IGL header and create meta file by respective field hyphen split represents
         read_dir (str): Abs path to data directory
-        sample_meta_data_list (str): 
-        select_meta_data_list:
+        sample_meta_data_list (str): list representing all fields of IGL sample label
+        select_meta_data_list (str): list representing fields of IGL sample label to subset by
     """
     sample_meta_data_list = sample_meta_data_list.strip().split(',')
     select_meta_data_list = select_meta_data_list.strip().split(',')
