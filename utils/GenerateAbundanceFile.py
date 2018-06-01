@@ -104,7 +104,7 @@ def launch_slurm_submit_script(project_title, read_dir):
     sub_script = "{}_analysis.submit".format(project_title)
     analysis_script = "{}_analysis.R".format(project_title)
     scripts = [sub_script, analysis_script]
-    cmd = "sbatch %s/%s_analysis.submit" % (log, project_title)
+    cmd = "sbatch {}/{}_analysis.submit".format(log, project_title)
     # Set permissions on scripts to be launched to scheduler
 
     current_permissions = stat.S_IMODE(os.lstat(log).st_mode)
@@ -114,7 +114,7 @@ def launch_slurm_submit_script(project_title, read_dir):
     subprocess.call(cmd, shell = True)
 
 
-def generate_abundance_script(read_dir, meta_file, code_dir, tax_i_d, gtf_file, project_title, baseline,
+def generate_abundance_script(read_dir, meta_file, code_dir, tax_id, gtf_file, project_title, baseline,
                               sample_id = "sample_id", mart_dataset = "hsapiens_gene_ensembl", lm_by = "ID_Group",
                               gtf_feature = "gene", read_pattern = "*", useme_cols = "*", label_from_colname = "*",
                               path_type = "gene.counts", path_norms = "loess", covariate = False, ann_colplotme = None,
@@ -125,7 +125,7 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_i_d, gtf_file, 
         read_dir (str): Abs path to data directory
         meta_file (str): Abs path to associated metafile for -omics dataset
         code_dir (str): Abs path to code directory
-        tax_i_d (int): Taxa ID
+        tax_id (int): Taxa ID
         gtf_file (str): Abs path to gtf file for associated omics dataset samples
         project_title (str): Label for experiment directory and plot titles
         baseline (str): Baseline factor level to generate linear model
@@ -145,7 +145,6 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_i_d, gtf_file, 
         useme_cols (str): regex expression to incorporate meta data into expression object
         read_pattern (str): regex expression to identify samples to perform QC/QA analysis on
 
-
     """
     if ann_colplotme is None:
         ann_colplotme = lm_by
@@ -154,7 +153,7 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_i_d, gtf_file, 
     log = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
     out_f = open(os.path.join(log, project_title + '_analysis.R'), 'w')
     results = '/'.join(read_dir.split('/')[:-2]) + '/results'
-    code_context = {"code_dir": code_dir, "meta_file": meta_file, "sample_id": sample_id, "tax_i_d": tax_i_d,
+    code_context = {"code_dir": code_dir, "meta_file": meta_file, "sample_id": sample_id, "tax_id": tax_id,
                     "gtf_file": gtf_file, "gtf_feature": gtf_feature, "project_title": project_title,
                     "gtf_read_dir": gtf_read_dir, "read_dir": read_dir, "read_pattern": read_pattern,
                     "useme_cols": useme_cols, "lm_by": lm_by, "baseline": baseline, "path_type": path_type,
@@ -167,9 +166,9 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_i_d, gtf_file, 
         lm_expr = "y ~ {lm_by}".format(**code_context)
         code_context['lm_expr'] = lm_expr
         code_context['contr_ls'] = contrast_str
-        code_context['ann_colplotme'] = '%s' % ann_colplotme
-        code_context['annCollmBy'] = '"%s"' % lm_by
-        code_context['oneclass'] = '"%s"' % lm_by
+        code_context['ann_colplotme'] = '{}'.format(ann_colplotme)
+        code_context['annCollm_by'] = '"{}"'.format(lm_by)
+        code_context['oneclass'] = '"{}"'.format(lm_by)
 
     else:
 
@@ -190,13 +189,13 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_i_d, gtf_file, 
 
             ***Note***
             Both Time and Pressure need to be column headers in the table provided as an argument 
-                to expt.design in regressMatrix covariate list provided:
+            to expt.design in regressMatrix covariate list provided:
             """)
             print(covariate.split(','))
             print("baseline list provided:")
             print(baseline.split(','))
         else:
-            code_context['oneclass'] = '"%s"' % lm_by
+            code_context['oneclass'] = '"{}"'.format(lm_by)
             covariate_list = covariate.split(',')
             baseline_list = baseline.split(',')
             lm_expr = "y ~ " + ' + '.join(covariate_list)
@@ -207,8 +206,8 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_i_d, gtf_file, 
             covariate_str = "list(" + cov_str[:-1] + ")"
             code_context['contr_ls'] = covariate_str
             reformat_covariate = '"' + '","'.join(covariate_list) + '"'
-            code_context['ann_colplotme'] = 'c(%s)' % reformat_covariate
-            code_context['annCollmBy'] = 'c(%s)' % reformat_covariate
+            code_context['ann_colplotme'] = 'c({})'.format(reformat_covariate)
+            code_context['annCollm_by'] = 'c({})'.format(reformat_covariate)
 
     if not load_table:
         code = qc_model
@@ -287,13 +286,13 @@ Project title associated with abundance dataset.(Will be incorporated into base 
                             metavar = '',
                             help = "Absolute path to code directory i.e. ProjectDirectory/code/",
                             default = "/home/users/estabroj/scratch/CEDAR/new_repo/")
-    optabundancegroup.add_argument("-t", "--taxID",
+    optabundancegroup.add_argument("-t", "--tax_id",
                             type = str,
                             metavar = '',
                             help = """
-TaxID can be found www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi""",
+tax_id can be found www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi""",
                             default = "9606")
-    optabundancegroup.add_argument("-g", "--gtfFile",
+    optabundancegroup.add_argument("-g", "--gtf_file",
                             type = str,
                             metavar = '',
                             help = "Absolute path to gtf used for alignment",
@@ -312,12 +311,12 @@ TaxID can be found www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cg
                             metavar='',
                             type = str,
                             help = "Covariates to generate contrasts against when generating lm")
-    optabundancegroup.add_argument("-id", "--SampleID",
+    optabundancegroup.add_argument("-id", "--sample_id",
                             metavar='',
                             type = str,
                             help = """
 Column in metadata.txt that identifies samples read in by label_from_colname""",
-                            default = "SampleID")
+                            default = "sample_id")
     optabundancegroup.add_argument("-bm", "--mart_dataset",
                             metavar='',
                             type = str,
@@ -377,8 +376,8 @@ Read pattern expression provided to R to select for unique sample label identifi
         generate_meta_file(args.read_dir, args.sample_meta_data_list, args.select_meta_data_list, args.split_hyphen)
 
     else:
-        generate_abundance_script(args.read_dir, args.meta_file, args.code_dir, args.taxID, args.gtfFile,
-                              args.project_title, args.baseline, args.SampleID, args.mart_dataset, args.lmBy,
+        generate_abundance_script(args.read_dir, args.meta_file, args.code_dir, args.tax_id, args.gtf_file,
+                              args.project_title, args.baseline, args.sample_id, args.mart_dataset, args.lmBy,
                               args.gtf_feature, args.read_pattern, args.useme_cols, args.label_from_colname,
                               args.path_type, args.path_norms, args.covariate, args.plot_me, args.load_table,
                               args.data_file_path, args.deseq, args.logged_B)
