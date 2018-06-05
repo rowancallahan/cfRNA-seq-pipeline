@@ -1,0 +1,37 @@
+{
+    "__default__" :
+    {
+        "t" : "35:00:00",
+        "N" : 1,
+        "partition" : "exacloud",
+	"J" : "master",
+	"o" : "logs/slurm_master-%j.out",
+	"e" : "logs/slurm_master-%j.err",
+	"c" : 4
+    },
+    "trim_reads" :
+    {
+        "J" : "ctadpt",
+        "e" : "logs/slurm_ctadpt-%j.err",
+        "o" : "logs/slurm_ctadpt-%j.out"
+    },
+    "align_reads" :
+    {
+	"J" : "bwt2",
+	"e" : "logs/slurm_bwt2-%j.err",
+	"o" : "logs/slurm_bwr2-%j.out",
+	"N" : 2
+    },
+    "sam2bam_reads" :
+    {
+	"J" : "sam2bam",
+        "e" : "logs/slurm_sam2bam-%j.err",
+        "o" : "logs/slurm_sam2bam-%j.out"
+    },
+    "filter_reads" :
+    {
+        "J" : "filter",
+        "e" : "logs/slurm_filter-%j.err",
+        "o" : "logs/slurm_filter-%j.out"
+    }
+}
