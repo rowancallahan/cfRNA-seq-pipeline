@@ -1,60 +1,26 @@
-#vim: set syntax=python
-
 __author__ = "Joey Estabrook"
 __email__ = "estabroj@ohsu.edu"
 __license__ = "MIT"
 
 """Computation Hub omic data processing pipeline"""
 
-configfile: "config.yaml"
+configfile: "omic_config.yaml"
 
 import sys
 import yaml
-	
-rule all:
- input:
-  "data/{project_id}_counts.txt"
+
+def format_plot_columns({config[meta_columns_to_plot]}):
+    factors = {config[meta_columns_to_plot]}.split(',')
+    reformat_factors = '"' + '","'.join(factors) + '"'
+    return 'c({})'.format(reformat_factors)
 
 rule qc_qa:
  input:
-
-
-rule trim_reads:
- input:
-  "reads/{sample}.fastq.gz"
+    "{config[omic_counts_data]}/{config[project_id]}_counts.txt"
  output:
-  "reads_trimmed/{sample}.trimmed.fastq"
+    "{config[omic_qc_results]/{config[project_id]}/tables/{project_id}_loess_Normed_with_Ratio_and_Abundance.txt"
  log:
-  "logs/ctadpt_{sample}.log"
+    "{config[omic_qc_results]}/{config[project_id]}/logs"
  shell:
-  "cutadapt -n 2 -g {config[adapter5]} -a {config[adapter3]} {input} > {output}"
-  
-rule align_reads:
- input:
-  "reads_trimmed/{sample}.trimmed.fastq"
- output:
-  "reads_aligned/{sample}.sam"
- log:
-  "logs/bwt2_{sample}.log"
- shell:
-  "bowtie2 -p 8 -x {config[bowtie2libidx]} --norc -U {input} -S {output} 2> {log}"
+    python GenerateAbundanceFile.py -d {config[results}]/{config[project_id]} -mf {omic_meta_data} -p {config[project_id]} -b {config[baseline]} -lm {config[linear_model]} -id {config[StudyID]} -pl format_plot_columns({config[meta_columns_to_plot]}) -df -da {config[omic_counts_data]}
 
-rule sam2bam_reads:
- input:
-  "reads_aligned/{sample}.sam"
- output:
-  "reads_sam2bam/{sample}.bam"
- log:
-  "logs/sam2bam_{sample}.log"
- shell:
-  "samtools view -bS {input} > {output} 2> {log}"
-
-rule filter_reads:
- input:
-  "reads_sam2bam/{sample}.bam"
- output:
-  "reads_filtered/{sample}.bam"
- log:
-  "logs/filtered_{sample}.log"
- shell:
-  "samtools view -bq 10 {input} > {output} 2> {log}"
