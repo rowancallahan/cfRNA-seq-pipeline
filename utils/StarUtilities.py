@@ -52,6 +52,15 @@ def compile_final_log(star_dir, project_title):
     np.savetxt(out, col_mat, fmt = '%s', delimiter = '\t')
 
 
+def compile_counts_table(data_dir, out):
+    files = [x for x in os.listdir(data_dir) if x.endswith('_gene_count.txt')]
+    tables = [pd.read_csv(fh, sep='\t', index_col=0, names=[fh.split('_')[0]]) for fh in files]
+    joined_table = pd.concat(tables, axis=1)
+    filtered_joined = joined_table.iloc[:-5, :]
+    filtered_joined_sorted = filtered_joined.reindex_axis(sorted(filtered_joined.columns), axis = 1)
+    filtered_joined_sorted.to_csv(out)
+
+
 def main():
     parser = argparse.ArgumentParser(description = 'Generate STAR mapping statistics summary table',
                                      usage = 'use "python StarUtilities.py --help" for more information',
