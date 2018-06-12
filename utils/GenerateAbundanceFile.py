@@ -38,6 +38,7 @@ def ensure_dir(relnm):
 
 model_name = ('{}_{:%Y-%m-%d_%H:%M:%S}'.format(model, datetime.datetime.now()))
 
+
 def generate_meta_file(read_dir, sample_meta_data_list, select_meta_data_list, split_hyphen = None):
     """Generate meta file from sample directory by column orientation based on IGL data formatting
 
@@ -91,24 +92,30 @@ def generate_slurm_submit_script(project_title, read_dir):
         project_title (str): Label for experiment directory and plot titles
         read_dir (str): Abs path to data directory
     """
-    log = '/'.join(read_dir.split('/')[:-3]) + '/logs'
-    submit = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
-    out_f = open(os.path.join(submit, project_title + '_analysis.submit'), 'w')
+    log_files = os.path.join(read_dir, project_title, '/logs')
+    _ = ensure_dir(log_files)
+    #log = '/'.join(read_dir.split('/')[:-3]) + '/logs'
+
+    analysis_sub = os.path.join(read_dir, project_title, '/analysis_code')
+    _ = ensure_dir(analysis_sub)
+    #submit = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
+
+    out_f = open(os.path.join(analysis_sub, project_title + '_analysis.submit'), 'w')
     cmd = """
 #!/bin/sh
 #SBATCH --ntasks=1
 #SBATCH --time=34:00:00
 #SBATCH --job-name={project_title}
 #SBATCH --mem=30000
-#SBATCH --error={log}/{project_title}.%j.AutoGenerate.stderr
-#SBATCH --output={log}/{project_title}.%j.AutoGenerate.stdout
+#SBATCH --error={log_files}/{project_title}.%j.AutoGenerate.stderr
+#SBATCH --output={log_files}/{project_title}.%j.AutoGenerate.stdout
 
 source activate Crayon
 
-Rscript {submit}/{project_title}_analysis.R
+Rscript {analysis_sub}/{project_title}_analysis.R
 """
     reformatted_cmd = textwrap.dedent(cmd).strip()
-    context = {"project_title": project_title, "log": log, "submit": submit}
+    context = {"project_title": project_title, "log_files": log_files, "analysis_sub": analysis_sub}
     out_f.write(reformatted_cmd.format(**context))
     out_f.close()
 
@@ -120,16 +127,17 @@ def launch_slurm_submit_script(project_title, read_dir):
         project_title (str): Label for experiment directory and plot titles
         read_dir (str): Abs path to data directory
     """
-    log = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
+    analysis_sub = os.path.join(read_dir, project_title, '/analysis_code')
+    #log = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
     sub_script = "{}_analysis.submit".format(project_title)
     analysis_script = "{}_analysis.R".format(project_title)
     scripts = [sub_script, analysis_script]
-    cmd = "sbatch {}/{}_analysis.submit".format(log, project_title)
+    cmd = "sbatch {}/{}_analysis.submit".format(analysis_sub, project_title)
     # Set permissions on scripts to be launched to scheduler
 
-    current_permissions = stat.S_IMODE(os.lstat(log).st_mode)
+    current_permissions = stat.S_IMODE(os.lstat(analysis_sub).st_mode)
     for s in scripts:
-        os.chmod(os.path.join(log, s), current_permissions)
+        os.chmod(os.path.join(analysis_sub, s), current_permissions)
 
     subprocess.call(cmd, shell = True)
 
@@ -170,9 +178,18 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_id, gtf_file, p
         ann_colplotme = lm_by
 
     gtf_read_dir = '/'.join(gtf_file.split('/')[:-1])
-    log = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
-    out_f = open(os.path.join(log, project_title + '_analysis.R'), 'w')
-    results = '/'.join(read_dir.split('/')[:-2]) + '/results'
+    analysis_sub = os.path.join(read_dir, project_title,'/analysis_code')
+    results = os.path.join(read_dir, project_title, '/results')
+    #log = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
+    log_files = os.path.join(read_dir, project_title, '/logs')
+
+    _ = ensure_dir(analysis_sub)
+    _ = ensure_dir(results)
+    _ = ensure_dir(log_files)
+
+    out_f = open(os.path.join(analysis_sub, project_title + '_analysis.R'), 'w')
+
+    #results = '/'.join(read_dir.split('/')[:-2]) + '/results'
     code_context = {"code_dir": code_dir, "meta_file": meta_file, "sample_id": sample_id, "tax_id": tax_id,
                     "gtf_file": gtf_file, "gtf_feature": gtf_feature, "project_title": project_title,
                     "gtf_read_dir": gtf_read_dir, "read_dir": read_dir, "read_pattern": read_pattern,
