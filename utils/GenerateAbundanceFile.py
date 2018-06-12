@@ -18,6 +18,26 @@ from operator import itemgetter
 from abundance_models import *
 
 
+def ensure_dir(relnm):
+    """ Accept relative filepath string, create it if it doesnt already exist
+        return filepath string
+
+    Args:
+        relnm (str) : Relative name/path
+
+    Returns:
+        relnm (str)
+
+    """
+
+    d = os.path.join(os.getcwd(), relnm)
+    if not os.path.exists(d):
+        os.makedirs(d)
+
+    return relnm
+
+model_name = ('{}_{:%Y-%m-%d_%H:%M:%S}'.format(model, datetime.datetime.now()))
+
 def generate_meta_file(read_dir, sample_meta_data_list, select_meta_data_list, split_hyphen = None):
     """Generate meta file from sample directory by column orientation based on IGL data formatting
 
@@ -83,7 +103,7 @@ def generate_slurm_submit_script(project_title, read_dir):
 #SBATCH --error={log}/{project_title}.%j.AutoGenerate.stderr
 #SBATCH --output={log}/{project_title}.%j.AutoGenerate.stdout
 
-source activate python2
+source activate Crayon
 
 Rscript {submit}/{project_title}_analysis.R
 """
@@ -122,7 +142,7 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_id, gtf_file, p
     """Generate QC -omics dataset Rscript
 
     Args:
-        read_dir (str): Abs path to data directory
+        read_dir (str): Abs path to out directory
         meta_file (str): Abs path to associated metafile for -omics dataset
         code_dir (str): Abs path to code directory
         tax_id (int): Taxa ID
