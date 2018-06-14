@@ -30,13 +30,10 @@ def ensure_dir(relnm):
 
     """
 
-    d = os.path.join(os.getcwd(), relnm)
-    if not os.path.exists(d):
-        os.makedirs(d)
+    if not os.path.exists(relnm):
+        os.makedirs(relnm)
 
     return relnm
-
-model_name = ('{}_{:%Y-%m-%d_%H:%M:%S}'.format(model, datetime.datetime.now()))
 
 
 def generate_meta_file(read_dir, sample_meta_data_list, select_meta_data_list, split_hyphen = None):
@@ -93,13 +90,7 @@ def generate_slurm_submit_script(project_title, read_dir):
         read_dir (str): Abs path to data directory
     """
     log_files = os.path.join(read_dir, project_title, '/logs')
-    _ = ensure_dir(log_files)
-    #log = '/'.join(read_dir.split('/')[:-3]) + '/logs'
-
     analysis_sub = os.path.join(read_dir, project_title, '/analysis_code')
-    _ = ensure_dir(analysis_sub)
-    #submit = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
-
     out_f = open(os.path.join(analysis_sub, project_title + '_analysis.submit'), 'w')
     cmd = """
 #!/bin/sh
@@ -128,7 +119,6 @@ def launch_slurm_submit_script(project_title, read_dir):
         read_dir (str): Abs path to data directory
     """
     analysis_sub = os.path.join(read_dir, project_title, '/analysis_code')
-    #log = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
     sub_script = "{}_analysis.submit".format(project_title)
     analysis_script = "{}_analysis.R".format(project_title)
     scripts = [sub_script, analysis_script]
@@ -178,10 +168,13 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_id, gtf_file, p
         ann_colplotme = lm_by
 
     gtf_read_dir = '/'.join(gtf_file.split('/')[:-1])
-    analysis_sub = os.path.join(read_dir, project_title,'/analysis_code')
-    results = os.path.join(read_dir, project_title, '/results')
-    #log = '/'.join(read_dir.split('/')[:-2]) + '/analysis_code'
-    log_files = os.path.join(read_dir, project_title, '/logs')
+    analysis_sub = os.path.join(read_dir, project_title,'analysis_code')
+    results = os.path.join(read_dir, project_title, 'results')
+    log_files = os.path.join(read_dir, project_title, 'logs')
+
+    print(analysis_sub)
+    print(results)
+    print(log_files)
 
     _ = ensure_dir(analysis_sub)
     _ = ensure_dir(results)
