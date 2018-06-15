@@ -558,7 +558,6 @@ source("{code_dir}BcorePlotting/ClusteringPlots.R")
 
 setwd("{results}")
 
-dir.create(file.path(getwd(),'{project_title}'),showWarnings=FALSE)
 oneclass = {oneclass}
 # constants
 # max data rows for hclust
@@ -644,7 +643,7 @@ names(LoM.norms) = names(STAR.data$LoM.raw)
 
 
 print("Bias reduction with normMatrix")
-dir.create(file.path(getwd(),'{project_title}/tables'),showWarnings=FALSE)
+dir.create(file.path(getwd(),'tables'),showWarnings=FALSE)
 
 for(tag in names(STAR.data$LoM.raw))
 {{
@@ -721,8 +720,8 @@ grpBy = annCol[[oneclass]]
 annCol.plotme = {ann_colplotme}
 clim.pct=0.96
 histbins=40
-dir.create(file.path(getwd(),'{project_title}/1'),showWarnings=FALSE)
-dir.create(file.path(getwd(),'{project_title}/2'),showWarnings=FALSE)
+dir.create(file.path(getwd(),'1'),showWarnings=FALSE)
+dir.create(file.path(getwd(),'2'),showWarnings=FALSE)
 
 print("Generate summary and qc.cluster plots")
 
@@ -840,7 +839,7 @@ select_lsmk = vector(mode='list',length=length(STAR.data$LoM.raw))
 names(select_lsmk) = names(STAR.data$LoM.raw)
 print("Perform qcQvalue & Generate masks")
 
-dir.create(file.path(getwd(),'{project_title}/3'),showWarnings=FALSE)
+dir.create(file.path(getwd(),'3'),showWarnings=FALSE)
 
 for( i in 1:length(mytypes))
 {{
@@ -900,7 +899,7 @@ names(ratio_lsmat) = names(STAR.data$LoM.raw)
 
 print("Perform PlotRatios")
 
-dir.create(file.path(getwd(),'{project_title}/4'),showWarnings=FALSE)
+dir.create(file.path(getwd(),'4'),showWarnings=FALSE)
 for( i in 1:length(mytypes))
 {{
   for( j in which(!mynorms %in% do.not.regress))
@@ -1462,7 +1461,7 @@ out_norm_mat = LoM.norms$gene.counts$loess[rowmask_ls${path_type}${path_norms},]
 out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtf_file}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
 out_table = out_table[!duplicated(out_table$Gene),]
 
-write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","{path_norms}","Normed_with_Ratio_and_Abundance.csv", sep="_")),quote=FALSE,sep='\t')
+write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","Normed_with_Ratio_and_Abundance.txt", sep="_")),quote=FALSE,sep='\t')
 
 print("Generate Abundance and Ratio table with associated q-value and p-values : Complete")
 
