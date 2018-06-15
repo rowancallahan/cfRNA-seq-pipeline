@@ -89,8 +89,8 @@ def generate_slurm_submit_script(project_title, read_dir):
         project_title (str): Label for experiment directory and plot titles
         read_dir (str): Abs path to data directory
     """
-    log_files = os.path.join(read_dir, project_title, '/logs')
-    analysis_sub = os.path.join(read_dir, project_title, '/analysis_code')
+    log_files = os.path.join(read_dir, '/logs')
+    analysis_sub = os.path.join(read_dir, '/analysis_code')
     out_f = open(os.path.join(analysis_sub, project_title + '_analysis.submit'), 'w')
     cmd = """
 #!/bin/sh
@@ -118,7 +118,7 @@ def launch_slurm_submit_script(project_title, read_dir):
         project_title (str): Label for experiment directory and plot titles
         read_dir (str): Abs path to data directory
     """
-    analysis_sub = os.path.join(read_dir, project_title, '/analysis_code')
+    analysis_sub = os.path.join(read_dir, '/analysis_code')
     sub_script = "{}_analysis.submit".format(project_title)
     analysis_script = "{}_analysis.R".format(project_title)
     scripts = [sub_script, analysis_script]
@@ -168,9 +168,9 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_id, gtf_file, p
         ann_colplotme = lm_by
 
     gtf_read_dir = '/'.join(gtf_file.split('/')[:-1])
-    analysis_sub = os.path.join(read_dir, project_title,'analysis_code')
-    results = os.path.join(read_dir, project_title, 'results')
-    log_files = os.path.join(read_dir, project_title, 'logs')
+    analysis_sub = os.path.join(read_dir,'analysis_code')
+    results = os.path.join(read_dir, 'results')
+    log_files = os.path.join(read_dir, 'logs')
 
     print(analysis_sub)
     print(results)
@@ -182,7 +182,6 @@ def generate_abundance_script(read_dir, meta_file, code_dir, tax_id, gtf_file, p
 
     out_f = open(os.path.join(analysis_sub, project_title + '_analysis.R'), 'w')
 
-    #results = '/'.join(read_dir.split('/')[:-2]) + '/results'
     code_context = {"code_dir": code_dir, "meta_file": meta_file, "sample_id": sample_id, "tax_id": tax_id,
                     "gtf_file": gtf_file, "gtf_feature": gtf_feature, "project_title": project_title,
                     "gtf_read_dir": gtf_read_dir, "read_dir": read_dir, "read_pattern": read_pattern,
