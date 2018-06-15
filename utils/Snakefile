@@ -1,0 +1,46 @@
+__author__ = "Joey Estabrook"
+__email__ = "estabroj@ohsu.edu"
+__license__ = "MIT"
+
+"""Computation Hub omic data processing pipeline"""
+
+configfile:"omic_config.yaml"
+
+
+def format_plot_columns():
+    factors = config['meta_columns_to_plot'].keys()
+    reformat_factors = '"' + '","'.join(factors) + '"'
+    return 'c({})'.format(reformat_factors)
+
+rule all:
+    input:
+        "analysis_code/{}_analysis.R".format(config['project_id']),
+        "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id'])
+
+rule generate_qc_qa:
+ input:
+    counts = expand("data/{project_id}.txt", project_id=config['project_id'])
+ params:
+    project_id = config["project_id"],
+    datadir = config['base_dir'],
+    meta = config["omic_meta_data"],
+    baseline = config["baseline"],
+    linear_model = config["linear_model"],
+    sample_id = config["sample_id"],
+    meta_viz = format_plot_columns(),
+ output:
+    expand("analysis_code/{project_id}_analysis.R", project_id=config['project_id'])
+
+ log:
+    "/logs"
+
+ shell:
+    "python GenerateAbundanceFile.py -d {params.datadir} -mf {params.meta} -p {params.project_id} -b {params.baseline} -lm {params.linear_model} -id '{params.sample_id}' -pl '{params.meta_viz}' -df -da {input.counts}"
+
+rule run_qc_qa:
+    input:
+        script = "analysis_code/{}_analysis.R".format(config['project_id'])
+    output:
+        "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id'])
+    shell:
+        "Rscript analysis_code/{}_analysis.R".format(config['project_id'])
