@@ -5,15 +5,24 @@
         "N" : 1,
         "partition" : "exacloud",
         "J" : "master",
-        "o" : "{config[omic_qc_results]}/{config[project_id]}/logs/slurm_master%j.out",
-        "e" : "{config[omic_qc_results]}/{config[project_id]}/logs/slurm_master%j.err",
+        "o" : "logs/slurm_master%j.out",
+        "e" : "logs/slurm_master%j.err",
         "c" : 4,
         "mem" : 45000
     },
-    "qc_qa" :
+    "generate_qc_qa" :
     {
-        "J" : "qc_qa",
-        "e" : "{config[omic_qc_results]}/{config[project_id]}/logs/slurm_master%j.err",
-        "o" : "{config[omic_qc_results]}/{config[project_id]}/logs/slurm_master%j.out"
+        "J" : "qc_qa_script_generation",
+        "e" : "logs/generate_qc_qa%j.err",
+        "o" : "logs/generate_qc_qa%j.out",
+        "c" : 1,
+        "mem" : 5000
     }
+    "run_qc_qa" :
+    {
+        "J" : "execute_qc_qa",
+        "e" : "logs/execute_qc_qa%j.err",
+        "o" : "logs/execute_qc_qa%j.out"
+    }
+
 }
