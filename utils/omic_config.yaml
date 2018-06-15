@@ -1,17 +1,13 @@
-#path to samples files, in tab delimited format, with columns sample name, path to fq1 file, path to fq2 file
 
-
-omic_counts_data:
-  /home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan_omic_qc/data/cfrna_joined_counts_samps_1-48_6-8-18.txt
 
 omic_meta_data:
   /home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan_omic_qc/PP_cohort_sample_info_log_JE.2018.06.06.txt
 
-omic_qc_results:
-  /home/users/estabroj/CEDAR/cfrna/analysis/pancan_omic_qc/results
+base_dir:
+  /home/exacloud/lustre1/CompBio/estabroj/CEDAR/practice_snakmake
 
 project_id:
-  cfrna_6_10_18
+  cfrna_joined_counts_samps_1-48_6-8-18
 
 baseline:
   HD
@@ -23,4 +19,6 @@ sample_id:
   StudyID
 
 meta_columns_to_plot:
-  Type,Notes,RNA_extraction_date
+  Type: Type
+  Notes: Notes
+  RNA_extraction_date: RNA_extraction_date
