@@ -12,7 +12,7 @@ timestamp = ('{:%Y-%m-%d_%H:%M:%S}'.format(datetime.datetime.now()))
 
 project_id = config["project_id"]
 rseqqc_env = config["rseqc_env"]
-samples = config["samples"]
+samples, = glob_wildcards("/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/")
 ext = ['r','R1.pdf','R2.pdf','xls']
 
 
@@ -32,7 +32,7 @@ rule all:
         "data/{}_counts.txt".format(config['project_id']),
         "analysis_code/{}_analysis.R".format(config['project_id']),
         "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
-        expand("rseqc/{sample}.insertion_profile.{ext}",sample=samples.split(','), ext=ext),
+        expand("rseqc/{sample}.insertion_profile.{ext}",sample=samples, ext=ext),
 
 rule insertion_profile:
     input:
@@ -96,5 +96,7 @@ rule run_qc_qa:
         script = "analysis_code/{}_analysis.R".format(config['project_id'])
     output:
         "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id'])
+    conda:
+        "envs/omic_qc_wf.yaml"
     shell:
         "Rscript analysis_code/{}_analysis.R".format(config['project_id'])
