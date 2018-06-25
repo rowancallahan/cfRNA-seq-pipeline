@@ -6,7 +6,18 @@ __license__ = "MIT"
 
 configfile:"omic_config.yaml"
 import datetime
+import sys
+
 timestamp = ('{:%Y-%m-%d_%H:%M:%S}'.format(datetime.datetime.now()))
+
+project_id = config["project_id"]
+rseqqc_env = config["rseqc_env"]
+samples = config["samples"]
+ext = ['r','R1.pdf','R2.pdf','xls']
+
+
+def message(mes):
+  sys.stderr.write("|--- " + mes + "\n")
 
 
 def format_plot_columns():
@@ -14,28 +25,29 @@ def format_plot_columns():
     reformat_factors = '"' + '","'.join(factors) + '"'
     return 'c({})'.format(reformat_factors)
 
+
 rule all:
     input:
         "results/tables/{}_STAR_mapping_statistics.txt".format(config['project_id']),
         "data/{}_counts.txt".format(config['project_id']),
         "analysis_code/{}_analysis.R".format(config['project_id']),
-        "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id'])
-
-project_id = config["project_id"]
-RSEQQC_ENV = 'source activate {config["rseqc_env"]}'.format(config=config)
+        "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
+        expand("rseqc/{sample}.insertion_profile.{ext}",sample=samples.split(','), ext=ext),
 
 rule insertion_profile:
     input:
-        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam"
+        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
     params:
-        seq_layout=config['seq_layout']
+        seq_layout=config['seq_layout'],
     output:
         "rseqc/{sample}.insertion_profile.r",
         "rseqc/{sample}.insertion_profile.R1.pdf",
         "rseqc/{sample}.insertion_profile.R2.pdf",
         "rseqc/{sample}.insertion_profile.xls",
+    conda:
+        "envs/rseqc.yaml"
     shell:
-        "{RSEQQC_ENV} insertion_profile.py -s '{params.seq_layout}' -i {input} -o {sample}"
+        "insertion_profile.py -s '{params.seq_layout}' -i {input} -o rseqc/{wildcards.sample}"
 
 rule star_statistics:
     input:
