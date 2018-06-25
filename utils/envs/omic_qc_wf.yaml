@@ -1,5 +1,6 @@
 name: omic-qc-wf
 channels:
+  - r
   - bioconda
   - conda-forge
   - defaults
@@ -138,6 +139,9 @@ dependencies:
   - sqlite=3.13.0=0
   - tk=8.5.18=0
   - xz=5.2.4=h14c3975_4
+  - r-ggplot2=2.2.1=r3.4.1_0
+  - r-reshape2=1.4.2=r3.4.1_0
+  - r-stringr=1.2.0=r3.4.1_0
   - pip:
     - cycler==0.10.0
     - dill==0.2.7.1
