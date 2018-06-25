@@ -24,5 +24,12 @@
         "e" : "logs/execute_qc_qa%j.err",
         "o" : "logs/execute_qc_qa%j.out"
     }
-
+    "insertion_profile" :
+    {
+        "J" : "insertion_profile",
+        "e" : "logs/insertion_profile%j.err",
+        "o" : "logs/insertion_profile%j.out",
+        "c" : 1,
+        "mem":5000
+    }
 }
