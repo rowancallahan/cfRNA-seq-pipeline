@@ -17,13 +17,13 @@
         "o" : "logs/generate_qc_qa%j.out",
         "c" : 1,
         "mem" : 5000
-    }
+    },
     "run_qc_qa" :
     {
         "J" : "execute_qc_qa",
         "e" : "logs/execute_qc_qa%j.err",
         "o" : "logs/execute_qc_qa%j.out"
-    }
+    },
     "insertion_profile" :
     {
         "J" : "insertion_profile",
