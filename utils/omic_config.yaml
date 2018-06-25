@@ -7,7 +7,7 @@ base_dir:
   /home/exacloud/lustre1/CompBio/estabroj/CEDAR/practice_snakmake
 
 project_id:
-  cfrna_joined_counts_samps_1-48_6-8-18
+  cfrna_6-8-18
 
 baseline:
   HD
@@ -15,10 +15,66 @@ baseline:
 linear_model:
   Type
 
+seq_layout:
+  PE
+
 sample_id:
   StudyID
+
+rseqc_env:
+  rseqc-omic-wf
 
 meta_columns_to_plot:
   Type: Type
   Notes: Notes
   RNA_extraction_date: RNA_extraction_date
+
+samples:
+  PP001
+  PP002
+  PP003
+  PP004
+  PP005
+  PP006
+  PP007
+  PP008
+  PP009
+  PP010
+  PP011
+  PP012
+  PP013
+  PP014
+  PP015
+  PP016
+  PP017
+  PP018
+  PP019
+  PP020
+  PP021
+  PP022
+  PP023
+  PP024
+  PP025
+  PP026
+  PP027
+  PP028
+  PP029
+  PP030
+  PP031
+  PP032
+  PP033
+  PP034
+  PP035
+  PP036
+  PP037
+  PP038
+  PP039
+  PP041
+  PP042
+  PP043
+  PP044
+  PP045
+  PP046
+  PP047
+  PP048
+  PP052
