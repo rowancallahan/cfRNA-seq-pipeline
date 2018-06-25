@@ -1,64 +1,45 @@
 import argparse
 import os
-import numpy as np
+import pandas as pd
 
 
-# noinspection PyTypeChecker
-def compile_final_log(star_dir, project_title):
-    """Function accepts a STAR output directory and an optional metadata file and row identifier
-    in the metadata file
+def compile_star_log(data_dir, project_title):
+    """Function accepts a STAR output directory and compiles all sample information from Log.final.out
 
     Args:
-        star_dir (str/path): Path to STAR output
+        data_dir (str/path): Path to STAR output
         project_title (str): Project title for compiled STAR mapping statistics
 
     Returns:
         Compiled STAR log.final.out as tab delimited file.
     """
 
-    sample_stats = {}
-    column_order = []
-    directories = [d for d in os.listdir(star_dir) if os.path.isdir(os.path.join(star_dir, d))]
-
-    for d in directories:
-        fh = os.path.join(star_dir, d + '/' + d + '_Log.final.out')
-        for line in open(fh):
-            if '|' in line:
-                line = line.strip().split('|')
-                line = [x.strip() for x in line]
-                if d not in sample_stats:
-                    sample_stats[d] = {}
-                if line[0] not in sample_stats[d]:
-                    sample_stats[d][line[0]] = line[1]
-                if line[0] not in column_order:
-                    column_order.append(line[0])
-            else:
-                continue
-
-    samples = sample_stats.keys()
-    mat = np.chararray((len(sample_stats), len(column_order)), itemsize = 50)
-
-    for i, e in enumerate(samples):
-        for j, m in enumerate(column_order):
-            try:
-                mat[i, j] = sample_stats[e][m]
-            except KeyError:
-                mat[i, j] = 'NA'
-
-    column_order.insert(0, 'Samples')
-    row_mat = np.column_stack((samples, mat))
-    col_mat = np.row_stack((column_order, row_mat))
-    out = "{}_STAR_mapping_statistics.txt".format(project_title)
-    np.savetxt(out, col_mat, fmt = '%s', delimiter = '\t')
+    files = [os.path.join(data_dir, d,'Log.final.out') for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d))]
+    tables = [pd.read_csv(fh, sep = '\t', index_col = 0, names = [fh.split('/')[-2]]) for fh in files]
+    joined_table = pd.concat(tables, axis=1)
+    joined_table_sorted = joined_table.reindex(sorted(joined_table.columns), axis = 1)
+    out = "results/tables/{}_STAR_mapping_statistics.txt".format(project_title)
+    joined_table_sorted.to_csv(out, sep='\t')
 
 
-def compile_counts_table(data_dir, out):
-    files = [x for x in os.listdir(data_dir) if x.endswith('_gene_count.txt')]
-    tables = [pd.read_csv(fh, sep='\t', index_col=0, names=[fh.split('_')[0]]) for fh in files]
+def compile_counts_table(data_dir, project_title):
+    """Function accepts a STAR output directory and compiles {sample}_gene_count.txt into a joined tab sep file
+
+    Args:
+        star_dir (str/path): Path to STAR output
+        project_title (str): Project title for compiled STAR gene counts table
+
+    Returns:
+        Compiled STAR gene counts table as tab delimited file.
+    """
+
+    files = [os.path.join(data_dir,x) for x in os.listdir(data_dir) if x.endswith('_gene_count.txt')]
+    tables = [pd.read_csv(fh, sep='\t', index_col=0, names=[fh.split('/')[-1].split('_')[0]]) for fh in files]
     joined_table = pd.concat(tables, axis=1)
     filtered_joined = joined_table.iloc[:-5, :]
-    filtered_joined_sorted = filtered_joined.reindex_axis(sorted(filtered_joined.columns), axis = 1)
-    filtered_joined_sorted.to_csv(out)
+    filtered_joined_sorted = filtered_joined.reindex(sorted(filtered_joined.columns), axis = 1)
+    out = "data/{}_counts.txt".format(project_title)
+    filtered_joined_sorted.to_csv(out, sep='\t')
 
 
 def main():
@@ -70,9 +51,14 @@ def main():
                            help = "Absolute path to abundance data directory i.e ../STAR/", metavar = "")
     metagroup.add_argument("-p", "--project_title", type = str, metavar = "",
                            help = """Project title associated with STAR summary table""")
-
+    metagroup.add_argument("-c", "--compile_counts",
+                           help = "Compile counts table", action = "store_true", default = False)
     args = parser.parse_args()
-    compile_final_log(args.read_dir, args.project_title)
+
+    if args.compile_counts:
+        compile_counts_table(args.read_dir, args.project_title)
+    else:
+        compile_star_log(args.read_dir, args.project_title)
 
 
 if __name__ == "__main__":
