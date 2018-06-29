@@ -13,22 +13,71 @@
     "generate_qc_qa" :
     {
         "J" : "qc_qa_script_generation",
-        "e" : "logs/generate_qc_qa%j.err",
-        "o" : "logs/generate_qc_qa%j.out",
+        "e" : "logs/generate_qc_qa_%j.err",
+        "o" : "logs/generate_qc_qa_%j.out",
         "c" : 1,
         "mem" : 5000
     },
     "run_qc_qa" :
     {
         "J" : "execute_qc_qa",
-        "e" : "logs/execute_qc_qa%j.err",
-        "o" : "logs/execute_qc_qa%j.out"
+        "e" : "logs/execute_qc_qa_%j.err",
+        "o" : "logs/execute_qc_qa_%j.out",
+        "mem" : 45000
     },
     "insertion_profile" :
     {
         "J" : "insertion_profile",
-        "e" : "logs/insertion_profile%j.err",
-        "o" : "logs/insertion_profile%j.out",
+        "e" : "logs/insertion_profile_%j.err",
+        "o" : "logs/insertion_profile_%j.out",
+        "c" : 1,
+        "mem":10000
+    },
+    "inner_distance" :
+    {
+        "J" : "inner_distance",
+        "e" : "logs/inner_distance_%j.err",
+        "o" : "logs/inner_distance_%j.out",
+        "c" : 1,
+        "mem":10000
+    },
+    "clipping_profile" :
+    {
+        "J" : "clipping_profile",
+        "e" : "logs/clipping_profile_%j.err",
+        "o" : "logs/clipping_profile_%j.out",
+        "c" : 1,
+        "mem":10000
+    },
+    "read_distribution" :
+    {
+        "J" : "read_distribution",
+        "e" : "logs/read_distribution_%j.err",
+        "o" : "logs/read_distribution_%j.out",
+        "c" : 1,
+        "mem":10000
+    },
+    "read_GC" :
+    {
+        "J" : "read_GC",
+        "e" : "logs/read_GC_%j.err",
+        "o" : "logs/read_GC_%j.out",
+        "c" : 1,
+        "mem":10000
+    },
+    "star_statistics" :
+    {
+        "J" : "star_statistics",
+        "e" : "logs/star_statistics_%j.err",
+        "o" : "logs/star_statistics_%j.out",
+        "c" : 1,
+        "mem":5000
+    },
+    "compile_counts" :
+    {
+        "J" : "compile_counts",
+        "e" : "logs/compile_counts_%j.err",
+        "o" : "logs/compile_counts_%j.out",
         "c" : 1,
         "mem":5000
     }
