@@ -649,11 +649,11 @@ for(tag in names(STAR.data$LoM.raw))
 {{
   if( length(STAR.data$LoM.raw[[tag]])>1 )
   {{
-    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[myreads]],fileData_ls=list(fileDir='{project_title}/tables/',fileBase='{project_title}'))
+    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[myreads]],fileData_ls=list(fileDir='./tables/',fileBase='{project_title}'))
   }}
   else
   {{
-    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[1]],fileData_ls=list(fileDir='{project_title}/tables/',fileBase='{project_title}'))
+    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[1]],fileData_ls=list(fileDir='./tables/',fileBase='{project_title}'))
   }}
 }}
 
@@ -743,8 +743,10 @@ for(i in 1:length(mytypes))
 
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
     colnames(rawmat)=samp.labels; colnames(normmat)=samp.labels
-    plotdata = list(plotdir='./{project_title}/1',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./1',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
     rowmask = rowSums(rawmat>1,na.rm=T) > (ncol(rawmat)/length(unique(grpBy)) ) & rowSums(is.na(normmat)) < (ncol(normmat)/length(unique(grpBy)))
+    # Too stringent of a rowmask for CFRNA project
+    # rowmask = rowSums(rawmat>1,na.rm=T) > (ncol(rawmat)/length(unique(grpBy))) 
 
     if(sum(rowmask)>hclust.limit)
     {{
@@ -752,7 +754,7 @@ for(i in 1:length(mytypes))
     }}
 
     ans = summary.plots(rawmat=log2(rawmat +1), normmat=normmat, mynorm=mynorms[j], samp.labels=samp.labels, samp.classes=grpBy, plotdata=plotdata,plot2file=TRUE,histbins=histbins, colorspec=colors.rgb)
-    plotdata = list(plotdir='./{project_title}/2',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./2',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
     ans = qc.clusters(rawmat=log2(rawmat[rowmask,] +1), normmat=normmat[rowmask,], attribs=annCol[annCol.plotme], oneclass=oneclass, colorspec=colors.rgb, plotdata=plotdata, plot2file=TRUE, clim.pct=clim.pct)
   }}
 }}
@@ -794,12 +796,14 @@ for(i in 1:length(mytypes))
     tmp = unlist(lapply(contr_ls,function(x){{x$baseline}}))
     tmp=paste(names(tmp),tmp,sep=".")
 
-    plotdata = list(plotdir='./{project_title}/3/',plotbase=paste(mynorms[j],mytypes[i],'vs',tmp,sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./3/',plotbase=paste(mynorms[j],mytypes[i],'vs',tmp,sep='.'),plottitle=proj.title)
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
     colnames(rawmat)=samp.labels; colnames(normmat)=samp.labels
 
     # prepare rowmask for heatmap/MDS (remove non-expr or low expr>hclustlim)
     rowmask = rowSums(rawmat>1,na.rm=T) > (ncol(rawmat)/length(unique(grpBy)) ) & rowSums(is.na(normmat)) <= na.lim
+    # Too stringent of a rowmask for CFRNA project
+
     rowmask_ls[[ mytypes[i] ]][[ mynorms[j] ]] = rowmask # save for later
 
     # regression
@@ -812,7 +816,7 @@ print("RegressMatrix with specified contrasts : Complete")
 
 save.image("./{project_title}.RData")
 
-topn=500 # number with which to play
+topn=50 # number with which to play
 
 for( i in 1:length(mytypes))
 {{
@@ -854,7 +858,7 @@ for( i in 1:length(mytypes))
     tmp = unlist(lapply(contr_ls,function(x){{x$baseline}}))
     tmp = paste(names(tmp),tmp,sep=".")
 
-    plotdata = list(plotdir='./{project_title}/3',plotbase=paste(mynorms[j],mytypes[i],tmp,sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./3',plotbase=paste(mynorms[j],mytypes[i],tmp,sep='.'),plottitle=proj.title)
 
     ##for(fac in names(reg_ls$q_list)[grep(lm_by,names(reg_ls$q_list))])
 
@@ -883,7 +887,7 @@ save.image("./{project_title}.RData")
 # Plot heatmaps and MDS plots based on selected genes and designed ratios
 
 
-ngene_v = c(200,500,1000) # q-value cuts by number; can also cut by q-value
+ngene_v = c(50,100,200) # q-value cuts by number; can also cut by q-value
 ratioby_ls = list("{lm_by}"=contr_ls${lm_by}$baseline)
 ratio_fold = 1.3
 intensity_fold = 2
@@ -926,7 +930,7 @@ for( i in 1:length(mytypes))
     mymask= rowmask_ls[[mytypes[i]]][[mynorms[j]]]
     reg_ls = regress_lsls[[mytypes[i]]][[mynorms[j]]]$q_list
     reg_ls = reg_ls[!grepl('Intercept',names(reg_ls))]
-    plotdata = list(plotdir='./{project_title}/4',plotbase=paste(mynorms[j],sub('counts','ratios',mytypes[i]),'minratio',paste0(ratio_fold,'x'),'minexpr',round(min(normmat,na.rm=T)+log2(intensity_fold),1),sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./4',plotbase=paste(mynorms[j],sub('counts','ratios',mytypes[i]),'minratio',paste0(ratio_fold,'x'),'minexpr',round(min(normmat,na.rm=T)+log2(intensity_fold),1),sep='.'),plottitle=proj.title)
 
     for(fac in names(reg_ls))
     {{
@@ -974,7 +978,7 @@ out_norm_mat = LoM.norms$gene.counts$loess[rowmask_ls${path_type}${path_norms},]
 out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtf_file}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
 out_table = out_table[!duplicated(out_table$Gene),]
 
-write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","{path_norms}","Normed_with_Ratio_and_Abundance.csv", sep="_")),quote=FALSE,sep='\t')
+write.table(out_table, row.names = FALSE, file=file.path(getwd(), './tables', paste("{project_title}","Normed_with_Ratio_and_Abundance.csv", sep="_")),quote=FALSE,sep='\t')
 
 print("Generate Abundance and Ratio table with associated q-value and p-values : Complete")
 
@@ -1125,11 +1129,11 @@ for(tag in names(STAR.data$LoM.raw))
 {{
   if( length(STAR.data$LoM.raw[[tag]])>1 )
   {{
-    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[myreads]],fileData_ls=list(fileDir='{project_title}/tables/',fileBase='{project_title}'),logged_B=logged_B)
+    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[myreads]],fileData_ls=list(fileDir='./tables/',fileBase='{project_title}'),logged_B=logged_B)
   }}
   else
   {{
-    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[1]],fileData_ls=list(fileDir='{project_title}/tables/',fileBase='{project_title}'), logged_B=logged_B)
+    LoM.norms[[tag]] = normMatrix(tag=tag,raw.mat=STAR.data$LoM.raw[[tag]][[1]],fileData_ls=list(fileDir='./tables/',fileBase='{project_title}'), logged_B=logged_B)
   }}
 }}
 
@@ -1225,7 +1229,7 @@ for(i in 1:length(mytypes))
 
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
     colnames(rawmat)=samp.labels; colnames(normmat)=samp.labels
-    plotdata = list(plotdir='./{project_title}/1',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./1',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
     rowmask = rowSums(rawmat>1,na.rm=T) > (ncol(rawmat)/length(unique(grpBy)) ) & rowSums(is.na(normmat)) < (ncol(normmat)/length(unique(grpBy)))
 
     if(sum(rowmask)>hclust.limit)
@@ -1234,7 +1238,7 @@ for(i in 1:length(mytypes))
     }}
 
     ans = summary.plots(rawmat=log2(rawmat +1), normmat=normmat, mynorm=mynorms[j], samp.labels=samp.labels, samp.classes=grpBy, plotdata=plotdata,plot2file=TRUE,histbins=histbins, colorspec=colors.rgb)
-    plotdata = list(plotdir='./{project_title}/2',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./2',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
     ans = qc.clusters(rawmat=log2(rawmat[rowmask,] +1), normmat=normmat[rowmask,], attribs=annCol[annCol.plotme], oneclass=oneclass, colorspec=colors.rgb, plotdata=plotdata, plot2file=TRUE, clim.pct=clim.pct)
   }}
 }}
@@ -1276,7 +1280,7 @@ for(i in 1:length(mytypes))
     tmp = unlist(lapply(contr_ls,function(x){{x$baseline}}))
     tmp=paste(names(tmp),tmp,sep=".")
 
-    plotdata = list(plotdir='./{project_title}/3/',plotbase=paste(mynorms[j],mytypes[i],'vs',tmp,sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./3/',plotbase=paste(mynorms[j],mytypes[i],'vs',tmp,sep='.'),plottitle=proj.title)
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
     colnames(rawmat)=samp.labels; colnames(normmat)=samp.labels
 
@@ -1336,7 +1340,7 @@ for( i in 1:length(mytypes))
     tmp = unlist(lapply(contr_ls,function(x){{x$baseline}}))
     tmp = paste(names(tmp),tmp,sep=".")
 
-    plotdata = list(plotdir='./{project_title}/3',plotbase=paste(mynorms[j],mytypes[i],tmp,sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./3',plotbase=paste(mynorms[j],mytypes[i],tmp,sep='.'),plottitle=proj.title)
 
     ##for(fac in names(reg_ls$q_list)[grep(lm_by,names(reg_ls$q_list))])
 
@@ -1413,7 +1417,7 @@ for( i in 1:length(mytypes))
     mymask= rowmask_ls[[mytypes[i]]][[mynorms[j]]]
     reg_ls = regress_lsls[[mytypes[i]]][[mynorms[j]]]$q_list
     reg_ls = reg_ls[!grepl('Intercept',names(reg_ls))]
-    plotdata = list(plotdir='./{project_title}/4',plotbase=paste(mynorms[j],sub('counts','ratios',mytypes[i]),'minratio',paste0(ratio_fold,'x'),'minexpr',round(min(normmat,na.rm=T)+log2(intensity_fold),1),sep='.'),plottitle=proj.title)
+    plotdata = list(plotdir='./4',plotbase=paste(mynorms[j],sub('counts','ratios',mytypes[i]),'minratio',paste0(ratio_fold,'x'),'minexpr',round(min(normmat,na.rm=T)+log2(intensity_fold),1),sep='.'),plottitle=proj.title)
 
     for(fac in names(reg_ls))
     {{
@@ -1461,7 +1465,7 @@ out_norm_mat = LoM.norms$gene.counts$loess[rowmask_ls${path_type}${path_norms},]
 out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtf_file}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
 out_table = out_table[!duplicated(out_table$Gene),]
 
-write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","Normed_with_Ratio_and_Abundance.txt", sep="_")),quote=FALSE,sep='\t')
+write.table(out_table, row.names = FALSE, file=file.path(getwd(), './tables', paste("{project_title}","Normed_with_Ratio_and_Abundance.txt", sep="_")),quote=FALSE,sep='\t')
 
 print("Generate Abundance and Ratio table with associated q-value and p-values : Complete")
 
