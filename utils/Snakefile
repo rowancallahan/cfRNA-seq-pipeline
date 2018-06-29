@@ -14,6 +14,14 @@ project_id = config["project_id"]
 rseqqc_env = config["rseqc_env"]
 samples, = glob_wildcards("/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/")
 ext = ['r','R1.pdf','R2.pdf','xls']
+insertion_prof_ext = ['r','R1.pdf','R2.pdf','xls']
+inner_distance_ext = ['_freq.txt','_plot.pdf','_plot.r','.txt']
+clipping_prof_ext = ['r','R1.pdf','R2.pdf','xls']
+read_dist_ext = ['txt']
+read_gc_ext = ['.xls','_plot.r','_plot.pdf']
+
+rseq_func=['insertion_profile','read_distribution','clipping_profile']
+rseq_dir=['insertion_profile','read_distribution','clipping_profile']
 
 
 def message(mes):
@@ -32,7 +40,11 @@ rule all:
         "data/{}_counts.txt".format(config['project_id']),
         "analysis_code/{}_analysis.R".format(config['project_id']),
         "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
-        expand("rseqc/{sample}.insertion_profile.{ext}",sample=samples, ext=ext),
+        expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=samples, ext=insertion_prof_ext),
+        expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = samples, ext = inner_distance_ext),
+        expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = samples, ext = clipping_prof_ext),
+        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = samples, ext = read_dist_ext),
+        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = samples, ext = read_gc_ext)
 
 rule insertion_profile:
     input:
@@ -40,14 +52,74 @@ rule insertion_profile:
     params:
         seq_layout=config['seq_layout'],
     output:
-        "rseqc/{sample}.insertion_profile.r",
-        "rseqc/{sample}.insertion_profile.R1.pdf",
-        "rseqc/{sample}.insertion_profile.R2.pdf",
-        "rseqc/{sample}.insertion_profile.xls",
+        "rseqc/insertion_profile/{sample}/{sample}.insertion_profile.r",
+        "rseqc/insertion_profile/{sample}/{sample}.insertion_profile.R1.pdf",
+        "rseqc/insertion_profile/{sample}/{sample}.insertion_profile.R2.pdf",
+        "rseqc/insertion_profile/{sample}/{sample}.insertion_profile.xls",
     conda:
         "envs/rseqc.yaml"
     shell:
-        "insertion_profile.py -s '{params.seq_layout}' -i {input} -o rseqc/{wildcards.sample}"
+        "insertion_profile.py -s '{params.seq_layout}' -i {input} -o rseqc/insertion_profile/{wildcards.sample}/{wildcards.sample}"
+
+
+rule inner_distance:
+    input:
+        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+    params:
+        bed=config['bed_file']
+    output:
+        "rseqc/inner_distance/{sample}/{sample}.inner_distance.txt",
+        "rseqc/inner_distance/{sample}/{sample}.inner_distance_plot.r",
+        "rseqc/inner_distance/{sample}/{sample}.inner_distance_plot.pdf",
+        "rseqc/inner_distance/{sample}/{sample}.inner_distance_freq.txt",
+    conda:
+        "envs/rseqc.yaml"
+    shell:
+        "inner_distance.py -i {input} -o rseqc/inner_distance/{wildcards.sample}/{wildcards.sample} -r {params.bed}"
+
+
+rule clipping_profile:
+    input:
+        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+    params:
+        seq_layout=config['seq_layout'],
+    output:
+        "rseqc/clipping_profile/{sample}/{sample}.clipping_profile.r",
+        "rseqc/clipping_profile/{sample}/{sample}.clipping_profile.R1.pdf",
+        "rseqc/clipping_profile/{sample}/{sample}.clipping_profile.R2.pdf",
+        "rseqc/clipping_profile/{sample}/{sample}.clipping_profile.xls",
+    conda:
+        "envs/rseqc.yaml"
+    shell:
+        "clipping_profile.py -i {input} -s '{params.seq_layout}' -o rseqc/clipping_profile/{wildcards.sample}/{wildcards.sample}"
+
+
+rule read_distribution:
+    input:
+        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+    params:
+        bed=config['bed_file']
+    output:
+        "rseqc/read_distribution/{sample}/{sample}.read_distribution.txt",
+    conda:
+        "envs/rseqc.yaml"
+    shell:
+        "read_distribution.py -i {input} -r {params.bed} > {output}"
+
+
+rule read_GC:
+    input:
+        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+    output:
+        "rseqc/read_GC/{sample}/{sample}.GC.xls",
+        "rseqc/read_GC/{sample}/{sample}.GC_plot.r",
+        "rseqc/read_GC/{sample}/{sample}.GC_plot.pdf",
+    conda:
+        "envs/rseqc.yaml"
+    shell:
+        "read_GC.py -i {input} -o rseqc/read_GC/{wildcards.sample}/{wildcards.sample}"
+
+
 
 rule star_statistics:
     input:
@@ -81,15 +153,16 @@ rule generate_qc_qa:
     baseline = config["baseline"],
     linear_model = config["linear_model"],
     sample_id = config["sample_id"],
+    gtf_file = config["gtf_file"],
     meta_viz = format_plot_columns(),
  output:
-    expand("analysis_code/{project_id}_analysis.R", project_id=config['project_id'])
+    "analysis_code/{project_id}_analysis.R".format(project_id=config['project_id'])
 
  log:
     "/logs"
 
  shell:
-    "python GenerateAbundanceFile.py -d {params.datadir} -mf {params.meta} -p {params.project_id} -b {params.baseline} -lm {params.linear_model} -id '{params.sample_id}' -pl '{params.meta_viz}' -df -da {input.counts}"
+    "python GenerateAbundanceFile.py -d {params.datadir} -mf {params.meta} -p {params.project_id} -b {params.baseline} -lm {params.linear_model} -id '{params.sample_id}' -pl '{params.meta_viz}' -g '{params.gtf_file}' -df -da {input.counts}"
 
 rule run_qc_qa:
     input:
