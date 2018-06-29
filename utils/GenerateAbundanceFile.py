@@ -325,8 +325,7 @@ tax_id can be found www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.c
                             type = str,
                             metavar = '',
                             help = "Absolute path to gtf used for alignment",
-                            default = """
-/home/exacloud/lustre1/BioCoders/DataResources/Genomes/hg19/release-75/gtf/Homo_sapiens.GRCh37.75.gtf""")
+                            default = """/home/exacloud/lustre1/BioCoders/DataResources/Genomes/hg19/release-75/gtf/Homo_sapiens.GRCh37.75.gtf""")
     optabundancegroup.add_argument("-lb", "--logged_B",
                             type = str,
                             metavar='',
