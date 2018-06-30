@@ -13,6 +13,9 @@ timestamp = ('{:%Y-%m-%d_%H:%M:%S}'.format(datetime.datetime.now()))
 project_id = config["project_id"]
 rseqqc_env = config["rseqc_env"]
 samples, = glob_wildcards("/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/")
+
+#TODO Remove abspath for glob_wildcards function
+
 ext = ['r','R1.pdf','R2.pdf','xls']
 insertion_prof_ext = ['r','R1.pdf','R2.pdf','xls']
 inner_distance_ext = ['_freq.txt','_plot.pdf','_plot.r','.txt']
@@ -173,3 +176,59 @@ rule run_qc_qa:
         "envs/omic_qc_wf.yaml"
     shell:
         "Rscript analysis_code/{}_analysis.R".format(config['project_id'])
+
+
+rule deseq2_init:
+    input:
+        counts="data/{project_id}_counts.txt".format(project_id = project_id)
+    output:
+        "deseq2/{project_id}_all.rds".format(project_id=project_id)
+    params:
+        samples=config["samples"],
+        design=config["pca"]["labels"],
+        row_names=config["sample_id"]
+    conda:
+        "envs/deseq2.yaml"
+    log:
+        "logs/deseq2/init.log"
+    threads: 6
+    shell:
+        "Rscript ./scripts/deseq2-init.R {threads} {input.counts} {params.samples} {output} {params.design} {params.row_names}"
+
+
+rule pca:
+    input:
+        "deseq2/{project_id}_all.rds".format(project_id=project_id)
+    output:
+        pca="results/deseq2/pca.svg",
+        rds="results/deseq2/rlog_dds.rds"
+
+    params:
+        pca_labels=config["pca"]["labels"]
+    conda:
+        "envs/deseq2.yaml"
+    log:
+        "logs/pca.log"
+    shell:
+        "Rscript ./scripts/plot-pca.R {input} {output.pca} {output.rds}"
+
+
+def get_contrast(wildcards):
+    """Return each contrast provided in the configuration file"""
+    return config["diffexp"]["contrasts"][wildcards.contrast]
+
+rule deseq2:
+    input:
+        "deseq2/{project_id}_all.rds".format(project_id=project_id)
+    output:
+        table="results/diffexp/{contrast}.diffexp.tsv",
+        ma_plot="results/diffexp/{contrast}.ma-plot.svg",
+    params:
+        contrast=get_contrast
+    conda:
+        "envs/deseq2.yaml"
+    log:
+        "logs/deseq2/{contrast}.diffexp.log"
+    threads: 6
+    shell:
+        "Rscript ./scripts/deseq2.R"
