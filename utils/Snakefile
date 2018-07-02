@@ -208,7 +208,7 @@ rule pca:
     conda:
         "envs/deseq2.yaml"
     log:
-        "logs/pca.log"
+        "logs/pca/pca.log"
     shell:
         "Rscript ./scripts/plot-pca.R {input} {output.pca} {output.rds}"
 
