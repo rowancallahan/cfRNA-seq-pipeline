@@ -11,6 +11,7 @@
 # Started - July, 2016
 #####################################################################################################
 library(ggplot2)
+library(RcolorBrewer)
 
 gene_pcaplot <-
 function(exprdat,sampleid,groupdat=NULL,colorfactor=NULL,shapefactor=NULL, plot_sampleids=TRUE, pcnum=1:2, plottitle = "PCA Plot") {
@@ -520,6 +521,7 @@ function (ratiomat, attribs, plottitle, subtitle=NULL, normmat=NULL,
 
   return(ah_ls)
 }
+
 getCidFromHeatmap <-
 function(aheatmapObj, numSubTrees, cutByRowLogic=T){
   #' Return a list of cluster IDs and elements of dendrogram in left-right order
