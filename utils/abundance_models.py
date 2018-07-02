@@ -529,7 +529,7 @@ out_norm_mat = LoM.norms$gene.counts$loess[rowmask_ls${path_type}${path_norms},]
 out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtf_file}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
 out_table = out_table[!duplicated(out_table$Gene),]
 
-write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","{path_norms}","Normed_with_Ratio_and_Abundance.csv", sep="_")),quote=FALSE,sep='\t')
+write.table(out_table, row.names = FALSE, file=file.path(getwd(), './{project_title}/tables', paste("{project_title}","{path_norms}","Normed_with_Ratio_and_Abundance.txt", sep="_")),quote=FALSE,sep='\t')
 
 print("Generate Abundance and Ratio table with associated q-value and p-values : Complete")
 
@@ -978,7 +978,7 @@ out_norm_mat = LoM.norms$gene.counts$loess[rowmask_ls${path_type}${path_norms},]
 out_table = outputTable(normmat= out_norm_mat, gtf.file = "{gtf_file}",ratiomat = ratio_lsmat${path_type}${path_norms}, q_list=reg_ls$q_list, gtf.Rdir=genome.func, gtf.key='transcript')
 out_table = out_table[!duplicated(out_table$Gene),]
 
-write.table(out_table, row.names = FALSE, file=file.path(getwd(), './tables', paste("{project_title}","Normed_with_Ratio_and_Abundance.csv", sep="_")),quote=FALSE,sep='\t')
+write.table(out_table, row.names = FALSE, file=file.path(getwd(), './tables', paste("{project_title}","Normed_with_Ratio_and_Abundance.txt", sep="_")),quote=FALSE,sep='\t')
 
 print("Generate Abundance and Ratio table with associated q-value and p-values : Complete")
 
