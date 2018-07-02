@@ -314,7 +314,7 @@ Project title associated with abundance dataset.(Will be incorporated into base 
                             type = str,
                             metavar = '',
                             help = "Absolute path to code directory i.e. ProjectDirectory/code/",
-                            default = "/home/users/estabroj/scratch/CEDAR/new_repo/")
+                            default = "/home/users/estabroj/scratch/CEDAR/Omics-QC-pipeline/")
     optabundancegroup.add_argument("-t", "--tax_id",
                             type = str,
                             metavar = '',
