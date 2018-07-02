@@ -13,7 +13,7 @@ bed_file:
   /home/exacloud/lustre1/CompBio/estabroj/CEDAR/practice_snakmake/gencode_v27.bed
 
 project_id:
-  test_rseqc
+  CFRNA_7_2_18
 
 baseline:
   HD
