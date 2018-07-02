@@ -7,6 +7,7 @@ __license__ = "MIT"
 configfile:"omic_config.yaml"
 import datetime
 import sys
+import os
 
 timestamp = ('{:%Y-%m-%d_%H:%M:%S}'.format(datetime.datetime.now()))
 
@@ -26,6 +27,13 @@ read_gc_ext = ['.xls','_plot.r','_plot.pdf']
 rseq_func=['insertion_profile','read_distribution','clipping_profile']
 rseq_dir=['insertion_profile','read_distribution','clipping_profile']
 
+
+rule_dirs = ['insertion_profile','inner_distance','clipping_profile','read_GC','star_statistics','compile_counts','generate_qc_qa','run_qc_qa','star_statistics','deseq2']
+for rule in rule_dirs:
+    if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
+        log_out = os.path.join(os.getcwd(), 'logs', rule)
+        os.makedirs(log_out)
+        print(log_out)
 
 def message(mes):
   sys.stderr.write("|--- " + mes + "\n")
@@ -49,6 +57,7 @@ rule all:
         expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = samples, ext = read_dist_ext),
         expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = samples, ext = read_gc_ext)
 
+
 rule insertion_profile:
     input:
         "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
@@ -63,7 +72,6 @@ rule insertion_profile:
         "envs/rseqc.yaml"
     shell:
         "insertion_profile.py -s '{params.seq_layout}' -i {input} -o rseqc/insertion_profile/{wildcards.sample}/{wildcards.sample}"
-
 
 rule inner_distance:
     input:
@@ -109,7 +117,6 @@ rule read_distribution:
     shell:
         "read_distribution.py -i {input} -r {params.bed} > {output}"
 
-
 rule read_GC:
     input:
         "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
@@ -122,8 +129,6 @@ rule read_GC:
     shell:
         "read_GC.py -i {input} -o rseqc/read_GC/{wildcards.sample}/{wildcards.sample}"
 
-
-
 rule star_statistics:
     input:
         dir="/home/users/estabroj/CEDAR/cfrna/analysis/pancan/genecounts_rmdp"
@@ -133,6 +138,8 @@ rule star_statistics:
         "results/tables/{}_STAR_mapping_statistics.txt".format(config['project_id'])
     message:
         "Executing star_statistics on {timestamp}"
+    log:
+        "logs/star_statistics/"
     shell:
         "python StarUtilities.py -d {input.dir} -p {params.project_id}"
 
@@ -160,9 +167,8 @@ rule generate_qc_qa:
     meta_viz = format_plot_columns(),
  output:
     "analysis_code/{project_id}_analysis.R".format(project_id=config['project_id'])
-
  log:
-    "/logs"
+    "logs/generate_qc_qa/"
 
  shell:
     "python GenerateAbundanceFile.py -d {params.datadir} -mf {params.meta} -p {params.project_id} -b {params.baseline} -lm {params.linear_model} -id '{params.sample_id}' -pl '{params.meta_viz}' -g '{params.gtf_file}' -df -da {input.counts}"
@@ -174,6 +180,8 @@ rule run_qc_qa:
         "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id'])
     conda:
         "envs/omic_qc_wf.yaml"
+    log:
+        "logs/run_qc_qa/"
     shell:
         "Rscript analysis_code/{}_analysis.R".format(config['project_id'])
 
@@ -182,7 +190,7 @@ rule deseq2_init:
     input:
         counts="data/{project_id}_counts.txt".format(project_id = project_id)
     output:
-        "deseq2/{project_id}_all.rds".format(project_id=project_id)
+        "results/deseq2/{project_id}_all.rds".format(project_id=project_id)
     params:
         samples=config["samples"],
         design=config["pca"]["labels"],
@@ -208,7 +216,7 @@ rule pca:
     conda:
         "envs/deseq2.yaml"
     log:
-        "logs/pca/pca.log"
+        "logs/deseq2/pca.log"
     shell:
         "Rscript ./scripts/plot-pca.R {input} {output.pca} {output.rds}"
 
