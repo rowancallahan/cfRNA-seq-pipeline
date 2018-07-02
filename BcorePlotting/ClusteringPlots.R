@@ -389,6 +389,36 @@ setColSpecs <- function(ratiomat, attribs, setCol_v=NULL, colOrder_v=NULL, labco
   } # fi
 } # setColSpecs
 
+uni_qual_colors <- function(attribs, pal = 'Set1'){
+    #' @description
+	#' This function expands qualitative ColorBrewer palettes to accommodate datasets which large
+	#' number of factors that cannot be represented by a single ColorBrewer palette.
+    #' @param attribs list of sample classifications to be tracked in clustering
+    #'    each list element contains a string vector with one label per sample
+    #'    set to NA to omit
+	colourCount = 0
+
+	`%+=%` = function(e1,e2) eval.parent(substitute(e1 <- e1 + e2))
+
+	for(i in names(annCol[annCol.plotme])){
+	colourCount %+=% length(unique(annCol[i][[1]]))[[1]]; colourCount}
+
+	getPalette = colorRampPalette(brewer.pal(9, pal))
+
+	ann_color_palette = getPalette(colourCount)
+	subcolors = ann_color_palette
+	annColors = list()
+
+	for(i in names(attribs)){
+		icolors = subcolors[1:length(unique(attribs[i][[1]]))[[1]]]
+		names(icolors) = unique(attribs[i][[1]])
+		annColors[i]=list(icolors)
+		subcolors=subcolors[-(1:length(unique(attribs[i][[1]])))]
+		}
+	return(annColors)
+}
+
+
 makeHeatmap <-
 function (ratiomat, attribs, plottitle, subtitle=NULL, normmat=NULL,
                         clim.pct=.99, clim_fix=NULL, colorbrew="-PiYG:64", 
@@ -429,14 +459,9 @@ function (ratiomat, attribs, plottitle, subtitle=NULL, normmat=NULL,
   require(NMF)
   colSpecs_lsv <- setColSpecs(ratiomat = ratiomat, attribs = attribs, setCol_v = setCol_v, colOrder_v = colOrder_v)
   ratiomat = colSpecs_lsv$ratiomat
-  
-  # # set column labels
-  # if( any(grepl("colnames",labcoltype,ignore.case=T)) ){
-  #   labCol = colnames(ratiomat)
-  # } else {
-  #   labCol = 1:ncol(ratiomat)
-  # }
-  # 
+
+  annColors = uni_qual_colors(attribs)
+
   # set row labels
   if(!is.null(labRowType)) {
     if (length(labRowType) == nrow(ratiomat)) {
@@ -446,37 +471,7 @@ function (ratiomat, attribs, plottitle, subtitle=NULL, normmat=NULL,
       labRow = rownames(ratiomat)
     }
   } else { labRow = NULL }
-  # 
-  # if( any(grepl("colnames",labcoltype,ignore.case=T)) ){
-  #   labCol = colnames(ratiomat)
-  # } else {
-  #   labCol = 1:ncol(ratiomat)
-  # }
-  # 
-  # # Sort matrix columns by attribs
-  # if (!is.null(setColv)){
-  #   # Get column indeces and combine with ordering attribute
-  #   colIndex = 1:ncol(ratiomat)
-  #   temp_dt = as.data.table(cbind(colIndex, attribs[[setColv]]))
-  #   # Sort by ordering attribute
-  #   if (is.null(colOrder_v)){
-  #     # Simple alphabetical
-  #     setkey(temp_dt, "V2")
-  #   } else {
-  #     # Specific order
-  #     temp_dt <- temp_dt[order(match(`V2`, colOrder_v))]
-  #   }
-  #   
-  #   # Assign variable to pass to Colv in aheatmap function call, also reorder attribs and ratiomat to correspond
-  #   colOut = as.numeric(temp_dt$colIndex)
-  #   attribs[[setColv]] <- temp_dt$V2
-  #   ratiomat = ratiomat[,colnames(ratiomat)[colOut]]
-  #   setColv = NA # Turns off ordering in aheatmap call, which is what we want b/c we ordered mat appropriately
-  #   rm(temp_dt)
-  # } else {
-  #   setColv = NULL
-  # }
-  
+
   # calculate the number of colors in each half vector
   if(length(colorbrew)>1){ # color vector given
     halfbreak = length(colorbrew)/2
