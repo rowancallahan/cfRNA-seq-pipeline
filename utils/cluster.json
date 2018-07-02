@@ -20,9 +20,9 @@
     },
     "run_qc_qa" :
     {
-        "J" : "execute_qc_qa",
-        "e" : "logs/execute_qc_qa/execute_qc_qa_%j.err",
-        "o" : "logs/execute_qc_qa/execute_qc_qa_%j.out",
+        "J" : "run_qc_qa",
+        "e" : "logs/run_qc_qa/run_qc_qa_%j.err",
+        "o" : "logs/run_qc_qa/run_qc_qa_%j.out",
         "mem" : 45000
     },
     "insertion_profile" :
@@ -100,7 +100,7 @@
     {
         "J" : "deseq2",
         "e" : "logs/deseq2/deseq2_%j.err",
-        "o" : "logs/deseq2/deseq2_%j.out",
+        "o" : "logs/deseq2deseq2_%j.out",
         "c" : 6,
         "mem":40000
     }
