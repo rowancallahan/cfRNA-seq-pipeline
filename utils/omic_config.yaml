@@ -12,6 +12,9 @@ gtf_file:
 bed_file:
   /home/exacloud/lustre1/CompBio/estabroj/CEDAR/practice_snakmake/gencode_v27.bed
 
+fastq_dir:
+  /home/exacloud/lustre1/CEDAR/cfrna/data/LIB180515JW
+
 project_id:
   CFRNA_7_2_18
 
