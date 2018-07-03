@@ -459,7 +459,7 @@ function (ratiomat, attribs, plottitle, subtitle=NULL, normmat=NULL,
 
   # imports
   require(NMF)
-  require(RcolorBrewer)
+  require(RColorBrewer)
   colSpecs_lsv <- setColSpecs(ratiomat = ratiomat, attribs = attribs, setCol_v = setCol_v, colOrder_v = colOrder_v)
   ratiomat = colSpecs_lsv$ratiomat
 
