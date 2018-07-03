@@ -540,6 +540,7 @@ save.image("./{project_title}.RData")
 qc_matrix_model = """
 require(data.table)
 require(NMF)
+require(RColorBrewer)
 require(affy)
 require(limma)
 require(biomaRt)
