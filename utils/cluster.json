@@ -100,8 +100,17 @@
     {
         "J" : "deseq2",
         "e" : "logs/deseq2/deseq2_%j.err",
-        "o" : "logs/deseq2deseq2_%j.out",
+        "o" : "logs/deseq2/deseq2_%j.out",
+        "c" : 6,
+        "mem":40000
+    },
+    "fastqc" :
+    {
+        "J" : "fastqc",
+        "e" : "logs/fastqc/fastqc_%j.err",
+        "o" : "logs/fastqc/fastqc_%j.out",
         "c" : 6,
         "mem":40000
     }
+
 }
