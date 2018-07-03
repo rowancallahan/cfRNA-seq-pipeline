@@ -28,7 +28,7 @@ rseq_func=['insertion_profile','read_distribution','clipping_profile']
 rseq_dir=['insertion_profile','read_distribution','clipping_profile']
 
 
-rule_dirs = ['insertion_profile','inner_distance','clipping_profile','read_GC','star_statistics','compile_counts','generate_qc_qa','run_qc_qa','star_statistics','deseq2']
+rule_dirs = ['insertion_profile','inner_distance','clipping_profile','read_GC','star_statistics','compile_counts','generate_qc_qa','run_qc_qa','star_statistics','deseq2','fastqc','deseq2_init']
 for rule in rule_dirs:
     if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
         log_out = os.path.join(os.getcwd(), 'logs', rule)
@@ -44,6 +44,14 @@ def format_plot_columns():
     reformat_factors = '"' + '","'.join(factors) + '"'
     return 'c({})'.format(reformat_factors)
 
+def get_deseq2_threads(wildcards=None):
+    few_coeffs = False if wildcards is None else len(get_contrast(wildcards)) < 10
+    return 1 if len(samples) < 100 or few_coeffs else 6
+
+def get_contrast(wildcards):
+    """Return each contrast provided in the configuration file"""
+    return config["diffexp"]["contrasts"][wildcards.contrast]
+
 
 rule all:
     input:
@@ -55,8 +63,9 @@ rule all:
         expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = samples, ext = inner_distance_ext),
         expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = samples, ext = clipping_prof_ext),
         expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = samples, ext = read_dist_ext),
-        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = samples, ext = read_gc_ext)
-
+        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = samples, ext = read_gc_ext),
+        expand(["results/diffexp/{contrast}.diffexp.tsv", "results/diffexp/{contrast}.ma-plot.svg"],contrast = config["diffexp"]["contrasts"]),
+        "results/diffexp/pca.svg"
 
 rule insertion_profile:
     input:
@@ -190,7 +199,7 @@ rule deseq2_init:
     input:
         counts="data/{project_id}_counts.txt".format(project_id = project_id)
     output:
-        "results/deseq2/{project_id}_all.rds".format(project_id=project_id)
+        "results/diffexp/{project_id}_all.rds".format(project_id=project_id)
     params:
         samples=config["samples"],
         design=config["pca"]["labels"],
@@ -199,17 +208,17 @@ rule deseq2_init:
         "envs/deseq2.yaml"
     log:
         "logs/deseq2/init.log"
-    threads: 6
+    threads: get_deseq2_threads()
     shell:
         "Rscript ./scripts/deseq2-init.R {threads} {input.counts} {params.samples} {output} {params.design} {params.row_names}"
 
 
 rule pca:
     input:
-        "deseq2/{project_id}_all.rds".format(project_id=project_id)
+        "results/diffexp/{project_id}_all.rds".format(project_id=project_id)
     output:
-        pca="results/deseq2/pca.svg",
-        rds="results/deseq2/rlog_dds.rds"
+        pca="results/diffexp/pca.svg",
+        rds="results/diffexp/rlog_dds.rds"
 
     params:
         pca_labels=config["pca"]["labels"]
@@ -221,13 +230,9 @@ rule pca:
         "Rscript ./scripts/plot-pca.R {input} {output.pca} {output.rds}"
 
 
-def get_contrast(wildcards):
-    """Return each contrast provided in the configuration file"""
-    return config["diffexp"]["contrasts"][wildcards.contrast]
-
 rule deseq2:
     input:
-        "deseq2/{project_id}_all.rds".format(project_id=project_id)
+        "results/diffexp/{project_id}_all.rds".format(project_id=project_id)
     output:
         table="results/diffexp/{contrast}.diffexp.tsv",
         ma_plot="results/diffexp/{contrast}.ma-plot.svg",
@@ -237,6 +242,24 @@ rule deseq2:
         "envs/deseq2.yaml"
     log:
         "logs/deseq2/{contrast}.diffexp.log"
-    threads: 6
+    threads: get_deseq2_threads()
     shell:
         "Rscript ./scripts/deseq2.R"
+
+rule fastqc:
+    input:
+        fwd = "/home/exacloud/lustre1/CEDAR/cfrna/data/LIB180515JW/{project}_{sample}_{s}_{lane}_R1_001.fastq",
+        rev = "/home/exacloud/lustre1/CEDAR/cfrna/data/LIB180515JW/{project}_{sample}_{s}_{lane}_R2_001.fastq"
+
+    output:
+        fwd = "fastqc/{sample}/{project}_{sample}_{s}_{lane}_R1_001.fastq_fastqc.zip",
+        rev = "fastqc/{sample}/{project}_{sample}_{s}_{lane}_R2_001.fastq_fastqc.zip"
+
+    conda:
+        "envs/fastqc-omic-wf.yaml"
+
+    message:
+        """--- Quality check of raw data with Fastqc."""
+
+    shell:
+        """fastqc --outdir  fastqc/{wildcards.smp} --extract  -f fastq {input.fwd} {input.rev}"""
