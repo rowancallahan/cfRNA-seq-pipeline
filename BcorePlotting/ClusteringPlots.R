@@ -11,7 +11,7 @@
 # Started - July, 2016
 #####################################################################################################
 library(ggplot2)
-library(RcolorBrewer)
+library(RColorBrewer)
 
 gene_pcaplot <-
 function(exprdat,sampleid,groupdat=NULL,colorfactor=NULL,shapefactor=NULL, plot_sampleids=TRUE, pcnum=1:2, plottitle = "PCA Plot") {
@@ -397,7 +397,7 @@ uni_qual_colors <- function(attribs, pal = 'Set1'){
     #' @param attribs list of sample classifications to be tracked in clustering
     #'    each list element contains a string vector with one label per sample
     #'    set to NA to omit
-    require(RcolorBrewer)
+    require(RColorBrewer)
 	colourCount = 0
 
 	`%+=%` = function(e1,e2) eval.parent(substitute(e1 <- e1 + e2))
