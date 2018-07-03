@@ -397,6 +397,7 @@ uni_qual_colors <- function(attribs, pal = 'Set1'){
     #' @param attribs list of sample classifications to be tracked in clustering
     #'    each list element contains a string vector with one label per sample
     #'    set to NA to omit
+    require(RcolorBrewer)
 	colourCount = 0
 
 	`%+=%` = function(e1,e2) eval.parent(substitute(e1 <- e1 + e2))
@@ -458,6 +459,7 @@ function (ratiomat, attribs, plottitle, subtitle=NULL, normmat=NULL,
 
   # imports
   require(NMF)
+  require(RcolorBrewer)
   colSpecs_lsv <- setColSpecs(ratiomat = ratiomat, attribs = attribs, setCol_v = setCol_v, colOrder_v = colOrder_v)
   ratiomat = colSpecs_lsv$ratiomat
 
