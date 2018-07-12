@@ -30,6 +30,9 @@ seq_layout:
 sample_id:
   StudyID
 
+dds_design:
+  SampleID
+
 rseqc_env:
   source activate rseqc-omic-wf
 
