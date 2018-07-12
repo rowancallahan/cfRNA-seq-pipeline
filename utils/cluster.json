@@ -84,25 +84,25 @@
     "deseq2_init" :
     {
         "J" : "deseq2_init",
-        "e" : "logs/deseq2_init/deseq2_init_%j.err",
-        "o" : "logs/deseq2_init/deseq2_init_%j.out",
-        "c" : 1,
-        "mem" : 40000
+        "e" : "logs/deseq2/deseq2_init_%j.err",
+        "o" : "logs/deseq2/deseq2_init_%j.out",
+        "c" : 20,
+        "mem" : 80000
     },
-    "pca" :
+    "deseq2_plots" :
     {
-        "J" : "deseq2_pca",
-        "e" : "logs/deseq2_pca/deseq2_pca_%j.err",
-        "o" : "logs/deseq2_pca/deseq2_pca_%j.out",
-        "mem" : 5000
+        "J" : "deseq2_plots",
+        "e" : "logs/deseq2/deseq2_plots_%j.err",
+        "o" : "logs/deseq2/deseq2_plots_%j.out",
+        "mem" : 30000
     },
     "deseq2" :
     {
         "J" : "deseq2",
         "e" : "logs/deseq2/deseq2_%j.err",
         "o" : "logs/deseq2/deseq2_%j.out",
-        "c" : 6,
-        "mem":40000
+        "c" : 20,
+        "mem":80000
     },
     "fastqc" :
     {
