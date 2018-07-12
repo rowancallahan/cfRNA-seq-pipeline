@@ -16,6 +16,7 @@ rseqqc_env = config["rseqc_env"]
 samples, = glob_wildcards("/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/")
 
 #TODO Remove abspath for glob_wildcards function
+#TODO
 
 ext = ['r','R1.pdf','R2.pdf','xls']
 insertion_prof_ext = ['r','R1.pdf','R2.pdf','xls']
@@ -28,7 +29,7 @@ rseq_func=['insertion_profile','read_distribution','clipping_profile']
 rseq_dir=['insertion_profile','read_distribution','clipping_profile']
 
 
-rule_dirs = ['insertion_profile','inner_distance','clipping_profile','read_GC','star_statistics','compile_counts','generate_qc_qa','run_qc_qa','star_statistics','deseq2','fastqc','deseq2_init']
+rule_dirs = ['insertion_profile','inner_distance','clipping_profile','read_GC','star_statistics','compile_counts','generate_qc_qa','run_qc_qa','star_statistics','deseq2','fastqc']
 for rule in rule_dirs:
     if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
         log_out = os.path.join(os.getcwd(), 'logs', rule)
@@ -213,38 +214,43 @@ rule deseq2_init:
         "Rscript ./scripts/deseq2-init.R {threads} {input.counts} {params.samples} {output} {params.design} {params.row_names}"
 
 
-rule pca:
+rule deseq2_plots:
     input:
-        "results/diffexp/{project_id}_all.rds".format(project_id=project_id)
+        rds_object="results/diffexp/{project_id}_all.rds".format(project_id=project_id)
     output:
         pca="results/diffexp/pca.svg",
-        rds="results/diffexp/rlog_dds.rds"
-
+        rld_out="results/diffexp/rlog_dds.rds",
+        sd_mean_plot="results/diffexp/sd_mean_plot.svg",
+        heatmap_plot = "results/diffexp/heatmap_plot.svg",
+        distance_plot = "results/diffexp/distance_plot.svg",
+        ggplot_pca = "results/diffexp/ggplot_pca.svg",
+        panel_ma = "results/diffexp/panel_ma.svg"
     params:
         pca_labels=config["pca"]["labels"]
     conda:
-        "envs/deseq2.yaml"
+        "envs/deseq2_plots.yaml"
     log:
         "logs/deseq2/pca.log"
-    shell:
-        "Rscript ./scripts/plot-pca.R {input} {output.pca} {output.rds}"
+    script:
+        "./scripts/plot-pca.R"
 
 
 rule deseq2:
     input:
-        "results/diffexp/{project_id}_all.rds".format(project_id=project_id)
+        rds="results/diffexp/{project_id}_all.rds".format(project_id=project_id)
     output:
         table="results/diffexp/{contrast}.diffexp.tsv",
         ma_plot="results/diffexp/{contrast}.ma-plot.svg",
     params:
-        contrast=get_contrast
+        contrast=get_contrast,
+        condition = config["linear_model"]
     conda:
         "envs/deseq2.yaml"
     log:
         "logs/deseq2/{contrast}.diffexp.log"
     threads: get_deseq2_threads()
     shell:
-        "Rscript ./scripts/deseq2.R"
+        "Rscript ./scripts/deseq2.R {threads} {input.rds} {params.contrast} {params.condition} {output.ma_plot} {output.table}"
 
 rule fastqc:
     input:
