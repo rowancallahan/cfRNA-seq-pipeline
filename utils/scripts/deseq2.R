@@ -2,17 +2,25 @@ library("DESeq2")
 
 args = commandArgs(trailingOnly = TRUE)
 
+threads = args[1]
+rds = args[2]
+contrast1 = args[3]
+contrast2 = args[4]
+condition = args[5]
+ma_plot = args[6]
+out_table = args[7]
+
 parallel <- FALSE
-if (snakemake@threads > 1) {
+if (threads > 1) {
     library("BiocParallel")
     # setup parallelization
-    register(MulticoreParam(snakemake@threads))
+    register(MulticoreParam(threads))
     parallel <- TRUE
 }
 
-dds <- readRDS(snakemake@input[[1]])
+dds <- readRDS(rds)
 
-contrast <- c("condition", snakemake@params[["contrast"]])
+contrast <- c(condition, contrast1, contrast2)
 res <- results(dds, contrast=contrast, parallel=parallel)
 # shrink fold changes for lowly expressed genes
 res <- lfcShrink(dds, contrast=contrast, res=res)
@@ -21,9 +29,11 @@ res <- res[order(res$padj),]
 # TODO explore IHW usage
 
 
-# store results
-svg(snakemake@output[["ma_plot"]])
+# MA plot
+svg(ma_plot)
 plotMA(res, ylim=c(-2,2))
 dev.off()
 
-write.table(as.data.frame(res), file=snakemake@output[["table"]])
+
+
+write.table(as.data.frame(res), file=out_table)
