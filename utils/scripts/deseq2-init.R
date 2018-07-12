@@ -6,7 +6,7 @@ threads = args[1]
 counts = args[2]
 params = args[3]
 output = args[4]
-design = args[5]
+dds_design = args[5]
 row_names = args[6]
 
 parallel <- FALSE
@@ -27,7 +27,7 @@ cts <- cts[, rownames(coldata)]
 
 dds <- DESeqDataSetFromMatrix(countData=cts,
                               colData=coldata,
-                              design=~ design)
+                              design= as.formula(paste('~',dds_design)))
 
 # remove uninformative columns
 dds <- dds[ rowSums(counts(dds)) > 1, ]
