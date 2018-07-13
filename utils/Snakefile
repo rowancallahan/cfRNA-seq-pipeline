@@ -65,8 +65,8 @@ rule all:
         expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = samples, ext = clipping_prof_ext),
         expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = samples, ext = read_dist_ext),
         expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = samples, ext = read_gc_ext),
-        expand(["results/diffexp/{contrast}.diffexp.tsv", "results/diffexp/{contrast}.ma-plot.svg"],contrast = config["diffexp"]["contrasts"]),
-        "results/diffexp/pca.svg"
+        expand(["results/diffexp/{contrast}.diffexp.tsv", "results/diffexp/{contrast}.ma-plot.pdf"],contrast = config["diffexp"]["contrasts"]),
+        "results/diffexp/pca.pdf"
 
 rule insertion_profile:
     input:
@@ -200,7 +200,9 @@ rule deseq2_init:
     input:
         counts="data/{project_id}_counts.txt".format(project_id = project_id)
     output:
-        "results/diffexp/{project_id}_all.rds".format(project_id=project_id)
+        rds="results/diffexp/{project_id}_all.rds".format(project_id=project_id),
+        normed_counts="results/tables/{project_id}_normed_counts.txt".format(project_id = project_id),
+        rld_out = "results/diffexp/{project_id}_rlog_dds.rds".format(project_id = project_id),
     params:
         samples=config["samples"],
         design=config["pca"]["labels"],
@@ -211,20 +213,19 @@ rule deseq2_init:
         "logs/deseq2/init.log"
     threads: get_deseq2_threads()
     shell:
-        "Rscript ./scripts/deseq2-init.R {threads} {input.counts} {params.samples} {output} {params.design} {params.row_names}"
+        "Rscript ./scripts/deseq2-init.R {threads} {input.counts} {params.samples} {output.rds} {params.design} {params.row_names} {output.normed_counts} {output.rld_out}"
 
 
 rule deseq2_plots:
     input:
-        rds_object="results/diffexp/{project_id}_all.rds".format(project_id=project_id)
+        rds_object = "results/diffexp/{project_id}_rlog_dds.rds".format(project_id = project_id),
     output:
-        pca="results/diffexp/pca.svg",
-        rld_out="results/diffexp/rlog_dds.rds",
-        sd_mean_plot="results/diffexp/sd_mean_plot.svg",
-        heatmap_plot = "results/diffexp/heatmap_plot.svg",
-        distance_plot = "results/diffexp/distance_plot.svg",
-        ggplot_pca = "results/diffexp/ggplot_pca.svg",
-        panel_ma = "results/diffexp/panel_ma.svg"
+        pca="results/diffexp/pca.pdf",
+        sd_mean_plot="results/diffexp/sd_mean_plot.pdf",
+        heatmap_plot = "results/diffexp/heatmap_plot.pdf",
+        distance_plot = "results/diffexp/distance_plot.pdf",
+        ggplot_pca = "results/diffexp/ggplot_pca.pdf",
+        panel_ma = "results/diffexp/panel_ma.pdf"
     params:
         pca_labels=config["pca"]["labels"]
     conda:
@@ -232,7 +233,7 @@ rule deseq2_plots:
     log:
         "logs/deseq2/pca.log"
     script:
-        "./scripts/plot-pca.R"
+        "scripts/plot-pca.R"
 
 
 rule deseq2:
@@ -240,7 +241,7 @@ rule deseq2:
         rds="results/diffexp/{project_id}_all.rds".format(project_id=project_id)
     output:
         table="results/diffexp/{contrast}.diffexp.tsv",
-        ma_plot="results/diffexp/{contrast}.ma-plot.svg",
+        ma_plot="results/diffexp/{contrast}.ma-plot.pdf",
     params:
         contrast=get_contrast,
         condition = config["linear_model"]
@@ -249,8 +250,8 @@ rule deseq2:
     log:
         "logs/deseq2/{contrast}.diffexp.log"
     threads: get_deseq2_threads()
-    shell:
-        "Rscript ./scripts/deseq2.R {threads} {input.rds} {params.contrast} {params.condition} {output.ma_plot} {output.table}"
+    script:
+        "scripts/deseq2.R {threads} {input.rds} {params.contrast} {params.condition} {output.ma_plot} {output.table}"
 
 rule fastqc:
     input:
