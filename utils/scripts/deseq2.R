@@ -3,7 +3,6 @@ library("DESeq2")
 
 print('Setting parameters')
 
-
 rds = snakemake@input[['rds']]
 cat(sprintf(c('RDS object: ',rds,'\n')))
 
@@ -41,7 +40,7 @@ plotMA(res, ylim=c(-2,2))
 dev.off()
 
 p_hist = snakemake@output[['p_hist']]
-pdf(p_hist))
+pdf(p_hist)
 hist(res$pvalue[res$baseMean > 1], breaks = 0:20/20, col = "grey50", border = "white", main='P values for genes with mean normalized count larger than 1',xlab='pvalue')
 dev.off()
 
