@@ -1,41 +1,32 @@
 library("DESeq2")
 
-args = commandArgs(trailingOnly = TRUE)
 
 print('Setting parameters')
 
-threads = args[1]
-print(c('threads: ',threads))
 
-rds = args[2]
-print(c('RDS object: ', rds))
+rds = snakemake@input[['rds']]
+cat(sprintf(c('RDS object: ',rds,'\n')))
 
-contrast1 = args[3]
-print(c('baseline: ', contrast1))
+condition = snakemake@params[['condition']]
+cat(sprintf(c('Condition: ',condition,'\n')))
 
-contrast2 = args[4]
-print(c('contrast: ',contrast2))
+ma_plot = snakemake@output[['ma_plot']]
+cat(sprintf(c('MA plot', ma_plot,'\n')))
 
-condition = args[5]
-print(c('Condition: ',condition))
-
-ma_plot = args[6]
-print(c('MA plot', ma_plot))
-
-out_table = args[7]
-print(c('Summary results table', out_table))
+out_table = snakemake@output[['table']]
+cat(sprintf(c('Summary results table', out_table,'\n')))
 
 parallel <- FALSE
-if (threads > 1) {
+if (snakemake@threads > 1) {
     library("BiocParallel")
     # setup parallelization
-    register(MulticoreParam(threads))
+    register(MulticoreParam(snakemake@threads))
     parallel <- TRUE
 }
 
 dds <- readRDS(rds)
 
-contrast <- c(condition, contrast1, contrast2)
+contrast <- c(condition, snakemake@params[["contrast"]])
 res <- results(dds, contrast=contrast, parallel=parallel)
 # shrink fold changes for lowly expressed genes
 res <- lfcShrink(dds, contrast=contrast, res=res)
@@ -49,5 +40,9 @@ pdf(ma_plot)
 plotMA(res, ylim=c(-2,2))
 dev.off()
 
+p_hist = snakemake@output[['p_hist']]
+pdf(p_hist))
+hist(res$pvalue[res$baseMean > 1], breaks = 0:20/20, col = "grey50", border = "white", main='P values for genes with mean normalized count larger than 1',xlab='pvalue')
+dev.off()
 
-write.table(as.data.frame(res), file=out_table)
+write.table(as.data.frame(res), file=out_table, quote=FALSE, sep='\t')
