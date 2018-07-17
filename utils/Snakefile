@@ -45,9 +45,11 @@ def format_plot_columns():
     reformat_factors = '"' + '","'.join(factors) + '"'
     return 'c({})'.format(reformat_factors)
 
+
 def get_deseq2_threads(wildcards=None):
     few_coeffs = False if wildcards is None else len(get_contrast(wildcards)) < 10
     return 1 if len(samples) < 100 or few_coeffs else 6
+
 
 def get_contrast(wildcards):
     """Return each contrast provided in the configuration file"""
@@ -206,26 +208,29 @@ rule deseq2_init:
     params:
         samples=config["samples"],
         design=config["pca"]["labels"],
-        row_names=config["sample_id"]
+        row_names=config["sample_id"],
     conda:
-        "envs/deseq2.yaml"
+        "envs/deseq2.yaml",
     log:
-        "logs/deseq2/init.log"
+        "logs/deseq2/init.log",
     threads: get_deseq2_threads()
-    shell:
-        "Rscript ./scripts/deseq2-init.R {threads} {input.counts} {params.samples} {output.rds} {params.design} {params.row_names} {output.normed_counts} {output.rld_out}"
+    script:
+        "scripts/deseq2-init.R"
 
 
 rule deseq2_plots:
     input:
         rds_object = "results/diffexp/{project_id}_rlog_dds.rds".format(project_id = project_id),
+        dds_object = "results/diffexp/{project_id}_all.rds".format(project_id = project_id),
+
     output:
         pca="results/diffexp/pca.pdf",
         sd_mean_plot="results/diffexp/sd_mean_plot.pdf",
         heatmap_plot = "results/diffexp/heatmap_plot.pdf",
         distance_plot = "results/diffexp/distance_plot.pdf",
-        ggplot_pca = "results/diffexp/ggplot_pca.pdf",
-        panel_ma = "results/diffexp/panel_ma.pdf"
+        panel_ma = "results/diffexp/panel_ma.pdf",
+        var_heat = "results/diffexp/variance_heatmap.pdf",
+        ggplot_pca_factor = "results/diffexp/ggplot_factor_pca.pdf",
     params:
         pca_labels=config["pca"]["labels"]
     conda:
@@ -241,17 +246,19 @@ rule deseq2:
         rds="results/diffexp/{project_id}_all.rds".format(project_id=project_id)
     output:
         table="results/diffexp/{contrast}.diffexp.tsv",
-        ma_plot="results/diffexp/{contrast}.ma-plot.pdf",
+        ma_plot="results/diffexp/{contrast}.ma_plot.pdf",
+        p_hist="results/diffexp/{contrast}.phist_plot.pdf",
     params:
         contrast=get_contrast,
-        condition = config["linear_model"]
+        condition = config["linear_model"],
     conda:
-        "envs/deseq2.yaml"
+        "envs/deseq2.yaml",
     log:
-        "logs/deseq2/{contrast}.diffexp.log"
+        "logs/deseq2/{contrast}.diffexp.log",
     threads: get_deseq2_threads()
     script:
-        "scripts/deseq2.R {threads} {input.rds} {params.contrast} {params.condition} {output.ma_plot} {output.table}"
+        "scripts/deseq2.R"
+
 
 rule fastqc:
     input:
