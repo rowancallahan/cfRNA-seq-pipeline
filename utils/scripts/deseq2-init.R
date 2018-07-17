@@ -1,13 +1,19 @@
 
 library("DESeq2")
-args = commandArgs(trailingOnly = TRUE)
 
-threads = args[1]
-counts = args[2]
-params = args[3]
-output = args[4]
-dds_design = args[5]
-row_names = args[6]
+counts = snakemake@input[['counts']]
+
+params = snakemake@params[['samples']]
+
+output = snakemake@output[['rds']]
+
+dds_design = snakemake@params[['design']]
+
+row_names = snakemake@params[['row_names']]
+
+out_table = snakemake@output[['normed_counts']]
+
+rld_out = snakemake@output[['rld_out']]
 
 parallel <- FALSE
 if (threads > 1) {
@@ -35,3 +41,10 @@ dds <- dds[ rowSums(counts(dds)) > 1, ]
 dds <- DESeq(dds, parallel=parallel)
 
 saveRDS(dds, file=output)
+
+normed_counts <-counts(dds,normalized=TRUE)
+write.table(normed_counts,quote=F,sep='\t',file=out_table)
+
+# obtain normalized counts
+rld <- rlog(dds, blind=FALSE)
+saveRDS(rld, file=rld_out)
