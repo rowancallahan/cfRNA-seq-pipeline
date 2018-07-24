@@ -16,7 +16,6 @@ rseqqc_env = config["rseqc_env"]
 samples, = glob_wildcards("/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/")
 
 #TODO Remove abspath for glob_wildcards function
-#TODO
 
 ext = ['r','R1.pdf','R2.pdf','xls']
 insertion_prof_ext = ['r','R1.pdf','R2.pdf','xls']
@@ -28,13 +27,20 @@ read_gc_ext = ['.xls','_plot.r','_plot.pdf']
 rseq_func=['insertion_profile','read_distribution','clipping_profile']
 rseq_dir=['insertion_profile','read_distribution','clipping_profile']
 
-
 rule_dirs = ['insertion_profile','inner_distance','clipping_profile','read_GC','star_statistics','compile_counts','generate_qc_qa','run_qc_qa','star_statistics','deseq2','fastqc']
 for rule in rule_dirs:
     if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
         log_out = os.path.join(os.getcwd(), 'logs', rule)
         os.makedirs(log_out)
         print(log_out)
+
+result_dirs = ['diffexp','tables']
+for rule in result_dirs:
+    if not os.path.exists(os.path.join(os.getcwd(),'results',rule)):
+        log_out = os.path.join(os.getcwd(), 'results', rule)
+        os.makedirs(log_out)
+        print(log_out)
+
 
 def message(mes):
   sys.stderr.write("|--- " + mes + "\n")
