@@ -16,7 +16,7 @@ out_table = snakemake@output[['normed_counts']]
 rld_out = snakemake@output[['rld_out']]
 
 parallel <- FALSE
-if (threads > 1) {
+if (snakemake@threads > 1) {
     library("BiocParallel")
     # setup parallelization
     register(MulticoreParam(snakemake@threads))

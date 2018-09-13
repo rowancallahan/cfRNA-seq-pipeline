@@ -68,6 +68,8 @@ rule all:
         "data/{}_counts.txt".format(config['project_id']),
         "analysis_code/{}_analysis.R".format(config['project_id']),
         "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
+        expand("samples/trimmed/{smp}_R1_t.fq", smp = samples),
+        expand("samples/star/{smp}_bam/Aligned.sortedByCoord.out.bam", smp = samples),
         expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=samples, ext=insertion_prof_ext),
         expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = samples, ext = inner_distance_ext),
         expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = samples, ext = clipping_prof_ext),
@@ -76,9 +78,101 @@ rule all:
         expand(["results/diffexp/{contrast}.diffexp.tsv", "results/diffexp/{contrast}.ma-plot.pdf"],contrast = config["diffexp"]["contrasts"]),
         "results/diffexp/pca.pdf"
 
+rule trimming:
+    input:
+        fwd = "samples/raw/{smp}_R1.fq.gz",
+        rev = "samples/raw/{smp}_R2.fq.gz"
+    output:
+        fwd = "samples/trimmed/{smp}_R1_t.fq",
+        rev = "samples/trimmed/{smp}_R2_t.fq",
+        single = "samples/trimmed/{smp}_R1_singletons.fq"
+    message:
+        """--- Trimming."""
+    shell:
+        """sickle pe -f {input.fwd} -r {input.rev}  -l 40 -q 20 -t sanger  -o {output.fwd} -p {output.rev} -s {output.single} &> {input.fwd}.log"""
+
+
+rule STAR:
+        input:
+            fwd = "samples/trimmed/{smp}_R1_t.fq",
+            rev = "samples/trimmed/{smp}_R2_t.fq"
+        output:
+            temp("samples/star/{smp}_bam/Aligned.sortedByCoord.out.bam")
+        threads: 12
+        params:
+            name="STAR_{smp}",
+            mem="64000",
+            threads="12"
+        run:
+         STAR=config["star_tool"],
+         pathToGenomeIndex = config["star_index"]
+
+         shell("""mkdir -p samples/star/{wildcards.smp}
+                {STAR} --runThreadN {threads} --runMode alignReads --genomeDir {pathToGenomeIndex} \
+                --readFilesIn {input.fwd} {input.rev} \
+                --outFileNamePrefix samples/star/{wildcards.smp}_bam \
+                --outSAMtype BAM SortedByCoordinate
+                """)
+
+rule picard:
+  input:
+      "samples/star/{smp}_bam/Aligned.sortedByCoord.out.bam"
+  output:
+      temp("samples/genecounts_rmdp/{smp}_bam/{smp}.rmd.bam")
+  params:
+      name="rmd_{smp}",
+      mem="5300"
+  threads: 1
+  run:
+    picard=config["picard_tool"]
+
+    shell("java -Xmx3g -jar {picard} \
+    INPUT={input} \
+    OUTPUT={output} \
+    METRICS_FILE=samples/genecounts_rmdp/{wildcards.smp}_bam/{wildcards.smp}.rmd.metrics.text \
+    REMOVE_DUPLICATES=true")
+
+
+rule sort:
+  input:
+    "samples/genecounts_rmdp/{smp}_bam/{smp}.rmd.bam"
+  output:
+    "samples/genecounts_rmdp/{smp}_bam/{smp}_sort.rmd.bam"
+  params:
+    name = "sort_{smp}",
+    mem = "6400"
+  conda:
+    "envs/intergrin.yaml"
+  shell:
+    """samtools sort -O bam -n {input} -o {output}"""
+
+
+rule genecount:
+  input:
+    "samples/genecounts_rmdp/{smp}_bam/{smp}_sort.rmd.bam"
+  output:
+    "samples/htseq_count/{smp}_htseq_gene_count.txt"
+  params:
+    name = "genecount_{smp}",
+    mem = "5300"
+  conda:
+    "envs/intergrin.yaml"
+  threads: 1
+  shell:
+    """
+      htseq-count \
+            -f bam \
+            -r name \
+            -s reverse \
+            -m union \
+            --samout=genecounts_rmdp/htseq_samout/Output_{wildcards.smp}.sam \
+            {input} \
+            /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf > {output}"""
+
+
 rule insertion_profile:
     input:
-        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+        "samples/genecounts_rmdp/{smp}_bam/{smp}_sort.rmd.bam",
     params:
         seq_layout=config['seq_layout'],
     output:
@@ -91,9 +185,10 @@ rule insertion_profile:
     shell:
         "insertion_profile.py -s '{params.seq_layout}' -i {input} -o rseqc/insertion_profile/{wildcards.sample}/{wildcards.sample}"
 
+
 rule inner_distance:
     input:
-        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+        "samples/genecounts_rmdp/{smp}_bam/{smp}_sort.rmd.bam",
     params:
         bed=config['bed_file']
     output:
@@ -109,7 +204,7 @@ rule inner_distance:
 
 rule clipping_profile:
     input:
-        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+        "samples/genecounts_rmdp/{smp}_bam/{smp}_sort.rmd.bam",
     params:
         seq_layout=config['seq_layout'],
     output:
@@ -125,7 +220,7 @@ rule clipping_profile:
 
 rule read_distribution:
     input:
-        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+        "samples/genecounts_rmdp/{smp}_bam/{smp}_sort.rmd.bam",
     params:
         bed=config['bed_file']
     output:
@@ -137,7 +232,7 @@ rule read_distribution:
 
 rule read_GC:
     input:
-        "/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam",
+        "samples/genecounts_rmdp/{smp}_bam/{smp}_sort.rmd.bam",
     output:
         "rseqc/read_GC/{sample}/{sample}.GC.xls",
         "rseqc/read_GC/{sample}/{sample}.GC_plot.r",
@@ -149,7 +244,7 @@ rule read_GC:
 
 rule star_statistics:
     input:
-        dir="/home/users/estabroj/CEDAR/cfrna/analysis/pancan/genecounts_rmdp"
+        dir="samples/genecounts_rmdp"
     params:
         project_id = project_id
     output:
@@ -163,7 +258,7 @@ rule star_statistics:
 
 rule compile_counts:
     input:
-        sample_counts="/home/exacloud/lustre1/CEDAR/cfrna/analysis/pancan/results"
+        sample_counts="samples/htseq_count/"
     params:
         project_id = project_id
     output:
@@ -256,7 +351,7 @@ rule deseq2:
         p_hist="results/diffexp/{contrast}.phist_plot.pdf",
     params:
         contrast=get_contrast,
-        condition = config["linear_model"],
+        condition = config["linear_model"]
     conda:
         "envs/deseq2.yaml",
     log:
