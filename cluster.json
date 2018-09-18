@@ -22,11 +22,11 @@
     {
         "J" : "run_qc_qa",
         "e" : "logs/run_qc_qa/run_qc_qa_%j.err",
-        "o" : "logs/run_qc_qa/run_qc_qa_%j.out",
-        "mem" : 45000
-    },
+        "o" : "logs/run_qc_qa/run_qc_qa_%j.out", 
+        "mem" : 45000 
+    }, 
     "insertion_profile" :
-    {
+    { 
         "J" : "insertion_profile",
         "e" : "logs/insertion_profile/insertion_profile_%j.err",
         "o" : "logs/insertion_profile/insertion_profile_%j.out",
@@ -73,6 +73,14 @@
         "c" : 1,
         "mem":5000
     },
+    "STAR" :
+    {
+        "J" : "star",
+        "e" : "logs/star%j.err",
+        "o" : "logs/star%j.out",
+        "c" : 12,
+        "mem" : 64000
+    },
     "compile_counts" :
     {
         "J" : "compile_counts",
@@ -111,6 +119,29 @@
         "o" : "logs/fastqc/fastqc_%j.out",
         "c" : 6,
         "mem":40000
+    },
+    "circ_star" :
+    {
+        "J" : "circ_star",
+        "e" : "logs/circ_star%j.err",
+        "o" : "logs/circ_star_%j.out",
+        "c" : 12,
+        "mem" : 64000
+    },
+    "circ_explorer" :
+    {
+        "J" : "circ_explorer",
+        "e" : "logs/circ_explorer%j.err",
+        "o" : "logs/circ_explorer_%j.out",
+        "c" : 1,
+        "mem" : 64000
+    },
+    "junction_counts" :
+    {
+        "J" : "junction_counts",
+        "e" : "logs/junction_counts%j.err",
+        "o" : "logs/junction_counts%j.out",
+        "c" : 1,
+        "mem" : 5400
     }
-
 }
