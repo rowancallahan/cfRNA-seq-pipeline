@@ -22,18 +22,16 @@ def compile_star_log(data_dir, project_title):
     joined_table_sorted.to_csv(out, sep='\t')
 
 
-def compile_counts_table(data_dir, project_title):
+def compile_counts_table(files, project_title):
     """Function accepts a STAR output directory and compiles {sample}_gene_count.txt into a joined tab sep file
 
     Args:
-        star_dir (str/path): Path to STAR output
+        files (list): list of globbed wildcards
         project_title (str): Project title for compiled STAR gene counts table
 
     Returns:
         Compiled STAR gene counts table as tab delimited file.
     """
-
-    files = [os.path.join(data_dir,x) for x in os.listdir(data_dir) if x.endswith('_gene_count.txt')]
     tables = [pd.read_csv(fh, sep='\t', index_col=0, names=[fh.split('/')[-1].split('_')[0]]) for fh in files]
     joined_table = pd.concat(tables, axis=1)
     filtered_joined = joined_table.iloc[:-5, :]
