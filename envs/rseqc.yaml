@@ -28,8 +28,8 @@ dependencies:
   - mkl_fft=1.0.1=py27h3010b51_0
   - mkl_random=1.0.1=py27h629b387_0
   - ncurses=6.1=hf484d3e_0
-  - numpy=1.14.3=py27hcd700cb_2
-  - numpy-base=1.14.3=py27hdbf6ddf_2
+  - numpy=1.14.3
+  - numpy-base=1.14.3
   - openssl=1.0.2o=h20670df_0
   - pip=10.0.1=py27_0
   - python=2.7.15=h1571d57_0

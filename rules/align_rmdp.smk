@@ -47,7 +47,7 @@ rule STAR:
          shell("""
                 {STAR} --runThreadN {threads} --runMode alignReads --genomeDir {pathToGenomeIndex} \
                 --readFilesIn {input.fwd} {input.rev} \
-                --outFileNamePrefix samples/star2/{wildcards.sample}_bam/ \
+                --outFileNamePrefix samples/star/{wildcards.sample}_bam/ \
                 --sjdbGTFfile {params.gtf} --quantMode GeneCounts \
                 --sjdbGTFtagExonParentGene gene_name \
                 --outSAMtype BAM SortedByCoordinate --readFilesCommand zcat --twopassMode Basic

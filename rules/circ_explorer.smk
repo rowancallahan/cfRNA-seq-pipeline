@@ -9,7 +9,7 @@ rule circ_star:
   params:
     name="star_{sample}", mem="64000"
   conda:
-    "envs/environment.yaml"
+    "../envs/environment.yaml"
   run:
     STAR=config["star_tool"]
     pathToGenomeIndex = config["star_index"]
