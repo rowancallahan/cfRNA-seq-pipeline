@@ -22,7 +22,7 @@ insertion_and_clipping_prof_ext = ['r','R1.pdf','R2.pdf','xls']
 inner_distance_ext = ['_freq.txt','_plot.pdf','_plot.r','.txt']
 read_dist_ext = ['txt']
 read_gc_ext = ['.xls','_plot.r','_plot.pdf']
-#EXT=['circrna/circularRNA_known.txt']
+circ_ext=['circrna/circularRNA_known.txt']
 
 
 # TODO generate initializing rule to automatically generate log out for all rules
@@ -83,7 +83,9 @@ rule all:
         "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
         "results/diffexp/pca.pdf",
         expand("results/diffexp/{project_id}_all.rds",project_id = config['project_id']),
-
+        # expand("samples/circexplorer/{sample}_{circ_ext}",circ_ext=circ_ext,sample=SAMPLES),
+        # expand("samples/circexplorer/{sample}_chim_bam/Chimeric.out.junction",sample=SAMPLES),
+        # expand("results/tables/{}_circexplorer_junctioncounts.txt".format(config['project_id']),
 
 include: "rules/align_rmdp.smk"
 include: "rules/omic_qc.smk"
