@@ -15,15 +15,14 @@ configfile:"omic_config.yaml"
 project_id = config["project_id"]
 rseqqc_env = config["rseqc_env"]
 
-SAMPLES, = glob_wildcards("samples/raw/{smp}_R1_001.fastq.gz")
-
-#TODO Remove abspath for glob_wildcards function
+SAMPLES, = glob_wildcards("samples/raw/{sample}_R1.fq")
 
 ext = ['r','R1.pdf','R2.pdf','xls']
 insertion_and_clipping_prof_ext = ['r','R1.pdf','R2.pdf','xls']
 inner_distance_ext = ['_freq.txt','_plot.pdf','_plot.r','.txt']
 read_dist_ext = ['txt']
 read_gc_ext = ['.xls','_plot.r','_plot.pdf']
+#EXT=['circrna/circularRNA_known.txt']
 
 
 # TODO generate initializing rule to automatically generate log out for all rules
@@ -44,7 +43,7 @@ for rule in result_dirs:
 
 
 def message(mes):
-  sys.stderr.write("|--- " + mes + "\n")
+    sys.stderr.write("|--- " + mes + "\n")
 
 
 def format_plot_columns():
@@ -55,7 +54,7 @@ def format_plot_columns():
 
 def get_deseq2_threads(wildcards=None):
     few_coeffs = False if wildcards is None else len(get_contrast(wildcards)) < 10
-    return 1 if len(samples) < 100 or few_coeffs else 6
+    return 1 if len(config["samples"]) < 100 or few_coeffs else 6
 
 
 def get_contrast(wildcards):
@@ -63,34 +62,30 @@ def get_contrast(wildcards):
     return config["diffexp"]["contrasts"][wildcards.contrast]
 
 
-for smp in SAMPLES:
-    message("Sample " + smp + " will be processed")
+for sample in SAMPLES:
+    message("Sample " + sample + " will be processed")
 
 
 rule all:
     input:
-        expand("samples/trimmed/{smp}_R1_t.fq", smp = SAMPLES),
-        expand("samples/trimmed/{smp}_R2_t.fq", smp = SAMPLES),
-        expand("samples/star/{smp}_bam/Aligned.sortedByCoord.out.bam", smp = SAMPLES),
-        expand("samples/star/{smp}_bam/ReadsPerGene.out.tab", smp = SAMPLES),
-        expand("results/tables/{}_STAR_mapping_statistics.txt".format(config['project_id'])),
-        expand("samples/fastqc/{smp}/{smp}_{ext}_t_fastqc.zip", smp = SAMPLES, ext = ext),
-        expand("samples/genecounts_rmdp/{smp}_bam/{smp}.rmd.bam", smp = SAMPLES),
-        expand("samples/genecounts_rmdp/{smp}_bam/{smp}_sort.rmd.bam", smp = SAMPLES),
+        expand("samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam", sample = SAMPLES),
+        expand("samples/star/{sample}_bam/ReadsPerGene.out.tab", sample = SAMPLES),
+        "results/tables/{}_STAR_mapping_statistics.txt".format(config['project_id']),
+        expand("samples/fastqc/{sample}/{sample}_{ext}_t_fastqc.zip", sample = SAMPLES, ext = ext),
+        expand("samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam", sample = SAMPLES),
+        expand("samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam", sample = SAMPLES),
         expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
         expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
         expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
         expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
         expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
-        expand("data/{}_counts.txt".format(config['project_id'])),
-        "results/tables/{}_STAR_mapping_statistics.txt".format(config['project_id']),
-        "data/{}_counts.txt".format(config['project_id']),
-        "analysis_code/{}_analysis.R".format(config['project_id']),
+        expand("samples/htseq_count/{sample}_htseq_gene_count.txt", sample=SAMPLES),
         "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
-        expand(["results/diffexp/{contrast}.diffexp.tsv", "results/diffexp/{contrast}.ma-plot.pdf"],contrast = config["diffexp"]["contrasts"]),
-        "results/diffexp/pca.pdf"
+        "results/diffexp/pca.pdf",
+        expand("results/diffexp/{project_id}_all.rds",project_id = config['project_id']),
 
 
 include: "rules/align_rmdp.smk"
-include: "rules/deseq.smk"
 include: "rules/omic_qc.smk"
+include: "rules/deseq.smk"
+#include: "rules/circ_explorer.smk"
