@@ -1,6 +1,6 @@
 rule deseq2_init:
     input:
-        counts="data/{project_id}_counts.txt".format(project_id = project_id)
+        counts = rules.compile_counts.output
     output:
         rds="results/diffexp/{project_id}_all.rds".format(project_id=project_id),
         normed_counts="results/tables/{project_id}_normed_counts.txt".format(project_id = project_id),
@@ -10,12 +10,12 @@ rule deseq2_init:
         design=config["pca"]["labels"],
         row_names=config["sample_id"],
     conda:
-        "envs/deseq2.yaml",
+        "../envs/deseq2.yaml",
     log:
         "logs/deseq2/init.log",
     threads: get_deseq2_threads()
     script:
-        "scripts/deseq2-init.R"
+        "../scripts/deseq2-init.R"
 
 
 rule deseq2_plots:
@@ -34,11 +34,11 @@ rule deseq2_plots:
     params:
         pca_labels=config["pca"]["labels"]
     conda:
-        "envs/deseq2_plots.yaml"
+        "../envs/deseq2_plots.yaml"
     log:
         "logs/deseq2/pca.log"
     script:
-        "scripts/plot-pca.R"
+        "../scripts/plot-pca.R"
 
 
 rule deseq2:
@@ -52,9 +52,9 @@ rule deseq2:
         contrast=get_contrast,
         condition = config["linear_model"]
     conda:
-        "envs/deseq2.yaml",
+        "../envs/deseq2.yaml",
     log:
         "logs/deseq2/{contrast}.diffexp.log",
     threads: get_deseq2_threads()
     script:
-        "scripts/deseq2.R"
+        "../scripts/deseq2.R"
