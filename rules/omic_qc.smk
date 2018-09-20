@@ -79,15 +79,10 @@ rule compile_counts:
         expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
     params:
         project_id = config["project_id"],
-        sample_counts="samples/htseq_count/"
     output:
         "data/{params.project_id}_counts.txt"
-    run:
-        from StarUtilities import compile_counts
-        import os
-        import pandas as pd
-
-        compile_counts_table(input,params.project_id)
+    script:
+        "../scripts/compile_counts_table"
     
 rule generate_qc_qa:
  input:
