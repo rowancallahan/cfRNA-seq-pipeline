@@ -34,7 +34,8 @@ rule STAR:
         rev = "samples/trimmed/{sample}_R2_t.fq"
     output:
         "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
-        "samples/star/{sample}_bam/ReadsPerGene.out.tab"
+        "samples/star/{sample}_bam/ReadsPerGene.out.tab",
+        "samples/star/{sample}_bam/Log.final.out"
     threads: 12
     params:
         gtf=config["gtf_file"]
@@ -55,19 +56,13 @@ rule STAR:
 
 rule star_statistics:
     input:
-        "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
-        "samples/star/{sample}_bam/ReadsPerGene.out.tab"
+        expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES)
     params:
         project_id = config["project_id"]
     output:
         "results/tables/{params.project_id}_STAR_mapping_statistics.txt"
-    message:
-        "Executing star_statistics on {timestamp}"
-    log:
-        "logs/star_statistics/"
-    shell:
-        "python StarUtilities.py -d samples/star -p {params.project_id}"
-
+    script:
+        "../scripts/compile_star_log"
 
 rule picard:
   input:
