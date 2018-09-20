@@ -77,10 +77,8 @@ rule read_GC:
 rule compile_counts:
     input:
         expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
-    params:
-        project_id = config["project_id"],
     output:
-        "data/{params.project_id}_counts.txt"
+        "data/{project_id}_counts.txt".format(project_id=config["project_id"])
     script:
         "../scripts/compile_counts_table"
     
