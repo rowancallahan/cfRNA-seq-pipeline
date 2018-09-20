@@ -57,10 +57,8 @@ rule STAR:
 rule star_statistics:
     input:
         expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES)
-    params:
-        project_id = config["project_id"]
     output:
-        "results/tables/{params.project_id}_STAR_mapping_statistics.txt"
+        "results/tables/{project_id}_STAR_mapping_statistics.txt".format(project_id = config["project_id"])
     script:
         "../scripts/compile_star_log"
 
