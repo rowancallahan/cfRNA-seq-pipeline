@@ -18,6 +18,7 @@ rseqqc_env = config["rseqc_env"]
 SAMPLES, = glob_wildcards("samples/raw/{sample}_R1.fq")
 
 ext = ['r','R1.pdf','R2.pdf','xls']
+fastq_ext = ['R1','R2']
 insertion_and_clipping_prof_ext = ['r','R1.pdf','R2.pdf','xls']
 inner_distance_ext = ['_freq.txt','_plot.pdf','_plot.r','.txt']
 read_dist_ext = ['txt']
@@ -70,8 +71,10 @@ rule all:
     input:
         expand("samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam", sample = SAMPLES),
         expand("samples/star/{sample}_bam/ReadsPerGene.out.tab", sample = SAMPLES),
-        "results/tables/{}_STAR_mapping_statistics.txt".format(config['project_id']),
-        expand("samples/fastqc/{sample}/{sample}_{ext}_t_fastqc.zip", sample = SAMPLES, ext = ext),
+        expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES),
+        expand("results/tables/{project_id}_STAR_mapping_statistics.txt", project_id = config['project_id']),
+        "results/tables/{}_STAR_mapping_statistics.txt".format
+        expand("samples/fastqc/{sample}/{sample}_{fastq_ext}_t_fastqc.zip", sample = SAMPLES, fastq_ext = fastq_ext),
         expand("samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam", sample = SAMPLES),
         expand("samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam", sample = SAMPLES),
         expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
