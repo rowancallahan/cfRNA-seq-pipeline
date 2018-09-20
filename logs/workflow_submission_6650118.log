@@ -1,0 +1,15 @@
+MissingInputException in line 69 of /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/Snakefile:
+Missing input files for rule all:
+results/tables/cfRNA_9_14_STAR_mapping_statistics.txt
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/insertion_profile
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/inner_distance
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/clipping_profile
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/read_GC
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/star_statistics
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/compile_counts
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/generate_qc_qa
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/run_qc_qa
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/deseq2
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/logs/fastqc
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/results/diffexp
+/home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/results/tables
