@@ -95,7 +95,7 @@ rule generate_qc_qa:
     gtf_file = config["gtf_file"],
     meta_viz = format_plot_columns(),
  output:
-    "analysis_code/{params.project_id}_analysis.R"
+    "analysis_code/{project_id}_analysis.R".format(project_id=project_id)
  log:
     "logs/generate_qc_qa/"
 
@@ -107,7 +107,7 @@ rule run_qc_qa:
     input:
         rules.generate_qc_qa.output
     output:
-        "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id'])
+        "results/tables/{project_id}_Normed_with_Ratio_and_Abundance.txt".format(project_id=config['project_id'])
     conda:
         "../envs/omic_qc_wf.yaml"
     log:
