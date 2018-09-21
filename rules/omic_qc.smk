@@ -80,7 +80,7 @@ rule compile_counts:
     output:
         "data/{project_id}_counts.txt".format(project_id=config["project_id"])
     script:
-        "../scripts/compile_counts_table"
+        "../scripts/compile_counts_table.py"
     
 rule generate_qc_qa:
  input:
