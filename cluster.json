@@ -4,11 +4,19 @@
         "t" : "35:00:00",
         "N" : 1,
         "partition" : "exacloud",
-        "J" : "master",
-        "o" : "logs/slurm_master%j.out",
-        "e" : "logs/slurm_master%j.err",
+        "J" : "{rule}.{wildcards}",
+        "o" : "logs/{rule}/{wildcards}_{rule}%j.out",
+        "e" : "logs/{rule}/{wildcards}_{rule}%j.err",
         "c" : 4,
         "mem" : 45000
+    },
+    "trimming" :
+    {
+        "J" : "trimming",
+        "e" : "logs/trimming/trimming_%j.err",
+        "o" : "logs/trimming/trimming_%j.out",
+        "c" : 1,
+        "mem" : 54000
     },
     "generate_qc_qa" :
     {
@@ -23,6 +31,7 @@
         "J" : "run_qc_qa",
         "e" : "logs/run_qc_qa/run_qc_qa_%j.err",
         "o" : "logs/run_qc_qa/run_qc_qa_%j.out", 
+        "c" : 1,
         "mem" : 45000 
     }, 
     "insertion_profile" :
@@ -73,6 +82,14 @@
         "c" : 1,
         "mem":5000
     },
+    "picard" :
+    {
+        "J" : "picard",
+        "e" : "logs/picard/picard_%j.err",
+        "o" : "logs/picard/picard_%j.out",
+        "c" : 1,
+        "mem" : 45000
+    },
     "STAR" :
     {
         "J" : "star",
@@ -80,6 +97,30 @@
         "o" : "logs/star%j.out",
         "c" : 12,
         "mem" : 64000
+    },
+    "sort" :
+    {
+        "J" : "sort",
+        "e" : "logs/sort/sort_%j.err",
+        "o" : "logs/sort/sort_%j.out",
+        "c" : 1,
+        "mem" : 54000
+    },
+    "samtools_stats" :
+    {
+        "J" : "samtools_stats",
+        "e" : "logs/samtools_stats/samtools_stats_%j.err",
+        "o" : "logs/samtools_stats/samtools_stats_%j.out",
+        "c" : 1,
+        "mem" : 54000
+    },
+    "genecount" :
+    {
+        "J" : "genecount",
+        "e" : "logs/genecount/genecount_%j.err",
+        "o" : "logs/genecount/genecount_%j.out",
+        "c" : 1,
+        "mem" : 54000
     },
     "compile_counts" :
     {
@@ -123,25 +164,59 @@
     "circ_star" :
     {
         "J" : "circ_star",
-        "e" : "logs/circ_star%j.err",
-        "o" : "logs/circ_star_%j.out",
+        "e" : "logs/circ_explorer/circ_star%j.err",
+        "o" : "logs/circ_explorer/circ_star_%j.out",
         "c" : 12,
         "mem" : 64000
     },
-    "circ_explorer" :
+    "circ_explorer_parse" :
     {
         "J" : "circ_explorer",
-        "e" : "logs/circ_explorer%j.err",
-        "o" : "logs/circ_explorer_%j.out",
+        "e" : "logs/circ_explorer/circ_explorer_parse%j.err",
+        "o" : "logs/circ_explorer/circ_explorer_parse%j.out",
         "c" : 1,
         "mem" : 64000
     },
-    "junction_counts" :
+    "circ_explorer_annotate" :
     {
-        "J" : "junction_counts",
-        "e" : "logs/junction_counts%j.err",
-        "o" : "logs/junction_counts%j.out",
+        "J" : "circ_explorer_annotate",
+        "e" : "logs/circ_explorer/circ_explorer_annotate%j.err",
+        "o" : "logs/circ_explorer/circ_explorer_annotate%j.out",
+        "c" : 1,
+        "mem" : 64000
+    },
+
+    "circexplorer_junction_counts" :
+    {
+        "J" : "circexplorer_junction_counts",
+        "e" : "logs/circexplorer_junction_counts/circexplorer_junction_counts%j.err",
+        "o" : "logs/circexplorer_junction_counts/circexplorer_junction_counts%j.out",
+        "c" : 1,
+        "mem" : 5400
+    },
+    "bwa" :
+    {
+        "J" : "bwa",
+        "e" : "logs/bwa/bwa%j.err",
+        "o" : "logs/bwa/bwa%j.out",
+        "c" : 12,
+        "mem" : 64000
+    },
+    "ciri" :
+    {
+        "J" : "ciri",
+        "e" : "logs/ciri/ciri%j.err",
+        "o" : "logs/ciri/ciri%j.out",
+        "c" : 12,
+        "mem" : 64000
+    },
+    "ciri_junction_counts" :
+    {
+        "J" : "ciri_junction_counts",
+        "e" : "logs/ciri_junction_counts/ciri_junction_counts%j.err",
+        "o" : "logs/ciri_junction_counts/ciri_junction_counts%j.out",
         "c" : 1,
         "mem" : 5400
     }
+
 }
