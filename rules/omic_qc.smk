@@ -1,5 +1,4 @@
 
-
 rule insertion_profile:
     input:
         "samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam",
@@ -77,18 +76,11 @@ rule read_GC:
 rule compile_counts:
     input:
         expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
-    params:
-        project_id = config["project_id"],
-        sample_counts="samples/htseq_count/"
     output:
-        "data/{params.project_id}_counts.txt"
-    run:
-        from StarUtilities import compile_counts
-        import os
-        import pandas as pd
-
-        compile_counts_table(input,params.project_id)
-    
+        "data/{project_id}_counts.txt".format(project_id=config["project_id"])
+    script:
+        "../scripts/compile_counts_table.py"
+ 
 rule generate_qc_qa:
  input:
     counts =rules.compile_counts.output
@@ -102,7 +94,7 @@ rule generate_qc_qa:
     gtf_file = config["gtf_file"],
     meta_viz = format_plot_columns(),
  output:
-    "analysis_code/{params.project_id}_analysis.R"
+    "analysis_code/{project_id}_analysis.R".format(project_id=project_id)
  log:
     "logs/generate_qc_qa/"
 
@@ -114,10 +106,10 @@ rule run_qc_qa:
     input:
         rules.generate_qc_qa.output
     output:
-        "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id'])
+        "results/tables/{project_id}_Normed_with_Ratio_and_Abundance.txt".format(project_id=config["project_id"])
     conda:
         "../envs/omic_qc_wf.yaml"
     log:
         "logs/run_qc_qa/"
     shell:
-        "Rscript analysis_code/{}_analysis.R".format(config['project_id'])
+        "Rscript analysis_code/{project_id}_analysis.R".format(project_id=config['project_id'])
