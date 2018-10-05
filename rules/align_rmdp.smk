@@ -6,6 +6,8 @@ rule trimming:
         fwd = "samples/trimmed/{sample}_R1_t.fq",
         rev = "samples/trimmed/{sample}_R2_t.fq",
         single = "samples/trimmed/{sample}_R1_singletons.fq"
+    log:
+        "logs/trimming/{sample}_trimming.log"
     message:
         """--- Trimming."""
     shell:
@@ -34,7 +36,8 @@ rule STAR:
         rev = "samples/trimmed/{sample}_R2_t.fq"
     output:
         "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
-        "samples/star/{sample}_bam/ReadsPerGene.out.tab"
+        "samples/star/{sample}_bam/ReadsPerGene.out.tab",
+        "samples/star/{sample}_bam/Log.final.out"
     threads: 12
     params:
         gtf=config["gtf_file"]
@@ -50,24 +53,18 @@ rule STAR:
                 --outFileNamePrefix samples/star/{wildcards.sample}_bam/ \
                 --sjdbGTFfile {params.gtf} --quantMode GeneCounts \
                 --sjdbGTFtagExonParentGene gene_name \
-                --outSAMtype BAM SortedByCoordinate --readFilesCommand zcat --twopassMode Basic
+                --outSAMtype BAM SortedByCoordinate \
+                #--readFilesCommand zcat \
+                --twopassMode Basic
                 """)
 
 rule star_statistics:
     input:
-        "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
-        "samples/star/{sample}_bam/ReadsPerGene.out.tab"
-    params:
-        project_id = config["project_id"]
+        expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES)
     output:
-        "results/tables/{params.project_id}_STAR_mapping_statistics.txt"
-    message:
-        "Executing star_statistics on {timestamp}"
-    log:
-        "logs/star_statistics/"
-    shell:
-        "python StarUtilities.py -d samples/star -p {params.project_id}"
-
+        "results/tables/{project_id}_STAR_mapping_statistics.txt".format(project_id = config["project_id"])
+    script:
+        "../scripts/compile_star_log.py"
 
 rule picard:
   input:
