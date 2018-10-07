@@ -72,7 +72,7 @@ rule all:
         expand("samples/star/{sample}_bam/ReadsPerGene.out.tab", sample = SAMPLES),
         expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES),
         expand("results/tables/{project_id}_STAR_mapping_statistics.txt", project_id = config['project_id']),
-        "results/tables/{}_STAR_mapping_statistics.txt".format
+        "results/tables/{}_STAR_mapping_statistics.txt".format,
         expand("samples/fastqc/{sample}/{sample}_{fastq_ext}_t_fastqc.zip", sample = SAMPLES, fastq_ext = fastq_ext),
         expand("samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam", sample = SAMPLES),
         expand("samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam", sample = SAMPLES),
