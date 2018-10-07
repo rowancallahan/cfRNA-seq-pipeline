@@ -80,11 +80,7 @@ rule compile_counts:
         "data/{project_id}_counts.txt".format(project_id=config["project_id"])
     script:
         "../scripts/compile_counts_table.py"
-<<<<<<< HEAD
- 
-=======
-    
->>>>>>> 4329dd695676d44b9156cd2d3e898716d1dd7cb5
+
 rule generate_qc_qa:
  input:
     counts =rules.compile_counts.output
