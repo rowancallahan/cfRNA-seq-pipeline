@@ -80,7 +80,11 @@ rule compile_counts:
         "data/{project_id}_counts.txt".format(project_id=config["project_id"])
     script:
         "../scripts/compile_counts_table.py"
+<<<<<<< HEAD
  
+=======
+    
+>>>>>>> 4329dd695676d44b9156cd2d3e898716d1dd7cb5
 rule generate_qc_qa:
  input:
     counts =rules.compile_counts.output
@@ -106,7 +110,7 @@ rule run_qc_qa:
     input:
         rules.generate_qc_qa.output
     output:
-        "results/tables/{project_id}_Normed_with_Ratio_and_Abundance.txt".format(project_id=config["project_id"])
+        "results/tables/{project_id}_Normed_with_Ratio_and_Abundance.txt".format(project_id=config['project_id'])
     conda:
         "../envs/omic_qc_wf.yaml"
     log:

@@ -5,6 +5,7 @@ import pandas as pd
 Args:
     snakemake.input (list): list of globbed wildcards HTSeq 
     snakemake.output[0] (str): data/{params.project_id}_counts.txt
+
 Returns:
     Compiled STAR gene counts table as tab delimited file.
 """

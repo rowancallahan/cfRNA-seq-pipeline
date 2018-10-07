@@ -5,6 +5,7 @@ import pandas as pd
 Args:
     snakemake.input (list): list of globbed wildcards STAR Log.final.out
     project_title (str): Project title for compiled STAR mapping statistics
+
 Returns:
     Compiled STAR log.final.out as tab delimited file.
 """

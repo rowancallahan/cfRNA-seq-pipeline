@@ -3,11 +3,11 @@ import os
 import pandas as pd
 
 
-def compile_star_log(files, out):
+def compile_star_log(files, project_title):
     """Function accepts a STAR output directory and compiles all sample information from Log.final.out
 
     Args:
-        data_dir (str/path): Path to STAR output
+        files (list): list of globbed wildcards
         project_title (str): Project title for compiled STAR mapping statistics
 
     Returns:
@@ -17,6 +17,7 @@ def compile_star_log(files, out):
     tables = [pd.read_csv(fh, sep = '\t', index_col = 0, names = [fh.split('/')[-2]]) for fh in files]
     joined_table = pd.concat(tables, axis=1)
     joined_table_sorted = joined_table.reindex(sorted(joined_table.columns), axis = 1)
+    out = "results/tables/{}_STAR_mapping_statistics.txt".format(project_title)
     joined_table_sorted.to_csv(out, sep='\t')
 
 
