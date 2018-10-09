@@ -1,5 +1,4 @@
 
-
 rule insertion_profile:
     input:
         "samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam",
@@ -81,7 +80,7 @@ rule compile_counts:
         "data/{project_id}_counts.txt".format(project_id=config["project_id"])
     script:
         "../scripts/compile_counts_table.py"
-    
+
 rule generate_qc_qa:
  input:
     counts =rules.compile_counts.output
@@ -113,4 +112,4 @@ rule run_qc_qa:
     log:
         "logs/run_qc_qa/"
     shell:
-        "Rscript analysis_code/{}_analysis.R".format(config['project_id'])
+        "Rscript analysis_code/{project_id}_analysis.R".format(project_id=config['project_id'])

@@ -1,11 +1,13 @@
 name: omic-qc-wf
 channels:
+  - defaults
   - conda-forge
   - r
   - bioconda
-  - defaults
 dependencies:
+  - bbmap=38.20=h470a237_0
   - bcftools=1.3.1=2
+  - bedops=2.4.35=h2d50403_1
   - bioconductor-affy=1.56.0=r3.4.1_0
   - bioconductor-affyio=1.48.0=r3.4.1_0
   - bioconductor-annotationdbi=1.40.0=r3.4.1_0
@@ -20,8 +22,14 @@ dependencies:
   - bioconductor-s4vectors=0.16.0=r3.4.1_0
   - bioconductor-zlibbioc=1.24.0=r3.4.1_0
   - bwa=0.7.12=1
+  - htseq=0.9.1=py35h24bf2e0_1
+  - htslib=1.7=0
+  - libdeflate=1.0=h470a237_0
+  - multiqc=0.9=py35_0
+  - pysam=0.14.1=py35hae42fb6_1
   - r-data.table=1.10.4=r3.4.1_0
   - samtools=1.3.1=5
+  - simplejson=3.8.1=py35_0
   - snakemake=3.11.0=py35_1
   - asn1crypto=0.24.0=py35_0
   - cffi=1.11.5=py35_0
@@ -68,26 +76,45 @@ dependencies:
   - zlib=1.2.11=h470a237_2
   - _r-mutex=1.0.0=anacondar_1
   - bcrypt=3.1.4=py35ha35c455_0
+  - blas=1.0=mkl
   - bzip2=1.0.6=h14c3975_5
   - ca-certificates=2018.03.07=0
   - cairo=1.14.8=0
-  - certifi=2018.4.16=py35_0
+  - certifi=2018.8.24=py35_1
+  - click=6.7=py35h353a69f_0
+  - cycler=0.10.0=py35hc4d5149_0
   - fontconfig=2.12.1=3
   - freetype=2.5.5=2
+  - git=2.14.1=pl526h58e4575_2
   - glib=2.50.2=1
   - graphviz=2.38.0=5
   - gsl=2.4=h14c3975_4
   - harfbuzz=0.9.39=2
   - icu=54.1=0
+  - intel-openmp=2018.0.3=0
+  - jinja2=2.10=py35h480ab6d_0
   - libgcc=7.2.0=h69d50b8_2
   - libgcc-ng=7.2.0=hdf63c60_3
+  - libgfortran-ng=7.2.0=hdf63c60_3
   - libiconv=1.14=0
   - libstdcxx-ng=7.2.0=hdf63c60_3
   - libxml2=2.9.4=0
-  - openssl=1.0.2o=h20670df_0
+  - markupsafe=1.0=py35h4f4fcf6_1
+  - matplotlib=1.5.1=np111py35_0
+  - mkl=2018.0.3=1
+  - numpy=1.11.3=py35h1b885b7_9
+  - numpy-base=1.11.3=py35h3dfced4_9
+  - openjdk=8.0.121=1
+  - openssl=1.0.2p=h14c3975_0
   - pango=1.40.3=1
   - pcre=8.39=1
+  - perl=5.26.2=h14c3975_0
+  - pyparsing=2.2.0=py35h041ed72_1
+  - pyqt=4.11.4=py35_4
   - python=3.5.1=5
+  - python-dateutil=2.7.3=py35_0
+  - pytz=2018.5=py35_0
+  - qt=4.8.7=4
   - r=3.4.1=r3.4.1_0
   - r-base=3.4.1=1
   - r-bh=1.62.0_1=r3.4.1_0
@@ -136,6 +163,7 @@ dependencies:
   - r-tibble=1.3.3=r3.4.1_0
   - r-xml=3.98_1.7=r3.4.1_0
   - r-xtable=1.8_2=r3.4.1_0
+  - sip=4.18=py35_0
   - sqlite=3.13.0=0
   - tk=8.5.18=0
   - xz=5.2.4=h14c3975_4
@@ -148,16 +176,10 @@ dependencies:
   - r-rngtools=1.2.4=r3.4.1_0
   - r-stringr=1.2.0=r3.4.1_0
   - pip:
-    - cycler==0.10.0
     - dill==0.2.7.1
     - kiwisolver==1.0.1
-    - matplotlib==2.2.2
     - mlxtend==0.12.0
-    - numpy==1.14.3
     - pandas==0.23.0
-    - pyparsing==2.2.0
-    - python-dateutil==2.7.3
-    - pytz==2018.4
     - scikit-learn==0.19.1
     - scipy==1.1.0
 prefix: /home/exacloud/lustre1/CompBio/miniconda3/envs/omic-qc-wf

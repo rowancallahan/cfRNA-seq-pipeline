@@ -1,11 +1,11 @@
 omic_meta_data:
-  /data/PP_cohort_sample_info_log_JE.2018.06.06.txt
+  /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/PP_cohort_sample_info_log_JE.2018.09.28.txt
 base_dir:
-  /home/exacloud/lustre1/CompBio/estabroj/data/snakemake/projects/Omics-QC-pipeline
+  /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline
 gtf_file:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf
 bed_file:
-  /home/exacloud/lustre1/CompBio/estabroj/CEDAR/practice_snakmake/gencode_v27.bed
+  /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/gencode_v27.bed
 fastq_dir:
   /home/exacloud/lustre1/CEDAR/cfrna/data/LIB180515JW
 #path to tools
@@ -48,4 +48,4 @@ pca:
     # columns of sample sheet to use for PCA
     - Type
 # path or URL to sample sheet (TSV format, columns: sample, condition, ...)
-samples: /home/exacloud/lustre1/CompBio/estabroj/CEDAR/cfrna/data/first_round_sequencing/PP_cohort_sample_info_log_JE.2018.06.06.txt
+samples: /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/PP_cohort_sample_info_log_JE.2018.09.28.txt

@@ -52,9 +52,9 @@ rule deseq2:
         contrast=get_contrast,
         condition = config["linear_model"]
     conda:
-        "../envs/deseq2.yaml",
+        "../envs/deseq2.yaml"
     log:
-        "logs/deseq2/{contrast}.diffexp.log",
+        "logs/deseq2/{contrast}.diffexp.log"
     threads: get_deseq2_threads()
     script:
         "../scripts/deseq2.R"

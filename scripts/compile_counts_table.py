@@ -2,7 +2,6 @@ import pandas as pd
 
 
 """Accepts a HTSeq output directory and compiles {sample}_htseq_gene_count.txt into a joined tab sep file
-
 Args:
     snakemake.input (list): list of globbed wildcards HTSeq 
     snakemake.output[0] (str): data/{params.project_id}_counts.txt

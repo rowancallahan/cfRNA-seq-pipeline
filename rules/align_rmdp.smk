@@ -6,6 +6,8 @@ rule trimming:
         fwd = "samples/trimmed/{sample}_R1_t.fq",
         rev = "samples/trimmed/{sample}_R2_t.fq",
         single = "samples/trimmed/{sample}_R1_singletons.fq"
+    log:
+        "logs/trimming/{sample}_trimming.log"
     message:
         """--- Trimming."""
     shell:
@@ -51,7 +53,9 @@ rule STAR:
                 --outFileNamePrefix samples/star/{wildcards.sample}_bam/ \
                 --sjdbGTFfile {params.gtf} --quantMode GeneCounts \
                 --sjdbGTFtagExonParentGene gene_name \
-                --outSAMtype BAM SortedByCoordinate --readFilesCommand zcat --twopassMode Basic
+                --outSAMtype BAM SortedByCoordinate \
+                #--readFilesCommand zcat \
+                --twopassMode Basic
                 """)
 
 rule star_statistics:
