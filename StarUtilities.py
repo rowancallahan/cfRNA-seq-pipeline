@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 
-def compile_star_log(files, project_title):
+def compile_star_log(files, out):
     """Function accepts a STAR output directory and compiles all sample information from Log.final.out
 
     Args:
@@ -17,7 +17,6 @@ def compile_star_log(files, project_title):
     tables = [pd.read_csv(fh, sep = '\t', index_col = 0, names = [fh.split('/')[-2]]) for fh in files]
     joined_table = pd.concat(tables, axis=1)
     joined_table_sorted = joined_table.reindex(sorted(joined_table.columns), axis = 1)
-    out = "results/tables/{}_STAR_mapping_statistics.txt".format(project_title)
     joined_table_sorted.to_csv(out, sep='\t')
 
 

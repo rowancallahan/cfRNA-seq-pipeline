@@ -21,11 +21,11 @@ rule fastqc:
     log:
         "logs/fastqc/{sample}_fastqc.log"
     conda:
-        "../envs/omic_qc_wf.yaml"
+        "../envs/fastqc.yaml"
     message:
         """--- Quality check of raw data with Fastqc."""
     shell:
-        """fastqc --outdir  samples/fastqc/{wildcards.sample} --extract  -f fastq {input.fwd} {input.rev}"""
+        """fastqc --outdir samples/fastqc/{wildcards.sample} --extract  -f fastq {input.fwd} {input.rev}"""
 
 
 rule STAR:

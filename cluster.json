@@ -123,24 +123,24 @@
     "circ_star" :
     {
         "J" : "circ_star",
-        "e" : "logs/circ_star%j.err",
-        "o" : "logs/circ_star_%j.out",
+        "e" : "logs/circ_star/circ_star%j.err",
+        "o" : "logs/circ_star/circ_star_%j.out",
         "c" : 12,
         "mem" : 64000
     },
     "circ_explorer" :
     {
         "J" : "circ_explorer",
-        "e" : "logs/circ_explorer%j.err",
-        "o" : "logs/circ_explorer_%j.out",
+        "e" : "logs/circ_explorer/circ_explorer%j.err",
+        "o" : "logs/circ_explorer/circ_explorer_%j.out",
         "c" : 1,
         "mem" : 64000
     },
     "junction_counts" :
     {
         "J" : "junction_counts",
-        "e" : "logs/junction_counts%j.err",
-        "o" : "logs/junction_counts%j.out",
+        "e" : "logs/junction_counts/junction_counts%j.err",
+        "o" : "logs/junction_counts/junction_counts%j.out",
         "c" : 1,
         "mem" : 5400
     }
