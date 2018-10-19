@@ -29,7 +29,7 @@ Workflow
 Locate raw files.
 
 ```
-$ cd /home/groups/CEDAR/seq/library_name
+$ cd /path/to/raw/data
 $ ls -alh
 ```
 
@@ -42,7 +42,7 @@ $ md5sum –c md5sum.txt > md5sum_out.txt
 Move your files into the archive to be stored.
 
 ```
-$ mv /home/groups/CEDAR/seq/library_name /home/groups/CEDAR/archive/seq
+$ mv /path/to/raw/data /path/to/archive
 ```
 
 Unzip all fastq files.
