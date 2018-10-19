@@ -26,7 +26,7 @@ We welcome contributors! For your pull requests, please include the following:
 Workflow
 ======================
 
-Locate raw files:
+Locate raw files.
 
 ```
 $ cd /home/groups/CEDAR/seq/library_name
