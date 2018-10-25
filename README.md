@@ -117,3 +117,26 @@ To see how the job is running, look at your queue.
 ```
 $ squeue -u your_username
 ```
+
+Detailed Steps and Output
+=================================
+
+Alignment
+======================
+1) Trimming
+    * Trimming of paired-end reads was performed using the trimming tool sickle
+    * The output is located in `samples/trimmed/`
+2) Quality Analysis
+    * Trimmed reads were subject to fastqc quality analysis
+    * The output is located in `samples/fastqc/{sample}/{samples}_t_fastqc.zip
+3) Alignment
+    * Trimmed reads were aligned to the hg19 genome assembly using STAR
+        * We included a two pass mode flag in order to increase the number of aligned reads
+        * Output is placed in `samples/star/{sample}_bam/`
+            * Output directory includes: `Aligned.sortedByCoord.out.bam`, `ReadsPerGene.out.tab`, and `Log.final.out`
+    * We extracted the statistics from the STAR run, and placed them in a table, summarizing the results across all samples from the Log.final.out output of STAR
+        * Output is `results/tables/{project_id}_STAR_mapping_statistics.txt`
+4) Summarizing output
+    * htseq and samtools were used to extract the gene counts for each sample
+    * We summarize these results into 1 table, which includes the gene counts across all samples
+    * The output is located in `data/{project_id}_counts.txt`
