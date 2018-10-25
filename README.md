@@ -23,7 +23,7 @@ We welcome contributors! For your pull requests, please include the following:
 * Documented code providing fix
 * Unit tests evaluating added/modified methods. 
 
-Workflow
+Use
 ======================
 
 Locate raw files:
@@ -118,7 +118,7 @@ To see how the job is running, look at your queue.
 $ squeue -u your_username
 ```
 
-Detailed Steps and Output
+Detailed Workflow
 =================================
 
 Alignment
