@@ -140,3 +140,62 @@ Alignment
     * htseq and samtools were used to extract the gene counts for each sample
     * We summarize these results into 1 table, which includes the gene counts across all samples
     * The output is located in `data/{project_id}_counts.txt`
+
+Quality Analysis / Quality Check
+======================
+1) RSEQC Quality check 
+    * RSEQC was used to check the quality of the reads by using a collection of commands from the RSEQC package:
+        * Insertion Profile
+        * Inner Distance
+        * Clipping Profile
+        * Read distribution
+        * Read GC
+    * For more information on these, visit: http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/rseqc/_build/html/index.html#usage-information
+2) QA/QC scripts to analyze the data as a whole 
+    * The purpose of this analysis is to identify potential batch effects and outliers in the data
+    * The outputs to this are located in the results directory, and are distributed amongst 4 subdirectories, numbered 1 through 4
+        * `1`
+            * A *boxplot* of the raw log2-transformed gene counts across all samples
+            * A *boxplot* of the loess-transformed gene counts across all samples
+            * A *scatter plot* comparing raw gene counts to loess-transformed gene counts
+            * A *density plot* of raw log2-transformed gene counts across all samples 
+            * A *density plot* of loess-transformed gene counts across all samples
+            * A *scatter plot* of the standard deviation of raw log2-transformed gene counts across all samples
+            * A *scatter plot* of the standard deviation of loess-transformed gene counts across all samples
+        * `2`
+            * A *heatmap* of all raw log2-transformed gene counts across samples
+            * A *heatmap* of all loess-transformed gene counts across samples
+                * These are generated to look for any batch effects in the data, due to date of extraction, or other factors
+            * An *MDS Plot* for all samples, generated with the raw log2-transformed gene counts
+            * An *MDS Plot* for all samples, generated with the loess-transformed gene counts
+                * These are generated to look for outliers in the data
+        * `3`
+            * *p-value histograms* for each contrast specified in the omic_config.yaml
+            * *q-value QC plot arrays* for each contrast specified in the omic_config.yaml
+        * `4`
+            * A *Heatmap* which looks at genes with a high FC and low q-value (very significant)
+                * Takes genes with a FC>1.3, and ranks those by q-value. From this, a heatmap is generated for the top *50, 100 and 200* genes in this list
+            * An *MDS Plot* which looks at the same subsets of genes as the Heatmap described above
+            
+Differential Expression Analysis (DESeq2)
+======================
+1) Initializing the DESeq2 object
+    * Here, we run DESeq2 on the genecounts table, which generates an RDS object and rlog
+        * This includes the DE analysis across all samples
+        * Output is located in the results/diffexp/ directory
+    * From the dds object generated, we extract the normalized counts and generate a table with the results
+        * Output is results/tables/{project_id}_normed_counts.txt
+2) Generating plots
+    * From the RDS object, we generate a collection of informative plots. These include:
+        * PCA Plot
+        * Standard Deviation from the Mean Plot
+        * Heatmap
+        * Variance Heatmap
+        * Distance Plot
+3) Differential Expression Analysis
+    * We perform Differential Expression (DE) analysis for each contrast listed in the omic_config.yaml
+    * Our output consists of DE gene count tables and a variety of plots
+        * A table is generated for genes that are differentially expressed for each contrast
+            * The output is placed in results/diffexp/{contrast}.diffexp.tsv
+        * *MA Plots* are generated for each contrast
+        * *p-histograms* are generated for each contrast
