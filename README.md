@@ -27,8 +27,7 @@ Use
 ======================
 
 Locate raw files:
-* After your files are sequenced, they are placed in `/home/groups/CEDAR/seq/library_name`.
-* Change into this directory and find out details about the fastq files contained inside.
+* After sequencing, your raw fastq files are placed in `/path/to/sequencing/files`.
 
 ```
 $ cd /path/to/raw/data
