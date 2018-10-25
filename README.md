@@ -33,7 +33,7 @@ $ cd /path/to/raw/data
 $ ls -alh
 ```
 
-Check md5sum to ensure your sequencing data is not corrupt.
+Check md5sum.
 
 ```
 $ md5sum –c md5sum.txt > md5sum_out.txt
@@ -43,6 +43,12 @@ Move your files into the archive to be stored.
 
 ```
 $ mv /path/to/raw/data /path/to/archive
+```
+
+Check md5sum again to ensure your sequencing files are not corrupted.
+
+```
+$ md5sum –c md5sum.txt > md5sum_out.txt
 ```
 
 Unzip all fastq files.
