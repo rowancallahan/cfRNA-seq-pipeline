@@ -27,7 +27,7 @@ Use
 ======================
 
 Locate raw files:
-* After your files are sequenced, they are placed in /home/groups/CEDAR/seq/library_name.
+* After your files are sequenced, they are placed in `/home/groups/CEDAR/seq/library_name`.
 * Change into this directory and find out details about the fastq files contained inside.
 
 ```
@@ -67,7 +67,7 @@ Clone the Omics-QC Pipeline into your working directory.
 $ git clone https://github.com/ohsu-cedar-comp-hub/Omics-QC-pipeline.git
 ```
 
-Create a sample/raw directory, a logs directory and a data directory (if they do not exist) in your wdir().
+Create a `samples/raw` directory, a `logs` directory and a `data` directory (if they do not exist) in your `wdir()`.
 
 ```
 $ mkdir logs
@@ -77,7 +77,7 @@ $ cd samples
 $ mkdir raw
 ```
 
-Symbollically link the fastq files of your samples to the wdir/samples/raw directory using a simple bash script loop in your terminal.
+Symbollically link the fastq files of your samples to the `wdir/samples/raw` directory using a bash script loop in your terminal.
 
 ```
 $ ls -1 /path/to/data/LIB*R1*fastq | while read fastq; do
@@ -89,16 +89,16 @@ $ ls -1 /path/to/data/LIB*R1*fastq | while read fastq; do
 done
 ```
 
-Upload your metadata file to the /data directory, with the correct formatting:
+Upload your metadata file to the `data` directory, with the correct formatting:
 * Columns should read:
 ```StudyID   SampleID   Type   Plasma_volume   RNA_volume   RNA_extracted_by   RNA_extraction_date   Lib_prep_by   Lib._Conc.   Sample_Information   Notes```
 * Each row should be a sample, with the above information provided
 * All values in this file should be tab-separated
 
-Edit the omic_config.yaml in your wdir():
+Edit the `omic_config.yaml` in your `wdir()`:
 * Change the project_id to a unique project identifier
-* Add appropriate contrasts based on your samples under the [diffexp][contrasts] section
-* Add the path to your metadata file for the omic_meta_data and samples parameters
+* Add appropriate contrasts based on your samples under the `[diffexp][contrasts]` section
+* Add the path to your metadata file for the `omic_meta_data` and `samples` parameters
 
 Do a dry-run of snakemake to ensure proper execution before submitting it to the cluster (in your wdir).
 
@@ -124,36 +124,37 @@ Detailed Workflow
 Alignment
 ======================
 1) Trimming
-    * Trimming of paired-end reads was performed using the trimming tool sickle
+    * Trimming of paired-end reads was performed using the trimming tool `sickle`
     * The output is located in `samples/trimmed/`
 2) Quality Analysis
-    * Trimmed reads were subject to fastqc quality analysis
+    * Trimmed reads were subject to `fastqc` quality analysis
     * The output is located in `samples/fastqc/{sample}/{samples}_t_fastqc.zip`
 3) Alignment
-    * Trimmed reads were aligned to the hg19 genome assembly using STAR
+    * Trimmed reads were aligned to the hg19 genome assembly using `STAR`
         * We included a two pass mode flag in order to increase the number of aligned reads
         * Output is placed in `samples/star/{sample}_bam/`
             * Output directory includes: `Aligned.sortedByCoord.out.bam`, `ReadsPerGene.out.tab`, and `Log.final.out`
-    * We extracted the statistics from the STAR run, and placed them in a table, summarizing the results across all samples from the Log.final.out output of STAR
+    * We extracted the statistics from the `STAR` run, and placed them in a table, summarizing the results across all samples from the `Log.final.out` output of STAR
         * Output is `results/tables/{project_id}_STAR_mapping_statistics.txt`
 4) Summarizing output
-    * htseq and samtools were used to extract the gene counts for each sample
+    * `htseq` and `samtools` were used to extract the gene counts for each sample, and `picard` was used to remove duplicate reads
     * We summarize these results into 1 table, which includes the gene counts across all samples
     * The output is located in `data/{project_id}_counts.txt`
 
 Quality Analysis / Quality Check
 ======================
 1) RSEQC Quality check 
-    * RSEQC was used to check the quality of the reads by using a collection of commands from the RSEQC package:
+    * `RSEQC` was used to check the quality of the reads by using a collection of commands from the `RSEQC` package:
         * Insertion Profile
         * Inner Distance
         * Clipping Profile
         * Read distribution
         * Read GC
     * For more information on these, visit: http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/rseqc/_build/html/index.html#usage-information
+    * Output directory: `rseqc/`
 2) QA/QC scripts to analyze the data as a whole 
     * The purpose of this analysis is to identify potential batch effects and outliers in the data
-    * The outputs to this are located in the results directory, and are distributed amongst 4 subdirectories, numbered 1 through 4
+    * The outputs to this are located in the `results` directory, and are distributed amongst 4 subdirectories, numbered `1 through 4`
         * `1`
             * A *boxplot* of the raw log2-transformed gene counts across all samples
             * A *boxplot* of the loess-transformed gene counts across all samples
@@ -170,8 +171,8 @@ Quality Analysis / Quality Check
             * An *MDS Plot* for all samples, generated with the loess-transformed gene counts
                 * These are generated to look for outliers in the data
         * `3`
-            * *p-value histograms* for each contrast specified in the omic_config.yaml
-            * *q-value QC plot arrays* for each contrast specified in the omic_config.yaml
+            * *p-value histograms* for each contrast specified in the `omic_config.yaml`
+            * *q-value QC plot arrays* for each contrast specified in the `omic_config.yaml`
         * `4`
             * A *Heatmap* which looks at genes with a high FC and low q-value (very significant)
                 * Takes genes with a FC>1.3, and ranks those by q-value. From this, a heatmap is generated for the top *50, 100 and 200* genes in this list
@@ -180,22 +181,22 @@ Quality Analysis / Quality Check
 Differential Expression Analysis (DESeq2)
 ======================
 1) Initializing the DESeq2 object
-    * Here, we run DESeq2 on the genecounts table, which generates an RDS object and rlog
+    * Here, we run `DESeq2` on the genecounts table, which generates an RDS object and rlog
         * This includes the DE analysis across all samples
-        * Output is located in the results/diffexp/ directory
+        * Output is located in the `results/diffexp/ directory`
     * From the dds object generated, we extract the normalized counts and generate a table with the results
-        * Output is results/tables/{project_id}_normed_counts.txt
+        * Output is `results/tables/{project_id}_normed_counts.txt`
 2) Generating plots
     * From the RDS object, we generate a collection of informative plots. These include:
-        * PCA Plot
-        * Standard Deviation from the Mean Plot
-        * Heatmap
-        * Variance Heatmap
-        * Distance Plot
+        * *PCA Plot*
+        * *Standard Deviation from the Mean Plot*
+        * *Heatmap*
+        * *Variance Heatmap*
+        * *Distance Plot*
 3) Differential Expression Analysis
-    * We perform Differential Expression (DE) analysis for each contrast listed in the omic_config.yaml
+    * We perform Differential Expression (DE) analysis for each contrast listed in the `omic_config.yaml`
     * Our output consists of DE gene count tables and a variety of plots
         * A table is generated for genes that are differentially expressed for each contrast
-            * The output is placed in results/diffexp/{contrast}.diffexp.tsv
+            * The output is placed in `results/diffexp/{contrast}.diffexp.tsv`
         * *MA Plots* are generated for each contrast
         * *p-histograms* are generated for each contrast
