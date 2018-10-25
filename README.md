@@ -26,7 +26,9 @@ We welcome contributors! For your pull requests, please include the following:
 Workflow
 ======================
 
-Locate raw files.
+Locate raw files:
+* After your files are sequenced, they are placed in /home/groups/CEDAR/seq/library_name.
+* Change into this directory and find out details about the fastq files contained inside.
 
 ```
 $ cd /path/to/raw/data
@@ -65,10 +67,11 @@ Clone the Omics-QC Pipeline into your working directory.
 $ git clone https://github.com/ohsu-cedar-comp-hub/Omics-QC-pipeline.git
 ```
 
-Create a samples/raw directory & a logs directory (if they do not exist) within this directory.
+Create a sample/raw directory, a logs directory and a data directory (if they do not exist) in your wdir().
 
 ```
 $ mkdir logs
+$ mkdir data
 $ mkdir samples
 $ cd samples
 $ mkdir raw
@@ -85,6 +88,17 @@ $ ls -1 /path/to/data/LIB*R1*fastq | while read fastq; do
     ln -s ${fastq%R1_001.fastq}R2_001.fastq ./$R2
 done
 ```
+
+Upload your metadata file to the /data directory, with the correct formatting:
+* Columns should read:
+```StudyID   SampleID   Type   Plasma_volume   RNA_volume   RNA_extracted_by   RNA_extraction_date   Lib_prep_by   Lib._Conc.   Sample_Information   Notes```
+* The rows should each be a sample, with the above information
+* All values in this file should be tab-separated
+
+Edit the omic_config.yaml in your wdir():
+* Change the project_id to a unique project identifier
+* Add appropriate contrasts based on your samples under the [diffexp][contrasts] section
+* Add the path to your metadata file for the omic_meta_data and samples parameters
 
 Do a dry-run of snakemake to ensure proper execution before submitting it to the cluster (in your wdir).
 
