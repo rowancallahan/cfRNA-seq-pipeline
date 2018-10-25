@@ -92,7 +92,7 @@ done
 Upload your metadata file to the /data directory, with the correct formatting:
 * Columns should read:
 ```StudyID   SampleID   Type   Plasma_volume   RNA_volume   RNA_extracted_by   RNA_extraction_date   Lib_prep_by   Lib._Conc.   Sample_Information   Notes```
-* The rows should each be a sample, with the above information
+* Each row should be a sample, with the above information provided
 * All values in this file should be tab-separated
 
 Edit the omic_config.yaml in your wdir():
