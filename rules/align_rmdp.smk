@@ -134,3 +134,41 @@ rule genecount:
                 -m union \
                 {input} \
                 {params.gtf} > {output}"""
+
+
+rule count_exons:
+    input:
+        "samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam"
+    output:
+        "samples/htseq_exon_count/{sample}_htseq_exon_count.txt"
+    params:
+        exon_gtf = config["exon_gtf"]
+    conda:
+        "../envs/omic_qc_wf.yaml"
+    shell:
+        """htseq-count \
+                -f bam \
+                -m intersection-nonempty \
+                -i exon_id \
+                --additional-attr=gene_name \
+                {input} \
+                {params.exon_gtf} > {output}"""
+
+
+rule compile_counts:
+    input:
+        expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
+    output:
+        "data/{project_id}_counts.txt".format(project_id=config["project_id"])
+    script:
+        "../scripts/compile_counts_table.py"
+
+
+rule compile_counts_and_stats:
+    input:
+        expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
+    output:
+        "data/{project_id}_counts_w_stats.txt".format(project_id=config["project_id"])
+    script:
+        "../scripts/compile_counts_table_w_stats.py"
+
