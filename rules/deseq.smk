@@ -1,6 +1,6 @@
 rule deseq2_init:
     input:
-        counts = rules.compile_counts.output
+        counts = "data/{project_id}_counts.txt".format(project_id=config["project_id"])
     output:
         rds="results/diffexp/{project_id}_all.rds".format(project_id=project_id),
         normed_counts="results/tables/{project_id}_normed_counts.txt".format(project_id = project_id),
