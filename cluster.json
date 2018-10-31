@@ -10,6 +10,14 @@
         "c" : 4,
         "mem" : 45000
     },
+    "trimming" :
+    {
+        "J" : "trimming",
+        "e" : "logs/trimming/trimming_%j.err",
+        "o" : "logs/trimming/trimming_%j.out",
+        "c" : 1,
+        "mem" : 54000
+    },
     "generate_qc_qa" :
     {
         "J" : "qc_qa_script_generation",
@@ -73,6 +81,14 @@
         "c" : 1,
         "mem":5000
     },
+    "picard" :
+    {
+        "J" : "picard",
+        "e" : "logs/picard/picard_%j.err",
+        "o" : "logs/picard/picard_%j.out",
+        "c" : 1,
+        "mem" : 45000
+    },
     "STAR" :
     {
         "J" : "star",
@@ -81,11 +97,51 @@
         "c" : 12,
         "mem" : 64000
     },
+    "sort" :
+    {
+        "J" : "sort",
+        "e" : "logs/sort/sort_%j.err",
+        "o" : "logs/sort/sort_%j.out",
+        "c" : 1,
+        "mem" : 54000
+    },
+    "samtools_stats" :
+    {
+        "J" : "samtools_stats",
+        "e" : "logs/samtools_stats/samtools_stats_%j.err",
+        "o" : "logs/samtools_stats/samtools_stats_%j.out",
+        "c" : 1,
+        "mem" : 54000
+    },
+    "genecount" :
+    {
+        "J" : "genecount",
+        "e" : "logs/genecount/genecount_%j.err",
+        "o" : "logs/genecount/genecount_%j.out",
+        "c" : 1,
+        "mem" : 54000
+    },
+    "count_exons" :
+    {
+        "J" : "count_exons",
+        "e" : "logs/count_exons/count_exons_%j.err",
+        "o" : "logs/count_exons/count_exons_%j.out",
+        "c" : 1,
+        "mem" : 54000
+    },
     "compile_counts" :
     {
         "J" : "compile_counts",
         "e" : "logs/compile_counts/compile_counts_%j.err",
         "o" : "logs/compile_counts/compile_counts_%j.out",
+        "c" : 1,
+        "mem":5000
+    },
+    "compile_counts_and_stats" :
+    {
+        "J" : "compile_counts_and_stats",
+        "e" : "logs/compile_counts/compile_counts_and_stats_%j.err",
+        "o" : "logs/compile_counts/compile_counts_and_stats_%j.out",
         "c" : 1,
         "mem":5000
     },
@@ -128,19 +184,27 @@
         "c" : 12,
         "mem" : 64000
     },
-    "circ_explorer" :
+    "bwa" :
     {
-        "J" : "circ_explorer",
-        "e" : "logs/circ_explorer/circ_explorer%j.err",
-        "o" : "logs/circ_explorer/circ_explorer_%j.out",
-        "c" : 1,
+        "J" : "bwa",
+        "e" : "logs/bwa/bwa%j.err",
+        "o" : "logs/bwa/bwa%j.out",
+        "c" : 12,
         "mem" : 64000
     },
-    "junction_counts" :
+    "ciri" :
     {
-        "J" : "junction_counts",
-        "e" : "logs/junction_counts/junction_counts%j.err",
-        "o" : "logs/junction_counts/junction_counts%j.out",
+        "J" : "ciri",
+        "e" : "logs/ciri/ciri%j.err",
+        "o" : "logs/ciri/ciri%j.out",
+        "c" : 12,
+        "mem" : 64000
+    },
+    "ciri_junction_counts" :
+    {
+        "J" : "ciri_junction_counts",
+        "e" : "logs/ciri_junction_counts/ciri_junction_counts%j.err",
+        "o" : "logs/ciri_junction_counts/ciri_junction_counts%j.out",
         "c" : 1,
         "mem" : 5400
     }
