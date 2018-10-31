@@ -6,8 +6,8 @@ gtf_file:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf
 bed_file:
   /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/gencode_v27.bed
-fastq_dir:
-  /home/exacloud/lustre1/CEDAR/cfrna/data/LIB180515JW
+exon_gtf:
+  /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.housekeeping_genes.exon.gtf
 #path to tools
 star_tool:
   /home/exacloud/lustre1/CEDAR/tools/STAR/tags/2.5.3a/bin/Linux_x86_64/STAR
@@ -20,7 +20,7 @@ refflat2:
 star_index:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/
 project_id:
-  cfRNA_9_14
+  cfRNA_11_01
 baseline:
   HD
 linear_model:
@@ -43,6 +43,9 @@ diffexp:
     HD-vs-MM:
       - HD
       - MM
+    HD-vs-LG:
+      - HD
+      - LG
 pca:
   labels:
     # columns of sample sheet to use for PCA
