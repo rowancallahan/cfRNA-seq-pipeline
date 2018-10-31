@@ -73,17 +73,9 @@ rule read_GC:
         "read_GC.py -i {input} -o rseqc/read_GC/{wildcards.sample}/{wildcards.sample}"
 
 
-rule compile_counts:
-    input:
-        expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
-    output:
-        "data/{project_id}_counts.txt".format(project_id=config["project_id"])
-    script:
-        "../scripts/compile_counts_table.py"
-
 rule generate_qc_qa:
  input:
-    counts =rules.compile_counts.output
+    counts = "data/{project_id}_counts.txt".format(project_id=config['project_id'])
  params:
     project_id = config["project_id"],
     datadir = config['base_dir'],
