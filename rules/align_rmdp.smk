@@ -3,20 +3,25 @@ rule trimming:
         fwd = "samples/raw/{sample}_R1.fq",
         rev = "samples/raw/{sample}_R2.fq"
     output:
-        fwd = "samples/trimmed/{sample}_R1_t.fq",
-        rev = "samples/trimmed/{sample}_R2_t.fq",
-        single = "samples/trimmed/{sample}_R1_singletons.fq"
+        fwd_P = "samples/trimmed/{sample}_R1_P_t.fq",
+        fwd_UP = "samples/trimmed/{sample}_R1_UP_t.fq",
+        rev_P = "samples/trimmed/{sample}_R2_P_t.fq",
+        rev_UP = "samples/trimmed/{sample}_R2_UP_t.fq"
+    params:
+        adapter=config["adapter-PE"]
     log:
         "logs/trimming/{sample}_trimming.log"
+    conda:
+        "../envs/trim.yaml"
     message:
         """--- Trimming."""
     shell:
-        """sickle pe -f {input.fwd} -r {input.rev}  -l 40 -q 20 -t sanger  -o {output.fwd} -p {output.rev} -s {output.single} &> {input.fwd}.log"""
+        """trimmomatic PE -trimlog {log} -basein {input.fwd} {input.rev} -baseout {output.fwd_P} {output.fwd_UP} {output.rev_P} {output.rev_UP} ILLUMINACLIP:{params.adapter}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"""
 
 rule fastqc:
     input:
-        fwd = "samples/trimmed/{sample}_R1_t.fq",
-        rev = "samples/trimmed/{sample}_R2_t.fq"
+        fwd = "samples/trimmed/{sample}_R1_P_t.fq",
+        rev = "samples/trimmed/{sample}_R2_P_t.fq"
     output:
         fwd = "samples/fastqc/{sample}/{sample}_R1_t_fastqc.zip",
         rev = "samples/fastqc/{sample}/{sample}_R2_t_fastqc.zip"
@@ -32,8 +37,8 @@ rule fastqc:
 
 rule STAR:
     input:
-        fwd = "samples/trimmed/{sample}_R1_t.fq",
-        rev = "samples/trimmed/{sample}_R2_t.fq"
+        fwd = "samples/trimmed/{sample}_R1_P_t.fq",
+        rev = "samples/trimmed/{sample}_R2_P_t.fq"
     output:
         "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
         "samples/star/{sample}_bam/ReadsPerGene.out.tab",
@@ -171,4 +176,15 @@ rule compile_counts_and_stats:
         "data/{project_id}_counts_w_stats.txt".format(project_id=config["project_id"])
     script:
         "../scripts/compile_counts_table_w_stats.py"
+
+
+rule compile_exon_counts:
+    input:
+        expand("samples/htseq_exon_count/{sample}_htseq_exon_count.txt", sample=SAMPLES)
+    output:
+        "data/{project_id}_exon_counts.txt".format(project_id = config["project_id"])
+    conda:
+        "../envs/junction_counts.yaml"
+    script:
+        "../scripts/compile_exon_counts.R"
 
