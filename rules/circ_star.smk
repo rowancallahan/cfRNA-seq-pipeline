@@ -1,7 +1,7 @@
 rule circ_star:
   input:
-    fwd = "samples/trimmed/{sample}_R1_t.fq",
-    rev = "samples/trimmed/{sample}_R2_t.fq"
+    fwd = "samples/trimmed/{sample}_R1_P_t.fq",
+    rev = "samples/trimmed/{sample}_R2_P_t.fq"
   output:
     "samples/circexplorer/{sample}_chim_bam/Chimeric.out.junction"
   threads: 12
