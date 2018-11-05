@@ -28,7 +28,7 @@ circ_ext=['circrna/circularRNA_known.txt']
 
 # TODO generate initializing rule to automatically generate log out for all rules
 
-rule_dirs = ['fastqc','star','picard','sort','samtools_stats','genecount','count_exons','compile_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts']
+rule_dirs = ['fastqc','star','picard','sort','samtools_stats','genecount','count_exons','compile_counts','compile_exon_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts']
 for rule in rule_dirs:
     if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
         log_out = os.path.join(os.getcwd(), 'logs', rule)
@@ -78,6 +78,7 @@ rule all:
         expand("samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam", sample = SAMPLES),
         "data/{project_id}_counts.txt".format(project_id=config['project_id']),
         "data/{project_id}_counts_w_stats.txt".format(project_id=config['project_id']),
+        "data/{project_id}_exon_counts.txt".format(project_id = config["project_id"]),
         expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
         expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
         expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
