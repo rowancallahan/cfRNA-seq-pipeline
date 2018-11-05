@@ -145,6 +145,14 @@
         "c" : 1,
         "mem":5000
     },
+    "compile_exon_counts" :
+    {
+        "J" : "compile_exon_counts",
+        "e" : "logs/compile_exon_counts/compile_exon_counts_%j.err",
+        "o" : "logs/compile_exon_counts/compile_exon_counts_%j.out",
+        "c" : 1,
+        "mem":5000
+    },
     "deseq2_init" :
     {
         "J" : "deseq2_init",
