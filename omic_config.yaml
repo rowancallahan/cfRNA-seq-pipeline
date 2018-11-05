@@ -8,6 +8,10 @@ bed_file:
   /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/gencode_v27.bed
 exon_gtf:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.housekeeping_genes.exon.gtf
+adapter-PE:
+  /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/TruSeq2-PE.fa
+adapter-SE:
+  /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/TruSeq2-SE.fa
 #path to tools
 star_tool:
   /home/exacloud/lustre1/CEDAR/tools/STAR/tags/2.5.3a/bin/Linux_x86_64/STAR
