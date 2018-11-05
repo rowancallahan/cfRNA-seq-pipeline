@@ -129,7 +129,7 @@ Alignment
     * Trimmed reads were subject to `fastqc` quality analysis
     * The output is located in `samples/fastqc/{sample}/{samples}_t_fastqc.zip`
 3) Alignment
-    * Trimmed reads were aligned to the hg19 genome assembly using `STAR`
+    * Trimmed reads were aligned to the hg38 genome assembly using `STAR`
         * We included a two pass mode flag in order to increase the number of aligned reads
         * Output is placed in `samples/star/{sample}_bam/`
             * Output directory includes: `Aligned.sortedByCoord.out.bam`, `ReadsPerGene.out.tab`, and `Log.final.out`
