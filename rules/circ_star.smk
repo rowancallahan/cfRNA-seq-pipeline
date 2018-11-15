@@ -7,8 +7,6 @@ rule circ_star:
   threads: 12
   params:
     name="star_{sample}", mem="64000"
-  conda:
-    "../envs/environment.yaml"
   run:
     STAR=config["star_tool"]
     pathToGenomeIndex = config["star_index"]
