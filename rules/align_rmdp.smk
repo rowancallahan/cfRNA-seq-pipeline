@@ -16,15 +16,15 @@ rule trimming:
     message:
         """--- Trimming."""
     shell:
-        """trimmomatic PE -trimlog {log} -basein {input.fwd} {input.rev} -baseout {output.fwd_P} {output.fwd_UP} {output.rev_P} {output.rev_UP} ILLUMINACLIP:{params.adapter}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"""
+        """trimmomatic PE -trimlog {log} {input.fwd} {input.rev} {output.fwd_P} {output.fwd_UP} {output.rev_P} {output.rev_UP} ILLUMINACLIP:{params.adapter}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"""
 
 rule fastqc:
     input:
         fwd = "samples/trimmed/{sample}_R1_P_t.fq",
         rev = "samples/trimmed/{sample}_R2_P_t.fq"
     output:
-        fwd = "samples/fastqc/{sample}/{sample}_R1_t_fastqc.zip",
-        rev = "samples/fastqc/{sample}/{sample}_R2_t_fastqc.zip"
+        fwd = "samples/fastqc/{sample}/{sample}_R1_P_t_fastqc.zip",
+        rev = "samples/fastqc/{sample}/{sample}_R2_P_t_fastqc.zip"
     log:
         "logs/fastqc/{sample}_fastqc.log"
     conda:
