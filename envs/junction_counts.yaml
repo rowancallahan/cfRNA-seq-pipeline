@@ -72,5 +72,4 @@ dependencies:
   - r-runit=0.4.26=mro350_0
   - r-spatial=7.3_11=mro350_0
   - r-survival=2.41_3=mro350_0
-prefix: /home/exacloud/lustre1/CEDAR/tools/miniconda3/envs/junction_counts
 
