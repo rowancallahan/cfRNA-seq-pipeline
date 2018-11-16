@@ -215,5 +215,21 @@
         "o" : "logs/ciri_junction_counts/ciri_junction_counts%j.out",
         "c" : 1,
         "mem" : 5400
+    },
+    "GO" :
+    {
+        "J" : "GO",
+        "e" : "logs/GO/GO%j.err",
+        "o" : "logs/GO/GO%j.out",
+        "c" : 12,
+        "mem" : 64000
+    },
+    "volcano" :
+    {
+        "J" : "volcano",
+        "e" : "logs/volcano/volcano%j.err",
+        "o" : "logs/volcano/volcano%j.out",
+        "c" : 1,
+        "mem" : 5400
     }
 }
