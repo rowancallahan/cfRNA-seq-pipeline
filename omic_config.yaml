@@ -1,7 +1,7 @@
 omic_meta_data:
   /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/PP_cohort_sample_info_log_JE.2018.09.28.txt
 base_dir:
-  /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline
+  /home/groups/CEDAR/roskamsh/projects/Omics-QC-pipeline
 gtf_file:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf
 bed_file:
@@ -12,6 +12,14 @@ adapter-PE:
   /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/TruSeq2-PE.fa
 adapter-SE:
   /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/TruSeq2-SE.fa
+anno-hg19:
+  /home/groups/CEDAR/anno/biomaRt/hg19.Ens_75.biomaRt.GO.geneID2GO.RData
+anno-hg38.89:
+  /home/groups/CEDAR/anno/biomaRt/hg38.Ens_89.biomaRt.GO.geneID2GO.RData
+anno-hg38.90:
+  /home/groups/CEDAR/anno/biomaRt/hg38.Ens_90.biomaRt.GO.geneID2GO.RData
+GO_Term_list:
+  /home/groups/CEDAR/anno/biomaRt/GO.db.Term.list.rda
 #path to tools
 star_tool:
   /home/exacloud/lustre1/CEDAR/tools/STAR/tags/2.5.3a/bin/Linux_x86_64/STAR
@@ -25,6 +33,8 @@ star_index:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/
 project_id:
   cfRNA_11_01
+assembly:
+  hg38.90
 baseline:
   HD
 linear_model:
@@ -44,12 +54,12 @@ meta_columns_to_plot:
 diffexp:
   # contrasts for the deseq2 results method
   contrasts:
-    HD-vs-MM:
+    #HD-vs-MM:
+    #  - HD
+    #  - MM
+    HD-vs-LCx:
       - HD
-      - MM
-    HD-vs-LG:
-      - HD
-      - LG
+      - LCx
 pca:
   labels:
     # columns of sample sheet to use for PCA
