@@ -141,5 +141,4 @@ dependencies:
   - openssl=1.0.2o=h20670df_0
   - readline=7.0
   - wget=1.19.5=h1ad7b7a_0
-prefix: /home/exacloud/lustre1/CompBio/miniconda3/envs/deseq2-omic-wf
 
