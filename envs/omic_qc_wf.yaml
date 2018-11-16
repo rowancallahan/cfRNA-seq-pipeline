@@ -182,5 +182,4 @@ dependencies:
     - pandas==0.23.0
     - scikit-learn==0.19.1
     - scipy==1.1.0
-prefix: /home/exacloud/lustre1/CompBio/miniconda3/envs/omic-qc-wf
 
