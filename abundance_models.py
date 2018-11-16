@@ -232,10 +232,9 @@ for(i in 1:length(mytypes))
     }}
 
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
-    normmat[is.na(normmat)] <-0
     colnames(rawmat)=samp.labels; colnames(normmat)=samp.labels
     plotdata = list(plotdir='./{project_title}/summary.plotsPlots',plotbase=paste(mynorms[j],mytypes[i],sep='.'),plottitle=proj.title)
-    rowmask = rowSums(rawmat>1,na.rm=T) > (ncol(rawmat)/length(unique(grpBy)) )
+    rowmask = rowSums(rawmat>1,na.rm=T) > (ncol(rawmat)/length(unique(grpBy)) ) & rowSums(is.na(normmat)) < (ncol(normmat)/length(unique(grpBy)))
 
     if(sum(rowmask)>hclust.limit)
     {{
@@ -288,7 +287,6 @@ for(i in 1:length(mytypes))
 
     plotdata = list(plotdir='./{project_title}/regressMatrixPlots/',plotbase=paste(mynorms[j],mytypes[i],'vs',tmp,sep='.'),plottitle=proj.title)
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
-    normmat[is.na(normmat)] <-0
     colnames(rawmat)=samp.labels; colnames(normmat)=samp.labels
 
     # prepare rowmask for heatmap/MDS (remove non-expr or low expr>hclustlim)
@@ -339,7 +337,6 @@ for( i in 1:length(mytypes))
   for( j in which(!mynorms %in% do.not.regress))
   {{
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
-    normmat[is.na(normmat)] <-0
     colnames(normmat)=samp.labels
     reg_ls = regress_lsls[[mytypes[i]]][[mynorms[j]]]
     mymask= rowmask_ls[[mytypes[i]]][[mynorms[j]]]
@@ -402,7 +399,6 @@ for( i in 1:length(mytypes))
   for( j in which(!mynorms %in% do.not.regress))
   {{
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
-    normmat[is.na(normmat)] <-0
     colnames(normmat)=samp.labels
 
     if( grepl('SJ',mytypes[i]))
@@ -1341,6 +1337,7 @@ for( i in 1:length(mytypes))
   for( j in which(!mynorms %in% do.not.regress))
   {{
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
+    normmat[is.na(normmat)] <- 0
     colnames(normmat)=samp.labels
     reg_ls = regress_lsls[[mytypes[i]]][[mynorms[j]]]
     mymask= rowmask_ls[[mytypes[i]]][[mynorms[j]]]
@@ -1400,6 +1397,7 @@ for( i in 1:length(mytypes))
   for( j in which(!mynorms %in% do.not.regress))
   {{
     normmat= LoM.norms[[ mytypes[i] ]][[ mynorms[j] ]]
+    normmat[is.na(normmat)] <-0
     colnames(normmat)=samp.labels
     groupdat = data.frame(annCol)
     sample_id = groupdat$Sample
