@@ -18,7 +18,7 @@ rseqqc_env = config["rseqc_env"]
 SAMPLES, = glob_wildcards("samples/raw/{sample}_R1.fq")
 
 ext = ['r','R1.pdf','R2.pdf','xls']
-fastq_ext = ['R1','R2']
+fastq_ext = ['R1_P','R2_P']
 insertion_and_clipping_prof_ext = ['r','R1.pdf','R2.pdf','xls']
 inner_distance_ext = ['_freq.txt','_plot.pdf','_plot.r','.txt']
 read_dist_ext = ['txt']
@@ -28,7 +28,7 @@ circ_ext=['circrna/circularRNA_known.txt']
 
 # TODO generate initializing rule to automatically generate log out for all rules
 
-rule_dirs = ['fastqc','star','picard','sort','samtools_stats','genecount','count_exons','compile_counts','compile_exon_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts']
+rule_dirs = ['fastqc','star','picard','sort','samtools_stats','genecount','count_exons','compile_counts','compile_exon_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts','circ_star','GO','volcano']
 for rule in rule_dirs:
     if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
         log_out = os.path.join(os.getcwd(), 'logs', rule)
@@ -86,7 +86,7 @@ rule all:
         expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
         expand("samples/htseq_count/{sample}_htseq_gene_count.txt", sample=SAMPLES),
         expand("samples/htseq_exon_count/{sample}_htseq_exon_count.txt", sample=SAMPLES),
-        "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
+        #"results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
         "results/diffexp/pca.pdf",
         expand("results/diffexp/{project_id}_all.rds",project_id = config['project_id']),
         expand(["results/diffexp/{contrast}.diffexp.tsv", "results/diffexp/{contrast}.ma_plot.pdf","results/diffexp/{contrast}.phist_plot.pdf"],contrast = config["diffexp"]["contrasts"]),
@@ -94,7 +94,9 @@ rule all:
         expand("samples/ciri/{sample}.sam",sample = SAMPLES),
         expand("results/ciri_out/{sample}_ciriout.txt",sample = SAMPLES),
         "results/tables/{project_id}_ciri_junctioncounts.txt".format(project_id=project_id),
-        "results/tables/{project_id}_ciri_frequency.txt".format(project_id=project_id)
+        "results/tables/{project_id}_ciri_frequency.txt".format(project_id=project_id),
+        expand(["results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01_BP_GO.txt", "results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01_BP_GO.txt", "results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01.BP.pdf", "results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01.BP.pdf","results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01_BP_classic_5_all.pdf","results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01_BP_classic_5_all.pdf"], contrast = config["diffexp"]["contrasts"]),
+        expand("results/diffexp/{contrast}.diffexp.01.VolcanoPlot.pdf", contrast = config["diffexp"]["contrasts"])
 
 include: "rules/align_rmdp.smk"
 include: "rules/omic_qc.smk"
