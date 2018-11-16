@@ -87,21 +87,16 @@ rule generate_qc_qa:
     meta_viz = format_plot_columns(),
  output:
     "analysis_code/{project_id}_analysis.R".format(project_id=project_id)
- log:
-    "logs/generate_qc_qa/"
-
  shell:
     "python GenerateAbundanceFile.py -d {params.datadir} -mf {params.meta} -p {params.project_id} -b {params.baseline} -lm {params.linear_model} -id '{params.sample_id}' -pl '{params.meta_viz}' -g '{params.gtf_file}' -df -da {input.counts}"
 
 
-rule run_qc_qa:
-    input:
-        rules.generate_qc_qa.output
-    output:
-        "results/tables/{project_id}_Normed_with_Ratio_and_Abundance.txt".format(project_id=config['project_id'])
-    conda:
-        "../envs/omic_qc_wf.yaml"
-    log:
-        "logs/run_qc_qa/"
-    shell:
-        "Rscript analysis_code/{project_id}_analysis.R".format(project_id=config['project_id'])
+#rule run_qc_qa:
+#    input:
+#        rules.generate_qc_qa.output
+#    output:
+#        "results/tables/{project_id}_Normed_with_Ratio_and_Abundance.txt".format(project_id=config['project_id'])
+#    conda:
+#        "../envs/omic_qc_wf.yaml"
+#    shell:
+#        "Rscript analysis_code/{project_id}_analysis.R".format(project_id=config['project_id'])
