@@ -1,3 +1,5 @@
+contrast = get_contrast
+
 rule deseq2_init:
     input:
         counts = "data/{project_id}_counts.txt".format(project_id=config["project_id"])
@@ -58,3 +60,30 @@ rule deseq2:
     threads: get_deseq2_threads()
     script:
         "../scripts/deseq2.R"
+
+rule GO:
+    input:
+        "results/diffexp/{contrast}.diffexp.tsv"
+    output:
+        "results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01_BP_GO.txt",
+        "results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01_BP_GO.txt",
+        "results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01.BP.pdf",
+        "results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01.BP.pdf",
+        "results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01_BP_classic_5_all.pdf",
+        "results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01_BP_classic_5_all.pdf"
+    params:
+        contrast = get_contrast,
+        assembly = config["assembly"],
+    conda:
+        "../envs/runGO.yaml"
+    shell: """Rscript scripts/runGOforDESeq2.R --degFile={input} --assembly={params.assembly} --FC=2 --adjp=0.01 --printTree=1"""
+
+rule volcano:
+    input:
+        "results/diffexp/{contrast}.diffexp.tsv"
+    output:
+        "results/diffexp/{contrast}.diffexp.01.VolcanoPlot.pdf"
+    params:
+       contrast = get_contrast
+    shell: """Rscript scripts/RNAseq_makeVolcano.R --degFile={input} --adjp=0.01 --FC=2"""
+
