@@ -19,6 +19,7 @@ SAMPLES, = glob_wildcards("samples/raw/{sample}_R1.fq")
 
 ext = ['r','R1.pdf','R2.pdf','xls']
 fastq_ext = ['R1_P','R2_P']
+fastqscreen_ext = ['html','png','txt']
 insertion_and_clipping_prof_ext = ['r','R1.pdf','R2.pdf','xls']
 inner_distance_ext = ['_freq.txt','_plot.pdf','_plot.r','.txt']
 read_dist_ext = ['txt']
@@ -28,7 +29,7 @@ circ_ext=['circrna/circularRNA_known.txt']
 
 # TODO generate initializing rule to automatically generate log out for all rules
 
-rule_dirs = ['fastqc','star','picard','sort','samtools_stats','genecount','count_exons','compile_counts','compile_exon_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts','circ_star','GO','volcano']
+rule_dirs = ['fastqc','fastqscreen','star','picard','sort','samtools_stats','genecount','count_exons','compile_counts','compile_exon_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts','circ_star','GO','volcano']
 for rule in rule_dirs:
     if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
         log_out = os.path.join(os.getcwd(), 'logs', rule)
@@ -74,6 +75,7 @@ rule all:
         expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES),
         expand("results/tables/{project_id}_STAR_mapping_statistics.txt", project_id = config['project_id']),
         expand("samples/fastqc/{sample}/{sample}_{fastq_ext}_t_fastqc.zip", sample = SAMPLES, fastq_ext = fastq_ext),
+        expand("samples/fastqscreen/{sample}/{sample}_{fastq_ext}_t_screen.{fastqscreen_ext}", sample=SAMPLES, fastq_ext=fastq_ext, fastqscreen_ext=fastqscreen_ext),
         expand("samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam", sample = SAMPLES),
         expand("samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam", sample = SAMPLES),
         "data/{project_id}_counts.txt".format(project_id=config['project_id']),

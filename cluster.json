@@ -184,6 +184,14 @@
         "c" : 6,
         "mem":40000
     },
+    "fastqscreen" :
+    {
+        "J" : "fastqscreen",
+        "e" : "logs/fastqscreen/fastqscreen_%j.err",
+        "o" : "logs/fastqscreen/fastqscreen_%j.out",
+        "c" : 6,
+        "mem":40000
+    },
     "circ_star" :
     {
         "J" : "circ_star",

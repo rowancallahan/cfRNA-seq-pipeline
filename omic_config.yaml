@@ -20,6 +20,8 @@ anno-hg38.90:
   /home/groups/CEDAR/anno/biomaRt/hg38.Ens_90.biomaRt.GO.geneID2GO.RData
 GO_Term_list:
   /home/groups/CEDAR/anno/biomaRt/GO.db.Term.list.rda
+conf:
+  /home/groups/CEDAR/tools/FastQ_Screen_Genomes/fastq_screen.conf
 #path to tools
 star_tool:
   /home/exacloud/lustre1/CEDAR/tools/STAR/tags/2.5.3a/bin/Linux_x86_64/STAR

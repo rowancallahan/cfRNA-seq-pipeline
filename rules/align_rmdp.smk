@@ -34,6 +34,23 @@ rule fastqc:
     shell:
         """fastqc --outdir samples/fastqc/{wildcards.sample} --extract  -f fastq {input.fwd} {input.rev}"""
 
+rule fastqscreen:
+    input:
+        fwd = "samples/trimmed/{sample}_R1_P_t.fq",
+        rev = "samples/trimmed/{sample}_R2_P_t.fq"
+    output:
+        "samples/fastqscreen/{sample}/{sample}_R1_P_t_screen.html",
+        "samples/fastqscreen/{sample}/{sample}_R1_P_t_screen.png",
+        "samples/fastqscreen/{sample}/{sample}_R1_P_t_screen.txt",
+        "samples/fastqscreen/{sample}/{sample}_R2_P_t_screen.html",
+        "samples/fastqscreen/{sample}/{sample}_R2_P_t_screen.png",
+        "samples/fastqscreen/{sample}/{sample}_R2_P_t_screen.txt"
+    params:
+        conf = config["conf"]
+    conda:
+        "../envs/fastqscreen.yaml"
+    shell:
+        """fastq_screen --aligner bowtie2 --conf {params.conf} --outdir samples/fastqscreen/{wildcards.sample} {input.fwd} {input.rev}"""
 
 rule STAR:
     input:
