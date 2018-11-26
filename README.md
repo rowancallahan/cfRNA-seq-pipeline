@@ -98,6 +98,7 @@ Edit the `omic_config.yaml` in your `wdir()`:
 * Change the project_id to a unique project identifier
 * Add appropriate contrasts based on your samples under the `[diffexp][contrasts]` section
 * Add the path to your metadata file for the `omic_meta_data` and `samples` parameters
+* Change `base_dir` to your current working directory
 
 Do a dry-run of snakemake to ensure proper execution before submitting it to the cluster (in your wdir).
 
