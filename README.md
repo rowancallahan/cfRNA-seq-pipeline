@@ -95,10 +95,12 @@ Upload your metadata file to the `data` directory, with the correct formatting:
 * All values in this file should be tab-separated
 
 Edit the `omic_config.yaml` in your `wdir()`:
-* Change the project_id to a unique project identifier
+* Change the `project_id` to a unique project identifier
 * Add appropriate contrasts based on your samples under the `[diffexp][contrasts]` section
 * Add the path to your metadata file for the `omic_meta_data` and `samples` parameters
 * Change `base_dir` to your current working directory
+* Ensure you have the correct `assembly` specified
+    * Current options for this are: hg19, hg38.89 (ensembl v89) and hg38.90 (ensembl v90)
 
 Do a dry-run of snakemake to ensure proper execution before submitting it to the cluster (in your wdir).
 
