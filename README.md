@@ -202,3 +202,12 @@ Differential Expression Analysis (DESeq2)
             * The output is placed in `results/diffexp/{contrast}.diffexp.tsv`
         * *MA Plots* are generated for each contrast
         * *p-histograms* are generated for each contrast
+4) Differential Expression Plots
+    * We use the output from DESeq2 to generate two types of plots:
+        * Gene Ontology (GO) plots:
+            * A `tree graph` describing the GO ID relationship for significantly up/downregulated genes in a given comparison
+                * Output is located in `results/diffexp/GOterms`
+            * A `bar graph` describing the enrichment and significance of GO IDs for up/downregulated genes in a given comparison
+        * Volcano plots:
+            * A `volcano plot` describing the distribution of up/downregulated genes in a given comparison
+                * Output is located in `results/diffexp`
