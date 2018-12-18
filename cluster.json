@@ -81,6 +81,14 @@
         "c" : 1,
         "mem":5000
     },
+    "bam_statistics" :
+    {
+        "J" : "bam_statistics",
+        "e" : "logs/bam_statistics/bam_statistics_%j.err",
+        "o" : "logs/bam_statistics/bam_statistics_%j.out",
+        "c" : 1,
+        "mem":5000
+    },
     "picard" :
     {
         "J" : "picard",
@@ -96,6 +104,30 @@
         "o" : "logs/star%j.out",
         "c" : 12,
         "mem" : 64000
+    },
+    "index" :
+    {
+        "J" : "index",
+        "e" : "logs/index%j.err",
+        "o" : "logs/index%j.out",
+        "c" : 1,
+        "mem" : 45000
+    },
+    "bam_statistics" :
+    {
+        "J" : "bam_statistics",
+        "e" : "logs/bam_statistics/bam_statistics%j.err",
+        "o" : "logs/bam_statistics/bam_statistics%j.out",
+        "c" : 1,
+        "mem" : 45000
+    },
+    "get_bam_coverage" :
+    {
+        "J" : "get_bam_coverage",
+        "e" : "logs/get_bam_coverage/get_bam_coverage%j.err",
+        "o" : "logs/get_bam_coverage/get_bam_coverage%j.out",
+        "c" : 1,
+        "mem" : 45000
     },
     "sort" :
     {
