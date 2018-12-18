@@ -80,6 +80,16 @@ rule STAR:
                 --twopassMode Basic
                 """)
 
+rule index:
+    input:
+        "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam"
+    output:
+        "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam.bai"
+    conda:
+        "../envs/omic_qc_wf.yaml"
+    shell:
+        """samtools index {input} {output}"""
+
 rule star_statistics:
     input:
         expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES)
@@ -88,37 +98,56 @@ rule star_statistics:
     script:
         "../scripts/compile_star_log.py"
 
-rule picard:
-  input:
-      "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam"
-  output:
-      temp("samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam")
-  params:
-      name="rmd_{sample}",
-      mem="5300"
-  threads: 1
-  run:
-    picard=config["picard_tool"]
+rule bam_statistics:
+    input:
+        "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam"
+    output:
+        "samples/bamstats/{sample}/genome_coverage.json"
+    run:
+        bamstats=config["bamstats_tool"]
+        gtf = config["gtf_file"]
 
-    shell("java -Xmx3g -jar {picard} \
-    INPUT={input} \
-    OUTPUT={output} \
-    METRICS_FILE=samples/genecounts_rmdp/{wildcards.sample}_bam/{wildcards.sample}.rmd.metrics.text \
-    REMOVE_DUPLICATES=true")
+        shell("{bamstats} -a {gtf} -i {input} -o {output} -u")
+
+rule get_bam_coverage:
+    input:
+        expand("samples/bamstats/{sample}/genome_coverage.json", sample=SAMPLES)
+    output:
+        "data/{project_id}_coverage.txt".format(project_id=config["project_id"])
+    script:
+        "../scripts/get_coverage.py"
+
+rule picard:
+    input:
+        "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam"
+    output:
+        temp("samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam")
+    params:
+        name="rmd_{sample}",
+        mem="5300"
+    threads: 1
+    run:
+      picard=config["picard_tool"]
+
+      shell("java -Xmx3g -jar {picard} \
+      INPUT={input} \
+      OUTPUT={output} \
+      METRICS_FILE=samples/genecounts_rmdp/{wildcards.sample}_bam/{wildcards.sample}.rmd.metrics.text \
+      REMOVE_DUPLICATES=true")
 
 
 rule sort:
-  input:
-    "samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam"
-  output:
-    "samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam"
-  params:
-    name = "sort_{sample}",
-    mem = "6400"
-  conda:
-    "../envs/omic_qc_wf.yaml"
-  shell:
-    """samtools sort -O bam -n {input} -o {output}"""
+    input:
+      "samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam"
+    output:
+      "samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam"
+    params:
+      name = "sort_{sample}",
+      mem = "6400"
+    conda:
+      "../envs/omic_qc_wf.yaml"
+    shell:
+      """samtools sort -O bam -n {input} -o {output}"""
 
 
 rule samtools_stats:
