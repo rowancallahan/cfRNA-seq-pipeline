@@ -27,6 +27,8 @@ star_tool:
   /home/exacloud/lustre1/CEDAR/tools/STAR/tags/2.5.3a/bin/Linux_x86_64/STAR
 picard_tool:
   /home/exacloud/lustre1/CEDAR/tools/picard-tools-1.119/MarkDuplicates.jar
+bamstats_tool:
+  /home/groups/CEDAR/roskamsh/tools/bamstats_bin/bamstats
 genome:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/GRCh38.primary_assembly.genome.fa
 refflat2:
@@ -46,7 +48,7 @@ seq_layout:
 sample_id:
   StudyID
 dds_design:
-  SampleID
+  Type
 rseqc_env:
   source activate rseqc-omic-wf
 meta_columns_to_plot:
