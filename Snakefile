@@ -29,7 +29,7 @@ circ_ext=['circrna/circularRNA_known.txt']
 
 # TODO generate initializing rule to automatically generate log out for all rules
 
-rule_dirs = ['fastqc','fastqscreen','star','picard','sort','samtools_stats','genecount','count_exons','compile_counts','compile_exon_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts','circ_star','GO','volcano']
+rule_dirs = ['fastqc','fastqscreen','star','index','bam_statistics','get_bam_coverage','picard','sort','samtools_stats','genecount','count_exons','compile_counts','compile_exon_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts','circ_star','GO','volcano']
 for rule in rule_dirs:
     if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
         log_out = os.path.join(os.getcwd(), 'logs', rule)
@@ -71,9 +71,12 @@ for sample in SAMPLES:
 rule all:
     input:
         expand("samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam", sample = SAMPLES),
+        expand("samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam.bai", sample = SAMPLES),
         expand("samples/star/{sample}_bam/ReadsPerGene.out.tab", sample = SAMPLES),
         expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES),
         expand("results/tables/{project_id}_STAR_mapping_statistics.txt", project_id = config['project_id']),
+        expand("samples/bamstats/{sample}/genome_coverage.json", sample = SAMPLES),
+        "data/{project_id}_coverage.txt".format(project_id=config["project_id"]),
         expand("samples/fastqc/{sample}/{sample}_{fastq_ext}_t_fastqc.zip", sample = SAMPLES, fastq_ext = fastq_ext),
         expand("samples/fastqscreen/{sample}/{sample}_{fastq_ext}_t_screen.{fastqscreen_ext}", sample=SAMPLES, fastq_ext=fastq_ext, fastqscreen_ext=fastqscreen_ext),
         expand("samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam", sample = SAMPLES),
@@ -88,7 +91,7 @@ rule all:
         expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
         expand("samples/htseq_count/{sample}_htseq_gene_count.txt", sample=SAMPLES),
         expand("samples/htseq_exon_count/{sample}_htseq_exon_count.txt", sample=SAMPLES),
-        #"results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
+        "results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
         "results/diffexp/pca.pdf",
         expand("results/diffexp/{project_id}_all.rds",project_id = config['project_id']),
         expand(["results/diffexp/{contrast}.diffexp.tsv", "results/diffexp/{contrast}.ma_plot.pdf","results/diffexp/{contrast}.phist_plot.pdf"],contrast = config["diffexp"]["contrasts"]),
