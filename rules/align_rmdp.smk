@@ -3,28 +3,25 @@ rule trimming:
         fwd = "samples/raw/{sample}_R1.fq",
         rev = "samples/raw/{sample}_R2.fq"
     output:
-        fwd_P = "samples/trimmed/{sample}_R1_P_t.fq",
-        fwd_UP = "samples/trimmed/{sample}_R1_UP_t.fq",
-        rev_P = "samples/trimmed/{sample}_R2_P_t.fq",
-        rev_UP = "samples/trimmed/{sample}_R2_UP_t.fq"
-    params:
-        adapter=config["adapter-PE"]
+        fwd = "samples/trimmed/{sample}_R1_t.fq",
+        rev = "samples/trimmed/{sample}_R2_t.fq",
+        single = "samples/trimmed/{sample}_R1_singletons.fq"
     log:
         "logs/trimming/{sample}_trimming.log"
-    conda:
-        "../envs/trim.yaml"
     message:
         """--- Trimming."""
-    shell:
-        """trimmomatic PE -trimlog {log} {input.fwd} {input.rev} {output.fwd_P} {output.fwd_UP} {output.rev_P} {output.rev_UP} ILLUMINACLIP:{params.adapter}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"""
+    run:
+        sickle = config["sickle_tool"]
+
+        shell("{sickle} pe -f {input.fwd} -r {input.rev}  -l 40 -q 20 -t sanger  -o {output.fwd} -p {output.rev} -s {output.single} &> {input.fwd}.log")
 
 rule fastqc:
     input:
-        fwd = "samples/trimmed/{sample}_R1_P_t.fq",
-        rev = "samples/trimmed/{sample}_R2_P_t.fq"
+        fwd = "samples/trimmed/{sample}_R1_t.fq",
+        rev = "samples/trimmed/{sample}_R2_t.fq"
     output:
-        fwd = "samples/fastqc/{sample}/{sample}_R1_P_t_fastqc.zip",
-        rev = "samples/fastqc/{sample}/{sample}_R2_P_t_fastqc.zip"
+        fwd = "samples/fastqc/{sample}/{sample}_R1_t_fastqc.zip",
+        rev = "samples/fastqc/{sample}/{sample}_R2_t_fastqc.zip"
     log:
         "logs/fastqc/{sample}_fastqc.log"
     conda:
@@ -36,15 +33,15 @@ rule fastqc:
 
 rule fastqscreen:
     input:
-        fwd = "samples/trimmed/{sample}_R1_P_t.fq",
-        rev = "samples/trimmed/{sample}_R2_P_t.fq"
+        fwd = "samples/trimmed/{sample}_R1_t.fq",
+        rev = "samples/trimmed/{sample}_R2_t.fq"
     output:
-        "samples/fastqscreen/{sample}/{sample}_R1_P_t_screen.html",
-        "samples/fastqscreen/{sample}/{sample}_R1_P_t_screen.png",
-        "samples/fastqscreen/{sample}/{sample}_R1_P_t_screen.txt",
-        "samples/fastqscreen/{sample}/{sample}_R2_P_t_screen.html",
-        "samples/fastqscreen/{sample}/{sample}_R2_P_t_screen.png",
-        "samples/fastqscreen/{sample}/{sample}_R2_P_t_screen.txt"
+        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.html",
+        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.png",
+        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.txt",
+        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.html",
+        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.png",
+        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.txt"
     params:
         conf = config["conf"]
     conda:
@@ -54,8 +51,8 @@ rule fastqscreen:
 
 rule STAR:
     input:
-        fwd = "samples/trimmed/{sample}_R1_P_t.fq",
-        rev = "samples/trimmed/{sample}_R2_P_t.fq"
+        fwd = "samples/trimmed/{sample}_R1_t.fq",
+        rev = "samples/trimmed/{sample}_R2_t.fq"
     output:
         "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
         "samples/star/{sample}_bam/ReadsPerGene.out.tab",
