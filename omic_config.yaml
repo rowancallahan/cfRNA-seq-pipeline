@@ -23,6 +23,8 @@ GO_Term_list:
 conf:
   /home/groups/CEDAR/tools/FastQ_Screen_Genomes/fastq_screen.conf
 #path to tools
+sickle_tool:
+  /home/groups/CEDAR/tools/sickle
 star_tool:
   /home/exacloud/lustre1/CEDAR/tools/STAR/tags/2.5.3a/bin/Linux_x86_64/STAR
 picard_tool:
