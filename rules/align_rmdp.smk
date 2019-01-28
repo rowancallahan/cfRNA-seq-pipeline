@@ -174,12 +174,11 @@ rule genecount:
         "../envs/omic_qc_wf.yaml"
     threads: 1
     shell:
-        """
-          htseq-count \
+        """htseq-count \
                 -f bam \
                 -r name \
                 -s reverse \
-                -m union \
+                -m intersection-strict \
                 {input} \
                 {params.gtf} > {output}"""
 
@@ -195,12 +194,14 @@ rule count_exons:
         "../envs/omic_qc_wf.yaml"
     shell:
         """htseq-count \
-                -f bam \
-                -m intersection-nonempty \
-                -i exon_id \
-                --additional-attr=gene_name \
-                {input} \
-                {params.exon_gtf} > {output}"""
+               -f bam \
+               -r name \
+               -s reverse \
+               -m intersection-strict \
+               -i exon_id \
+               --additional-attr=gene_name \
+               {input} \
+               {params.exon_gtf} > {output}"""
 
 
 rule compile_counts:
