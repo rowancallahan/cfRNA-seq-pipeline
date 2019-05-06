@@ -1,68 +1,32 @@
-args <- commandArgs()
+library(ggplot2)
+library(ggrepel)
+library(cowplot)
+library(gridExtra)
 
-help <- function(){
-    cat("RNAseq_makeVolcano.R :
-- For the deseq2 output in the pipeline, make a volcano plot.
-- Currently it calculates the adjusted p-val using the BH method, as there are many NAs in the table.
-- Color options can be hex followed by saturation ex. #FE117A60 or rcolors
-- The plot will have the same name as the degFile but with a .pdf extension.\n")
-    cat("Usage: \n")
-    cat("--degFile : deseq2 table with log2FoldChange and pvalue [ required ]\n")
-    cat("--adjp    : FDR adjusted p-value cutoff                 [ default = 0.01 ]\n")
-    cat("--FC      : fold change cutoff (not log2 transformed)   [ default = 2 ]\n")
-    cat("--upCol   : up regulated genes color                    [ default = red ]\n")
-    cat("--downCol : down regulated genes color                  [ default = blue ]\n")    
-    cat("--ncCol   : non-changing genes color                    [ default = grey ]\n")
-    cat("\n")
-    q()
-}
+degFile = snakemake@input[['degFile']]
 
-## Save values of each argument
-if(!is.na(charmatch("--help",args)) || !is.na(charmatch("-h",args))){
-    help()
-} else {
-    degFile  <-sub('--degFile=', '', args[grep('--degFile=', args)])
-    adjp     <-sub('--adjp=', '', args[grep('--adjp=', args)])
-    FC       <-sub('--FC=', '', args[grep('--FC=', args)])
-    upCol    <- sub('--upCol=', '', args[grep('--upCol=', args)])
-    downCol  <- sub('--downCol=', '', args[grep('--downCol=', args)])
-    ncCol    <- sub('--ncCol=', '', args[grep('--ncCol=', args)])
-}
+FC <- snakemake@params[['FC']]
 
-## set defaults if options are not provided
-if (identical(adjp,character(0))){
-   adjp<-0.01
-}else{
-    adjp <- as.numeric(adjp)
-}
+adjp <- snakemake@params[['adjp']]
 
-if (identical(FC,character(0))){
-   FC <- 2
-}else{
-    FC <- as.numeric(FC)
-}
+contrast <- snakemake@params[['contrast']]
 
-if (identical(downCol,character(0))){
-   downCol <- "blue"
-}
-if (identical(ncCol,character(0))){
-   ncCol <- "grey"
-}
-if (identical(upCol,character(0))){
-   upCol <- "red"
-}
+baseline <- contrast[[2]]
+
+target <- contrast[[1]]
+
+volcano_plot=snakemake@output[['volcano_plot']]
+
+upCol = "#FF9999"
+downCol = "#99CCFF"
+ncCol = "#CCCCCC"
 
 ##----------load differentially expressed genes --------#
 print("Loading differential expressed gene table")
 print(degFile)
 
 ## check if an rda file or tab sep
-if(grepl('rda|RData',degFile)){
-    deg <- get(load(file=degFile))
-}
-if(grepl('txt|tsv',degFile)){
-    deg <- read.delim(file=degFile)
-}
+deg <- read.delim(file=degFile)
 
 head(deg)
 dim(deg)
@@ -78,37 +42,92 @@ sum(up)
 down <- deg$padj < adjp & deg$log2FoldChange < -log2(FC)
 sum(down)
 
-## set labels for pdf
-adjplabel <- gsub("^0\\.","",adjp)
-comparison <- gsub("\\.txt$|\\.rda|\\.tsv","",degFile)
-pdfFile <- paste(comparison,adjplabel,"VolcanoPlot.pdf",sep=".")
-print(pdfFile)
+# Grab the top 5 up and down regulated genes to label in the volcano plot
+if (sum(up)>5) {
+  upGenesToLabel <- head(rownames(deg[up,]), 5)
+} else if (sum(up) %in% 1:5) {
+  upGenesToLabel <- rownames(deg[up,])
+}
 
-## remove directory to use in plot
-comparison <- gsub("^.*/","",comparison)
-
-Dir <- sub("$", "/Volcano", dirname(comparison))
-if(!(file.exists(Dir))) {
-      dir.create(Dir,FALSE,TRUE)
+if (sum(down)>5) {
+  downGenesToLabel <- head(rownames(deg[down,]), 5)
+} else if (sum(down) %in% 1:5) {
+  downGenesToLabel <- rownames(deg[down,])
 }
 
 ## calculate the -log10(adjp) for the plot
 deg$log10padj <- -log10(deg$padj)
 
-pdf(pdfFile,height=6,width=6)
-plot(deg$log2FoldChange
-    ,deg$log10padj
-    ,col=ncCol
-    ,pch=19
-    ,cex=1
-    ,main=comparison,xlab="log2(Fold Change)"
-    ,ylab="-log10(padj)"
-    ,cex.lab=1.2, cex.axis=1.2, cex.main=1.2, cex.sub=1.2)
-points(deg[up, "log2FoldChange"],deg[up,"log10padj"], col=upCol, pch=19,cex=1)
-points(deg[down, "log2FoldChange"],deg[down, "log10padj"], col=downCol, pch=19,cex=1)
-legend("topright", c(paste(sum(up),"genes p.adj-val < ",adjp),paste(sum(down),"genes p.adj-val < ",adjp)),
-       pch=c(19,19,1), col=c(upCol,downCol,ncCol),cex=0.9,)
-abline(v = -log2(FC), lty="dashed", col="black")
-abline(v = log2(FC), lty="dashed", col="black")
-abline(h = -log10(adjp), lty="dashed", col="black")
+# assign up and downregulated genes to a category so that they can be labeled in the plot
+deg$Expression <- ifelse(down, 'down',
+                  ifelse(up, 'up','NS'))
+deg$Expression <- factor(deg$Expression, levels=c("up","down","NS"))
+
+# Assign colours to conditions
+if (sum(up)==0) {
+  colours <- c(downCol, ncCol)
+} else if (sum(down)==0) {
+  colours <- c(upCol, ncCol)
+} else {
+  colours <- c(upCol, downCol, ncCol)
+}
+
+# Set all Infinity values to max out at 500 so that all points are contained in the plot
+if ("Inf" %in% deg$log10padj) {
+  deg$log10padj[deg$log10padj=="Inf"] <- max(deg[is.finite(deg$log10padj),"log10padj"]) + 2
+}
+
+deg$Gene <- rownames(deg)
+
+# Assign genes to label based on whether genes are DE or not
+if (exists("downGenesToLabel") & exists("upGenesToLabel")) {
+  genesToLabel <- c(downGenesToLabel, upGenesToLabel)
+} else if (exists("downGenesToLabel") & !exists("upGenesToLabel")) {
+  genesToLabel <- downGenesToLabel
+} else if (!exists("downGenesToLabel") & exists("upGenesToLabel")) {
+  genesToLabel <- upGenesToLabel
+}
+
+if (exists("genesToLabel")) {
+  p <- ggplot(data=deg, mapping=aes(x=log2FoldChange, y=log10padj, colour=Expression)) +
+    geom_vline(xintercept = c(-log2(FC),log2(FC)), linetype="dashed", colour="gray45") +
+    geom_hline(yintercept = -log10(adjp), linetype="dashed", colour="gray45") +
+    geom_label_repel(aes(label=ifelse(Gene %in% genesToLabel, as.character(Gene),'')),box.padding=0.1, point.padding=0.5, segment.color="gray70", show.legend=FALSE) +
+    geom_point() +
+    ylab("-log10(FDR)") +
+    xlab("log2(Fold Change)") +
+    ggtitle(paste(target, "vs", baseline)) +
+    scale_colour_manual(values=colours) +
+    theme(plot.title = element_text(hjust = 0.5, face="plain"),
+          axis.title.x = element_text(size=11),
+          axis.title.y = element_text(size=11),
+          panel.background = element_blank(),
+          axis.line = element_line(colour = "gray45"),
+          legend.key = element_rect(fill = "gray96"),
+          legend.text = element_text(size = 10))
+} else {
+  p <- ggplot(data=deg, mapping=aes(x=log2FoldChange, y=log10padj, colour=Expression)) +
+    geom_vline(xintercept = c(-log2(FC),log2(FC)), linetype="dashed", colour="gray45") +
+    geom_hline(yintercept = -log10(adjp), linetype="dashed", colour="gray45") +
+    geom_point() +
+    geom_vline(xintercept = c(-log2(FC),log2(FC)), linetype="dashed", colour="gray45") +
+    geom_hline(yintercept = -log10(adjp), linetype="dashed", colour="gray45") +
+    ylab("-log10(FDR)") +
+    xlab("log2(Fold Change)") +
+    ggtitle(paste(target, "vs", baseline)) +
+    scale_colour_manual(values=colours) +
+    theme(plot.title = element_text(hjust = 0.5, face="plain"),
+          axis.title.x = element_text(size=11),
+          axis.title.y = element_text(size=11),
+          panel.background = element_blank(),
+          axis.line = element_line(colour = "gray45"),
+          legend.key = element_rect(fill = "gray96"),
+          legend.text = element_text(size = 10))
+}
+
+
+pdf(volcano_plot)
+print({
+  p
+})
 dev.off()
