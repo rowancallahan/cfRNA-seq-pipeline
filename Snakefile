@@ -8,12 +8,13 @@ __license__ = "MIT"
 import datetime
 import sys
 import os
+import pandas as pd
+import json
 
 timestamp = ('{:%Y-%m-%d_%H:%M:%S}'.format(datetime.datetime.now()))
 
 configfile:"omic_config.yaml"
 project_id = config["project_id"]
-rseqqc_env = config["rseqc_env"]
 
 SAMPLES, = glob_wildcards("samples/raw/{sample}_R1.fq")
 
@@ -26,14 +27,17 @@ read_dist_ext = ['txt']
 read_gc_ext = ['.xls','_plot.r','_plot.pdf']
 
 
-# TODO generate initializing rule to automatically generate log out for all rules
+with open('cluster.json') as json_file:
+    json_dict = json.load(json_file)
 
-rule_dirs = ['fastqc','fastqscreen','star','index','bam_statistics','get_bam_coverage','picard','sort','samtools_stats','genecount','count_exons','compile_counts','compile_exon_counts','trimming','insertion_profile','read_distribution','inner_distance','clipping_profile','read_GC','star_statistics','generate_qc_qa','run_qc_qa','star_statistics','deseq2','bwa','ciri','ciri_junction_counts','GO','volcano']
+rule_dirs = list(json_dict.keys())
+
 for rule in rule_dirs:
     if not os.path.exists(os.path.join(os.getcwd(),'logs',rule)):
         log_out = os.path.join(os.getcwd(), 'logs', rule)
         os.makedirs(log_out)
         print(log_out)
+
 
 result_dirs = ['diffexp','tables']
 for rule in result_dirs:
@@ -42,20 +46,13 @@ for rule in result_dirs:
         os.makedirs(log_out)
         print(log_out)
 
-
 def message(mes):
     sys.stderr.write("|--- " + mes + "\n")
 
 
-def format_plot_columns():
-    factors = config['meta_columns_to_plot'].keys()
-    reformat_factors = '"' + '","'.join(factors) + '"'
-    return 'c({})'.format(reformat_factors)
-
-
 def get_deseq2_threads(wildcards=None):
     few_coeffs = False if wildcards is None else len(get_contrast(wildcards)) < 10
-    return 1 if len(config["samples"]) < 100 or few_coeffs else 6
+    return 1 if len(config["omic_meta_data"]) < 100 or few_coeffs else 6
 
 
 def get_contrast(wildcards):
@@ -69,41 +66,32 @@ for sample in SAMPLES:
 
 rule all:
     input:
-        expand("samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam", sample = SAMPLES),
-        expand("samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam.bai", sample = SAMPLES),
-        expand("samples/star/{sample}_bam/ReadsPerGene.out.tab", sample = SAMPLES),
-        expand("samples/star/{sample}_bam/Log.final.out",sample=SAMPLES),
         expand("results/tables/{project_id}_STAR_mapping_statistics.txt", project_id = config['project_id']),
-        expand("samples/bamstats/{sample}/genome_coverage.json", sample = SAMPLES),
         "data/{project_id}_coverage.txt".format(project_id=config["project_id"]),
         expand("samples/fastqc/{sample}/{sample}_{fastq_ext}_t_fastqc.zip", sample = SAMPLES, fastq_ext = fastq_ext),
         expand("samples/fastqscreen/{sample}/{sample}_{fastq_ext}_t_screen.{fastqscreen_ext}", sample=SAMPLES, fastq_ext=fastq_ext, fastqscreen_ext=fastqscreen_ext),
-        expand("samples/genecounts_rmdp/{sample}_bam/{sample}.rmd.bam", sample = SAMPLES),
-        expand("samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam", sample = SAMPLES),
-        "data/{project_id}_counts.txt".format(project_id=config['project_id']),
         "data/{project_id}_counts_w_stats.txt".format(project_id=config['project_id']),
         "data/{project_id}_exon_counts.txt".format(project_id = config["project_id"]),
-        #expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
-        #expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
-        #expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
-        #expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
-        #expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
-        #expand("samples/htseq_count/{sample}_htseq_gene_count.txt", sample=SAMPLES),
-        #expand("samples/htseq_exon_count/{sample}_htseq_exon_count.txt", sample=SAMPLES),
-        #"results/tables/{}_Normed_with_Ratio_and_Abundance.txt".format(config['project_id']),
-        #"results/diffexp/pca.pdf",
-        #expand("results/diffexp/{project_id}_all.rds",project_id = config['project_id']),
-        #expand(["results/diffexp/{contrast}.diffexp.tsv", "results/diffexp/{contrast}.ma_plot.pdf","results/diffexp/{contrast}.phist_plot.pdf"],contrast = config["diffexp"]["contrasts"]),
-        #expand("samples/circexplorer/{sample}_chim_bam/Chimeric.out.junction", sample = SAMPLES),
-        #expand("samples/ciri/{sample}.sam",sample = SAMPLES),
-        #expand("results/ciri_out/{sample}_ciriout.txt",sample = SAMPLES),
-        #"results/tables/{project_id}_ciri_junctioncounts.txt".format(project_id=project_id),
-        #"results/tables/{project_id}_ciri_frequency.txt".format(project_id=project_id),
-        #expand(["results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01_BP_GO.txt", "results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01_BP_GO.txt", "results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01.BP.pdf", "results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01.BP.pdf","results/diffexp/GOterms/{contrast}.diffexp.downFC.2.adjp.0.01_BP_classic_5_all.pdf","results/diffexp/GOterms/{contrast}.diffexp.upFC.2.adjp.0.01_BP_classic_5_all.pdf"], contrast = config["diffexp"]["contrasts"]),
-        #expand("results/diffexp/{contrast}.diffexp.01.VolcanoPlot.pdf", contrast = config["diffexp"]["contrasts"])
+        expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
+        expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
+        expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
+        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
+        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
+        expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
+        "results/diffexp/group/LRT_pca.pdf",
+        "results/diffexp/group/MDS_table.txt",
+        "results/diffexp/group/LRT_density_plot.pdf",
+        expand(["results/diffexp/pairwise/{contrast}.qplot.pdf","results/diffexp/pairwise/{contrast}.qhist.pdf","results/diffexp/pairwise/{contrast}.qvalue_diffexp.tsv"],contrast=config["diffexp"]["contrasts"]),
+        expand("results/ciri_out/{sample}_ciriout.txt",sample = SAMPLES),
+        "results/tables/{project_id}_ciri_junctioncounts.txt".format(project_id=project_id),
+        "results/tables/{project_id}_ciri_frequency.txt".format(project_id=project_id),
+        expand(["results/diffexp/pairwise/GOterms/{contrast}.diffexp.downFC.{FC}.adjp.{adjp}_BP_GO.txt", "results/diffexp/pairwise/GOterms/{contrast}.diffexp.upFC.{FC}.adjp.{adjp}_BP_GO.txt"], contrast = config["diffexp"]["contrasts"], FC=config['FC'], adjp=config['adjp']),
+        expand("results/diffexp/pairwise/{contrast}.diffexp.{adjp}.VolcanoPlot.pdf", contrast = config["diffexp"]["contrasts"], adjp = config['adjp']),
+        expand("results/diffexp/pairwise/permutationTest/Histogram.{contrast}.Permutation.Test.pdf", contrast = config["diffexp"]["contrasts"]),
+        expand(["results/diffexp/glimma-plots/{contrast}.ma_plot.html", "results/diffexp/glimma-plots/{contrast}.volcano_plot.html"],contrast = config["diffexp"]["contrasts"]),
+        "results/diffexp/glimma-plots/{project_id}.mds_plot.html".format(project_id=project_id)
 
 include: "rules/align_rmdp.smk"
-#include: "rules/omic_qc.smk"
-#include: "rules/deseq.smk"
-#include: "rules/ciri.smk"
-#include: "rules/circ_star.smk"
+include: "rules/omic_qc.smk"
+include: "rules/deseq.smk"
+include: "rules/ciri.smk"
