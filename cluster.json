@@ -1,4 +1,15 @@
 {
+    "__default__" :
+    {
+        "t" : "35:00:00",
+        "N" : 1,
+        "partition" : "exacloud",
+        "J" : "{rule}.{wildcards}",
+        "o" : "logs/{rule}/{wildcards}_{rule}%j.out",
+        "e" : "logs/{rule}/{wildcards}_{rule}%j.err",
+        "c" : 4,
+        "mem" : 45000
+    },
     "trimming" :
     {
         "J" : "trimming",
@@ -159,6 +170,14 @@
         "c" : 1,
         "mem":10000
     },
+    "compile_rd" :
+    {
+        "J" : "compile_rd",
+        "e" : "logs/compile_rd/compile_rd_%j.err",
+        "o" : "logs/compile_rd/compile_rd_%j.out",
+        "c" : 1,
+        "mem":5400
+    },
     "read_GC" :
     {
         "J" : "read_GC",
@@ -170,8 +189,8 @@
     "deseq2_init" :
     {
         "J" : "deseq2_init",
-        "e" : "logs/deseq2/deseq2_init_%j.err",
-        "o" : "logs/deseq2/deseq2_init_%j.out",
+        "e" : "logs/deseq2_init/deseq2_init_%j.err",
+        "o" : "logs/deseq2_init/deseq2_init_%j.out",
         "c" : 20,
         "mem" : 80000
     },
@@ -234,6 +253,22 @@
         "o" : "logs/permutation/permutation%j.out",
         "c" : 12,
         "mem" : 80000
+    },
+    "run_glimma" :
+    {
+        "J" : "run_glimma",
+        "e" : "logs/run_glimma/run_glimma%j.err",
+        "o" : "logs/run_glimma/run_glimma_%j.out",
+        "c" : 1,
+        "mem" : 10000
+    },
+    "run_glimma_mds" :
+    {
+        "J" : "run_glimma_mds",
+        "e" : "logs/run_glimma_mds/run_glimma_mds%j.err",
+        "o" : "logs/run_glimma_mds/run_glimma_mds%j.out",
+        "c" : 1,
+        "mem" : 10000
     },
     "circ_star" :
     {

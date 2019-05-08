@@ -35,11 +35,8 @@ md <- md[order(md[sampleID]),]
 subdata <- read.table(counts, header=TRUE, row.names=1, sep="\t", check.names=FALSE)
 subdata <- subdata[,order(colnames(subdata))]
 
-# Check
-stopifnot(md[[sampleID]]==colnames(subdata))
-
 # Extract only the Types that we want in further analysis & only the PP_ID and Status informative columns
-md <- filter(md, !!as.name(Type) == baseline | !!as.name(Type) == target)
+md <- filter(md, !!as.name(Type) == baseline | !!as.name(Type) == target, !!as.name(sampleID) %in% colnames(subdata))
 
 # Keep only the PP_IDs of the types we have chosen in the metadata table above
 rownames(md) <- md[[sampleID]]
@@ -47,6 +44,9 @@ md[[sampleID]] <- NULL
 keep <- colnames(subdata)[colnames(subdata) %in% rownames(md)]
 subdata <- subdata[, keep]
 dim(subdata)
+
+# Check
+stopifnot(rownames(md)==colnames(subdata))
 
 # Obtain the number of genes that meet padj<0.01 for reference line in histogram
 dds <- DESeqDataSetFromMatrix(countData=subdata,

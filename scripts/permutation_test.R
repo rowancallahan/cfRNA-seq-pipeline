@@ -24,18 +24,15 @@ baseline <- contrast[[2]]
 target <- contrast[[1]]
 
 md <- read.delim(file=metadata, sep = "\t", stringsAsFactors = FALSE)
-md <- md[with(md, order(SampleID)),]
+md <- md[order(md[[sampleID]]),]
 
 # Read in counts table
 subdata <- read.table(counts, header=TRUE, row.names=1, sep="\t")
 subdata <- subdata[,order(colnames(subdata))]
 
-# Check
-stopifnot(md[[sampleID]]==colnames(subdata))
-
 # Extract only the Types that we want in further analysis & only the PP_ID and Status informative columns
 md <- select(md, sampleID, Type)
-md <- filter(md, !!as.name(Type) == baseline | !!as.name(Type) == target)
+md <- filter(md, !!as.name(Type) == baseline | !!as.name(Type) == target, !!as.name(sampleID) %in% colnames(subdata))
 
 # Keep only the PP_IDs of the types we have chosen in the metadata table above
 rownames(md) <- md[[sampleID]]
@@ -43,6 +40,9 @@ md[[sampleID]] <- NULL
 keep <- colnames(subdata)[colnames(subdata) %in% rownames(md)]
 subdata <- subdata[, keep]
 dim(subdata)
+
+# Check
+stopifnot(rownames(md)==colnames(subdata))
 
 # Get the number of Cancer samples and number of HD samples from md table
 num1 = sum(md[[Type]] == baseline)

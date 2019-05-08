@@ -67,7 +67,6 @@ for sample in SAMPLES:
 rule all:
     input:
         expand("results/tables/{project_id}_STAR_mapping_statistics.txt", project_id = config['project_id']),
-        "data/{project_id}_coverage.txt".format(project_id=config["project_id"]),
         expand("samples/fastqc/{sample}/{sample}_{fastq_ext}_t_fastqc.zip", sample = SAMPLES, fastq_ext = fastq_ext),
         expand("samples/fastqscreen/{sample}/{sample}_{fastq_ext}_t_screen.{fastqscreen_ext}", sample=SAMPLES, fastq_ext=fastq_ext, fastqscreen_ext=fastqscreen_ext),
         "data/{project_id}_counts_w_stats.txt".format(project_id=config['project_id']),
@@ -77,14 +76,12 @@ rule all:
         expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
         expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
         expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
+        "results/tables/read_coverage.txt",
         expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
         "results/diffexp/group/LRT_pca.pdf",
         "results/diffexp/group/MDS_table.txt",
         "results/diffexp/group/LRT_density_plot.pdf",
         expand(["results/diffexp/pairwise/{contrast}.qplot.pdf","results/diffexp/pairwise/{contrast}.qhist.pdf","results/diffexp/pairwise/{contrast}.qvalue_diffexp.tsv"],contrast=config["diffexp"]["contrasts"]),
-        expand("results/ciri_out/{sample}_ciriout.txt",sample = SAMPLES),
-        "results/tables/{project_id}_ciri_junctioncounts.txt".format(project_id=project_id),
-        "results/tables/{project_id}_ciri_frequency.txt".format(project_id=project_id),
         expand(["results/diffexp/pairwise/GOterms/{contrast}.diffexp.downFC.{FC}.adjp.{adjp}_BP_GO.txt", "results/diffexp/pairwise/GOterms/{contrast}.diffexp.upFC.{FC}.adjp.{adjp}_BP_GO.txt"], contrast = config["diffexp"]["contrasts"], FC=config['FC'], adjp=config['adjp']),
         expand("results/diffexp/pairwise/{contrast}.diffexp.{adjp}.VolcanoPlot.pdf", contrast = config["diffexp"]["contrasts"], adjp = config['adjp']),
         expand("results/diffexp/pairwise/permutationTest/Histogram.{contrast}.Permutation.Test.pdf", contrast = config["diffexp"]["contrasts"]),
@@ -94,4 +91,3 @@ rule all:
 include: "rules/align_rmdp.smk"
 include: "rules/omic_qc.smk"
 include: "rules/deseq.smk"
-include: "rules/ciri.smk"

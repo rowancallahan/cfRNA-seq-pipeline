@@ -57,6 +57,16 @@ rule read_distribution:
     shell:
        "read_distribution.py -i {input} -r {params.bed} > {output}"
 
+
+rule compile_rd:
+    input:
+        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.txt", sample=SAMPLES)
+    output:
+        "results/tables/read_coverage.txt"
+    script:
+        "../scripts/get_rd.R"
+
+
 rule read_GC:
     input:
         "samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam",
