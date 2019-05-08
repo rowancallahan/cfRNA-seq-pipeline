@@ -254,6 +254,22 @@
         "c" : 12,
         "mem" : 80000
     },
+    "run_glimma" :
+    {
+        "J" : "run_glimma",
+        "e" : "logs/run_glimma/run_glimma%j.err",
+        "o" : "logs/run_glimma/run_glimma_%j.out",
+        "c" : 1,
+        "mem" : 10000
+    },
+    "run_glimma_mds" :
+    {
+        "J" : "run_glimma_mds",
+        "e" : "logs/run_glimma_mds/run_glimma_mds%j.err",
+        "o" : "logs/run_glimma_mds/run_glimma_mds%j.out",
+        "c" : 1,
+        "mem" : 10000
+    },
     "circ_star" :
     {
         "J" : "circ_star",
