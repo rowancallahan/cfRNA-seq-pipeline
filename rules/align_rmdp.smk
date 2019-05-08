@@ -6,10 +6,6 @@ rule trimming:
         fwd = "samples/trimmed/{sample}_R1_t.fq",
         rev = "samples/trimmed/{sample}_R2_t.fq",
         single = "samples/trimmed/{sample}_R1_singletons.fq"
-    log:
-        "logs/trimming/{sample}_trimming.log"
-    message:
-        """--- Trimming."""
     run:
         sickle = config["sickle_tool"]
 
@@ -22,12 +18,8 @@ rule fastqc:
     output:
         fwd = "samples/fastqc/{sample}/{sample}_R1_t_fastqc.zip",
         rev = "samples/fastqc/{sample}/{sample}_R2_t_fastqc.zip"
-    log:
-        "logs/fastqc/{sample}_fastqc.log"
     conda:
         "../envs/fastqc.yaml"
-    message:
-        """--- Quality check of raw data with Fastqc."""
     shell:
         """fastqc --outdir samples/fastqc/{wildcards.sample} --extract  -f fastq {input.fwd} {input.rev}"""
 
@@ -57,11 +49,8 @@ rule STAR:
         "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
         "samples/star/{sample}_bam/ReadsPerGene.out.tab",
         "samples/star/{sample}_bam/Log.final.out"
-    threads: 12
     params:
         gtf=config["gtf_file"]
-    log:
-        "logs/star/{sample}_star.log"
     run:
          STAR=config["star_tool"],
          pathToGenomeIndex = config["star_index"]
@@ -95,24 +84,6 @@ rule star_statistics:
     script:
         "../scripts/compile_star_log.py"
 
-rule bam_statistics:
-    input:
-        "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam"
-    output:
-        "samples/bamstats/{sample}/genome_coverage.json"
-    run:
-        bamstats=config["bamstats_tool"]
-        gtf = config["gtf_file"]
-
-        shell("{bamstats} -a {gtf} -i {input} -o {output} -u")
-
-rule get_bam_coverage:
-    input:
-        expand("samples/bamstats/{sample}/genome_coverage.json", sample=SAMPLES)
-    output:
-        "data/{project_id}_coverage.txt".format(project_id=config["project_id"])
-    script:
-        "../scripts/get_coverage.py"
 
 rule picard:
     input:
@@ -122,7 +93,6 @@ rule picard:
     params:
         name="rmd_{sample}",
         mem="5300"
-    threads: 1
     run:
       picard=config["picard_tool"]
 
