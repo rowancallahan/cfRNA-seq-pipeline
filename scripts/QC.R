@@ -80,7 +80,11 @@ p1 <- ggplot(data=df1, mapping=aes(x=SampleID, y=counts, fill=Condition)) +
 
 # width of pdf to ensure all sampleIDs are visible when exported to pdf
 # This was generated with a use case of 16 samples and a width of 7 fitting well, the +8 is to account for the margins
-width <- 7/24*(nrow(md)+8)
+if (nrow(md)<8) {
+  width <- 6
+} else {
+  width <- 7/24*(nrow(md)+8)
+}
 
 # raw counts boxplot
 pdf(rawCounts_out, width, 5)
@@ -182,7 +186,7 @@ save_pheatmap_pdf(hm, heatmap_out)
 # use plotMA function from limma, then extract data from this variable to plot with ggplot2
 p <- plotMDS(assay(rld), top = 1000)
 df <- data.frame(x=p$x, y=p$y, name=names(p$x))
-iv <- match(df$name, md[[sampleID]])
+iv <- match(df$name, md$SampleID)
 df$Condition <- paste(md[iv,][[Type]])
 
 pdf(MDS_out)
