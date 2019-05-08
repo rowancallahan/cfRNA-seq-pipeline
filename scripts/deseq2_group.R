@@ -58,9 +58,6 @@ md <- md[order(md[sampleID]),]
 cts <- read.table(counts, header=TRUE, row.names=1, sep="\t", check.names=F)
 cts <- cts[,order(colnames(cts))]
 
-# Check
-stopifnot(md[[sampleID]]==colnames(cts))
-
 # Put sample IDs as rownames of metadata
 rownames(md) <- md[[sampleID]]
 md[[sampleID]] <- NULL
@@ -68,6 +65,9 @@ md[[sampleID]] <- NULL
 # Ensure that we subset md to have exactly the same samples as in the counts table
 md <- md[colnames(cts),]
 dim(md)
+
+# Check
+stopifnot(rownames(md)==colnames(cts))
 
 # Create dds object from counts data and correct columns
 dds <- DESeqDataSetFromMatrix(countData=cts,
