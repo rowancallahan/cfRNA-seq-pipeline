@@ -41,7 +41,7 @@ rule fastqscreen:
     shell:
         """fastq_screen --aligner bowtie2 --conf {params.conf} --outdir samples/fastqscreen/{wildcards.sample} {input.fwd} {input.rev}"""
 
-rule STAR:
+rule star:
     input:
         fwd = "samples/trimmed/{sample}_R1_t.fq",
         rev = "samples/trimmed/{sample}_R2_t.fq"
