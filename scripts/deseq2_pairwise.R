@@ -130,7 +130,7 @@ forPlot$Expression <- ifelse(down, 'down',
 forPlot$Expression <- factor(forPlot$Expression, levels=c("up","down","NS"))
 
 # Assign colours to conditions
-if (sum(up==0) & sum(down)==0) {
+if (sum(up)==0 & sum(down)==0) {
   colours <- ncCol
 } else if (sum(up)==0) {
   colours <- c(downCol, ncCol)
