@@ -165,7 +165,10 @@ if (length(subset_cols)==1) {
   annot <- md[,subset_cols]
 }
 
-hm <- pheatmap(assay(rld), show_rownames=F, clustering_distance_rows = "correlation", 
+# Remove rows with no standard deviation so that pheatmap executes properly
+filt <- assay(rld)[apply(assay(rld), MARGIN = 1, FUN = function(x) sd(x) != 0),]
+
+hm <- pheatmap(filt, show_rownames=F, clustering_distance_rows = "correlation", 
          clustering_distance_cols = "correlation", clustering_method = "average", 
          annotation_col = annot, scale = "row", 
          main="Unsupervised heatmap of all gene counts across samples",
