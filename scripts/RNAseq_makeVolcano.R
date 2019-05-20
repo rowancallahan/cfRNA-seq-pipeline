@@ -19,6 +19,8 @@ upCol = "#FF9999"
 downCol = "#99CCFF"
 ncCol = "#CCCCCC"
 
+ens2geneID <- snakemake@config[['ens2geneID']]
+
 ##----------load differentially expressed genes --------#
 print("Loading differential expressed gene table")
 print(degFile)
@@ -40,17 +42,30 @@ sum(up)
 down <- deg$padj < adjp & deg$log2FoldChange < -log2(FC)
 sum(down)
 
+## Replace ensemble id's with gene id's
+gene_id = read.delim(ens2geneID)
+
+## Remove unique identifier .xx from heatmap data
+rownames(deg) <- sub("\\.[0-9]*", "", rownames(deg))
+iv <- match(rownames(deg), gene_id$ensembl_gene_id)
+head(gene_id[iv,])
+
+## assign the rownames of plot_LG to their external gene name using a variable, where we have indexed the 
+## row number for all matches between these two dataframes
+## Use paste to get rid of factors of this column, and just paste the value of the gene name
+deg$Gene <- paste(gene_id[iv, "external_gene_name"])
+
 # Grab the top 5 up and down regulated genes to label in the volcano plot
 if (sum(up)>5) {
-  upGenesToLabel <- head(rownames(deg[up,]), 5)
+  upGenesToLabel <- head(deg[up,]$Gene, 5)
 } else if (sum(up) %in% 1:5) {
-  upGenesToLabel <- rownames(deg[up,])
+  upGenesToLabel <- deg[up,]$Gene
 }
 
 if (sum(down)>5) {
-  downGenesToLabel <- head(rownames(deg[down,]), 5)
+  downGenesToLabel <- head(deg[down,]$Gene, 5)
 } else if (sum(down) %in% 1:5) {
-  downGenesToLabel <- rownames(deg[down,])
+  downGenesToLabel <- deg[down,]$Gene
 }
 
 ## calculate the -log10(adjp) for the plot
@@ -76,8 +91,6 @@ if (sum(up)==0 & sum(down)==0) {
 if ("Inf" %in% deg$log10padj) {
   deg$log10padj[deg$log10padj=="Inf"] <- max(deg[is.finite(deg$log10padj),"log10padj"]) + 2
 }
-
-deg$Gene <- rownames(deg)
 
 # Assign genes to label based on whether genes are DE or not
 if (exists("downGenesToLabel") & exists("upGenesToLabel")) {

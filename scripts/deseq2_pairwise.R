@@ -59,6 +59,8 @@ ncCol = "#CCCCCC"
 adjp <- 0.01
 FC <- 2
 
+ens2geneID <- snakemake@config[['ens2geneID']]
+
 parallel <- FALSE
 if (snakemake@threads > 1) {
     library("BiocParallel")
@@ -100,6 +102,19 @@ norm_counts <- counts(dds, normalized=TRUE)
 forPlot <- as.data.frame(res)
 forPlot$log2Norm <- log2(rowMeans(norm_counts))
 forPlot$Gene <- rownames(forPlot)
+
+## Replace ensemble id's with gene id's
+gene_id = read.delim(ens2geneID)
+
+## Remove unique identifier .xx from heatmap data
+forPlot$Gene <- sub("\\.[0-9]*", "", forPlot$Gene)
+iv <- match(forPlot$Gene, gene_id$ensembl_gene_id)
+head(gene_id[iv,])
+
+## assign the rownames of plot_LG to their external gene name using a variable, where we have indexed the 
+## row number for all matches between these two dataframes
+## Use paste to get rid of factors of this column, and just paste the value of the gene name
+forPlot$Gene  <- paste(gene_id[iv, "external_gene_name"])
 
 up <- forPlot$padj < adjp & forPlot$log2FoldChange > log2(FC)
 sum(up)
@@ -212,8 +227,20 @@ if (length(subset_cols)==1) {
   annot <- df[,subset_cols]
 }
 
+forHeat <- assay(rld)[topGenes,]
+
+## Remove unique identifier .xx from heatmap data
+rownames(forHeat) <- sub("\\.[0-9]*", "", rownames(forHeat))
+iv <- match(rownames(forHeat), gene_id$ensembl_gene_id)
+head(gene_id[iv,])
+
+## assign the rownames of plot_LG to their external gene name using a variable, where we have indexed the 
+## row number for all matches between these two dataframes
+## Use paste to get rid of factors of this column, and just paste the value of the gene name
+rownames(forHeat) <- paste(gene_id[iv, "external_gene_name"])
+
 pdf(heatmap_plot)
-pheatmap(assay(rld)[topGenes,], cluster_rows=T, scale="row", fontsize=6,fontsize_row=6,fontsize_col=6,show_rownames=T, cluster_cols=T, annotation_col=annot, labels_col=as.character(rownames(df)), main = paste("Heatmap of top 50 DE genes:", contrast[2], "vs", contrast[3]))
+pheatmap(forHeat, cluster_rows=T, scale="row", fontsize=6,fontsize_row=6,fontsize_col=6,show_rownames=T, cluster_cols=T, annotation_col=annot, labels_col=as.character(rownames(df)), main = paste("Heatmap of top 50 DE genes:", contrast[2], "vs", contrast[3]))
 dev.off()
 
 # Variance Heatmap
@@ -221,6 +248,12 @@ pdf(var_heat)
 topVarGenes <- head(order(rowVars(assay(rld)), decreasing = TRUE), 50)
 mat  <- assay(rld)[ topVarGenes, ]
 mat  <- mat - rowMeans(mat)
+
+## Remove unique identifier .xx from heatmap data
+rownames(mat) <- sub("\\.[0-9]*", "", rownames(mat))
+iv <- match(rownames(mat), gene_id$ensembl_gene_id)
+head(gene_id[iv,])
+
 pheatmap(mat, scale="row", annotation_col = annot,fontsize=6, main = paste("Heatmap of top 50 most variable genes:", contrast[2], "vs", contrast[3]))
 dev.off()
 
