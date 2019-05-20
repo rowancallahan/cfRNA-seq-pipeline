@@ -49,6 +49,16 @@ cat(sprintf(c('Subsetted group: ', group, '\n')))
 plot_cols <- snakemake@config[['meta_columns_to_plot']]
 subset_cols = names(plot_cols)
 
+# color palette
+colors <- snakemake@params[['colors']]
+discrete <- snakemake@params[['discrete']]
+
+# function to grab the ggplot2 colours
+gg_color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
 Dir <- "results/diffexp/group/"
 
 md <- read.delim(file=metadata, sep = "\t", stringsAsFactors = FALSE)
@@ -69,6 +79,17 @@ dim(md)
 # Check
 stopifnot(rownames(md)==colnames(cts))
 
+# Define colours based on number of Conditions
+if(colors[[1]] !='NA' & discrete[[1]] =='NA'){
+    if (brewer.pal.info[colors[[1]],]$maxcolors >= length(unique(md[[Type]]))) {
+        pal <- brewer.pal(length(unique(md[[Type]])),name=colors[[1]])
+    } 
+} else if(discrete[[1]] != 'NA' & length(discrete)==length(unique(md[[Type]]))){
+        pal <- unlist(discrete)
+} else {
+        pal <- gg_color_hue(length(unique(md[[Type]])))
+}
+
 # Create dds object from counts data and correct columns
 dds <- DESeqDataSetFromMatrix(countData=cts,
                               colData=md,
@@ -86,8 +107,16 @@ head(res.lrt)
 rld <- rlog(dds.lrt, blind=FALSE)
 
 # Pairwise PCA Plot
+pcaData <- plotPCA(rld, intgroup=labels[[1]], returnData=TRUE)
+
 pdf(pca_plot)
-plotPCA(rld, intgroup=labels[[1]])
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+ggplot(pcaData, aes_string("PC1", "PC2", color=labels[[1]])) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed() +
+  scale_colour_manual(values=pal)
 dev.off()
 
 # Pairwise PCA Plot with more than one PCA parameter
@@ -100,7 +129,8 @@ if (length(labels)>1) {
     geom_point(size=3) +
     xlab(paste0("PC1: ",percentVar[1],"% variance")) +
     ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-    coord_fixed()
+    coord_fixed() +
+    scale_colour_manual(values=pal)
   dev.off()
 }
 
