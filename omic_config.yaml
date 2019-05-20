@@ -15,8 +15,6 @@ exon_gtf:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.housekeeping_genes.exon.gtf
 genome:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/GRCh38.primary_assembly.genome.fa
-refflat2:
-  /home/groups/CEDAR/roskamsh/projects/Omics-QC-Pipeline-SE/data/gencode27_refflat2.txt
 ens2geneID:
   /home/groups/CEDAR/roskamsh/projects/cfRNA-seq-pipeline/data/biomart_ensembl_geneid.txt
 
