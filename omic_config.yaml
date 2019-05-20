@@ -41,14 +41,14 @@ bamstats_tool:
 
 # Metadata needed for differential expression analysis
 omic_meta_data:
-  /home/groups/CEDAR/roskamsh/projects/cfRNA-seq-pipeline/data/PP117-272_metadata.txt
+  /home/groups/CEDAR/roskamsh/projects/cfRNA-seq-pipeline/data/PP_metadata_final.txt
 
 #############################################################################################
 # Project-specific specifications you will need to make prior to submission of the pipeline
 #############################################################################################
 
 project_id:
-  cfRNA_11_01
+  PP_cohort_Run2
 assembly:
   hg38.90
 # option to print GO term tree (0/1)
@@ -69,16 +69,43 @@ sample_id:
   PP_ID
 meta_columns_to_plot:
   Type: Type
-  extraction_notes: extraction_notes
-  date_of_extraction: date_of_extraction
-  Origin: Origin
+  Gender: Gender
+  Date_of_RNA_Extraction: Date_of_RNA_Extraction
+  Date_of_Lib_Prep: Date_of_Lib_Prep
 diffexp:
   # contrasts for the deseq2 results method
   contrasts:
-    BreastCx-vs-Normal:
-      - BreastCx
-      - Normal
+    LG-vs-HD:
+      - LG
+      - HD
+    LCx-vs-HD:
+      - LCx
+      - HD
+    LCir-vs-HD:
+      - LCir
+      - HD
+    MM-vs-HD:
+      - MM
+      - HD
+    MG-vs-HD:
+      - MG
+      - HD
+    LG-vs-MM:
+      - LG
+      - MM
+    MM-vs-LCx:
+      - MM
+      - LCx
+    LG-vs-LCx:
+      - LG
+      - LCx
   LRT:
+    - HD
+    - LG
+    - MM
+    - MG
+    - LCx
+    - LCir
 pca:
   labels:
     # columns of sample sheet to use for PCA
@@ -90,9 +117,6 @@ pca:
 # If no options are specified, the default ggplot2 colours are used
 colors:
   rcolorbrewer:
-    - NA
+    - Paired
   discrete:
-    - red
-    - blue
-    - green
-    - yellow
+    - NA
