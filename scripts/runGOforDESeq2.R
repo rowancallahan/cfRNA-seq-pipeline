@@ -150,8 +150,7 @@ drawBarplot(go=go.UP.BP,ontology="BP",setName=paste(basename(comparison),"upFC",
 
 } else {
 up_out = snakemake@output[[1]]
-pdf(up_out)
-dev.off()
+write.table('No Significant Genes', file=up_out)
 }
     
 print("get down genes and make geneList")
@@ -175,7 +174,6 @@ drawBarplot(go=go.DN.BP,ontology="BP",setName=paste(basename(comparison),"downFC
 
 }else{
 down_out = snakemake@output[[2]]
-pdf(down_out)
-dev.off()
+write.table('No Significant Genes', file=down_out)
 }
 
