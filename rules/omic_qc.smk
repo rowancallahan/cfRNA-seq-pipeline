@@ -64,7 +64,7 @@ rule compile_rd:
     output:
         "results/tables/read_coverage.txt"
     script:
-        "../scripts/get_rd.R"
+        "../scripts/get_rd.py"
 
 
 rule read_GC:
