@@ -197,8 +197,6 @@ rule compile_exon_counts:
         expand("samples/htseq_exon_count/{sample}_htseq_exon_count.txt", sample=SAMPLES)
     output:
         "data/{project_id}_exon_counts.txt".format(project_id = config["project_id"])
-    conda:
-        "../envs/junction_counts.yaml"
     script:
         "../scripts/compile_exon_counts.R"
 
