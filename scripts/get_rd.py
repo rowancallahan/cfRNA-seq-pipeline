@@ -1,6 +1,6 @@
 import pandas as pd
 
-files = snakemake.input[0]
+files = snakemake.input
 out = snakemake.output[0]
 
 def split_exon_fraction(files, out):
