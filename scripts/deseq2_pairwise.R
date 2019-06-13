@@ -23,6 +23,8 @@ cat(sprintf(c('MA plot', ma_plot,'\n')))
 out_table = snakemake@output[['table']]
 cat(sprintf(c('Summary results table', out_table,'\n')))
 
+out_gene_table = snakemake@output[['geneID_table']]
+
 panel_ma = snakemake@output[['panel_ma']]
 cat(sprintf(c('MA panel', panel_ma,'\n')))
 
@@ -253,6 +255,7 @@ mat  <- mat - rowMeans(mat)
 rownames(mat) <- sub("\\.[0-9]*", "", rownames(mat))
 iv <- match(rownames(mat), gene_id$ensembl_gene_id)
 head(gene_id[iv,])
+rownames(mat) <- paste(gene_id[iv, "external_gene_name"])
 
 pheatmap(mat, scale="row", annotation_col = annot,fontsize=6, main = paste("Heatmap of top 50 most variable genes:", contrast[2], "vs", contrast[3]))
 dev.off()
@@ -260,3 +263,20 @@ dev.off()
 # sort by p-value
 res <- res[order(res$padj),]
 write.table(as.data.frame(res), file=out_table, quote=FALSE, sep='\t')
+
+# Export table with the geneIDs
+## Remove unique identifier .xx from results table
+res$GeneID <- sub("\\.[0-9]*", "", rownames(res))
+iv <- match(res$GeneID, gene_id$ensembl_gene_id)
+head(gene_id[iv,])
+
+## Paste external gene name of these ensembl IDs into this column instead
+## Use paste to get rid of factors of this column, and just paste the value of the gene name
+res$GeneID  <- paste(gene_id[iv, "external_gene_name"])
+
+resGen <- cbind(res$GeneID, as.data.frame(res)[,1:6])
+colnames(resGen)[1] <- "GeneID"
+
+# Export to table
+write.table(resGen, file=out_gene_table, row.names=FALSE, quote=FALSE, sep="\t")
+
