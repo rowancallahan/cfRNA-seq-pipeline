@@ -255,6 +255,7 @@ mat  <- mat - rowMeans(mat)
 rownames(mat) <- sub("\\.[0-9]*", "", rownames(mat))
 iv <- match(rownames(mat), gene_id$ensembl_gene_id)
 head(gene_id[iv,])
+rownames(mat) <- paste(gene_id[iv, "external_gene_name"])
 
 pheatmap(mat, scale="row", annotation_col = annot,fontsize=6, main = paste("Heatmap of top 50 most variable genes:", contrast[2], "vs", contrast[3]))
 dev.off()
@@ -274,8 +275,8 @@ head(gene_id[iv,])
 res$GeneID  <- paste(gene_id[iv, "external_gene_name"])
 
 resGen <- cbind(res$GeneID, as.data.frame(res)[,1:6])
+colnames(resGen)[1] <- "GeneID"
 
 # Export to table
 write.table(resGen, file=out_gene_table, row.names=FALSE, quote=FALSE, sep="\t")
-
 
