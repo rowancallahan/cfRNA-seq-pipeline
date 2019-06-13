@@ -12,6 +12,8 @@ contrast = c(condition, snakemake@params[["contrast"]])
 rds = snakemake@input[['rds']]
 cat(sprintf(c('RDS object: ',rds,'\n')))
 
+ens2geneID <- snakemake@config[['ens2geneID']]
+
 out_path = file.path(getwd(),'results','diffexp')
 dir.create(out_path)
 print(out_path)
@@ -25,6 +27,34 @@ res <- results(rds, contrast=contrast)
 res$padj[is.na(res$padj)] = 1
 
 rnaseq = as.data.frame(counts(rds, normalized=T))
+
+## Replace ensemble id's with gene id's
+gene_id = read.delim(ens2geneID)
+
+## Remove unique identifier .xx from heatmap data
+rownames(res) <- sub("\\.[0-9]*", "", rownames(res))
+iv <- match(rownames(res), gene_id$ensembl_gene_id)
+head(gene_id[iv,])
+
+res$GeneID  <- paste(gene_id[iv, "external_gene_name"])
+
+res <- res[order(res$padj),]
+# Remove duplicated geneIDs (this will, be default, remove the ones with the higher p-values, as we have ordered by p-value above
+res <- res[!duplicated(res$GeneID),]
+
+# Also subset your rnaseq counts table by these ensembl IDs so all of the data matches
+rownames(rnaseq) <- sub("\\.[0-9]*", "", rownames(rnaseq))
+rnaseq <- rnaseq[rownames(rnaseq) %in% rownames(res),]
+# Now match gene symbols to these ensembl IDS
+iv <- match(rownames(rnaseq), gene_id$ensembl_gene_id)
+head(gene_id[iv,])
+# Add gene symbols as rownames
+rownames(rnaseq)  <- paste(gene_id[iv, "external_gene_name"])
+
+# Now remove old ensembl IDs from results and paste gene symbol there
+rownames(res) <- res$GeneID
+res$GeneID <- NULL
+
 genes = as.data.frame(row.names(res))
 colnames(genes) = 'GeneID'
 
