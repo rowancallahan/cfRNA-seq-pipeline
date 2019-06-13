@@ -7,6 +7,7 @@ def split_exon_fraction(files, out):
     sample_list = []
     for file in files:
         sample = file.split('.')[0]
+        name = sample.split('/')[3]
         results = {}
         equal = False
         for line in open(file):
@@ -25,13 +26,14 @@ def split_exon_fraction(files, out):
                     results[key] = float(line[2])
                 else:
                     continue
-
-        exon_fraction = (results['CDS_Exons'] + results["5'UTR_Exons"] + results["3'UTR_Exons"]) / results["Total_Assigned"]
-        intron_fraction = results['Introns'] / results['Total_Assigned']
-        sample_list.append([sample, exon_fraction, intron_fraction])
+        Total = results['CDS_Exons'] + results["5'UTR_Exons"] + results["3'UTR_Exons"] + results['Introns'] + results['TSS_up_1kb'] + results['TSS_up_5kb'] + results['TSS_up_10kb'] + results['TES_down_1kb'] + results['TES_down_5kb'] + results['TES_down_10kb']
+        exon_fraction = (results['CDS_Exons'] + results["5'UTR_Exons"] + results["3'UTR_Exons"]) / Total
+        intron_fraction = results['Introns'] / Total
+        intergenic_fraction = (results['TSS_up_1kb'] + results['TSS_up_5kb'] + results['TSS_up_10kb'] + results['TES_down_1kb'] + results['TES_down_5kb'] + results['TES_down_10kb']) / Total
+        sample_list.append([name, exon_fraction, intron_fraction, intergenic_fraction])
 
     frame = pd.DataFrame(sample_list)
-    frame.columns = ['Sample','Exon','Intron']
+    frame.columns = ['Sample','Exon','Intron','Intergenic']
     frame.to_csv(out,sep='\t',index=False)
 
 split_exon_fraction(files, out)
