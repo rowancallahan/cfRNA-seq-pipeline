@@ -24,6 +24,7 @@ rule deseq2_pairwise:
         rld = "results/diffexp/pairwise/{contrast}_rlog_dds.rds"
     output:
         table="results/diffexp/pairwise/{contrast}.diffexp.tsv",
+        geneID_table="results/diffexp/pairwise/{contrast}.diffexp.geneID.tsv",
         ma_plot="results/diffexp/pairwise/{contrast}.ma_plot.pdf",
         p_hist="results/diffexp/pairwise/{contrast}.phist_plot.pdf",
         heatmap_plot = "results/diffexp/pairwise/{contrast}.heatmap_plot.pdf",
