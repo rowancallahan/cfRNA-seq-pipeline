@@ -170,6 +170,22 @@
         "c" : 1,
         "mem":10000
     },
+    "map_TE" :
+    {
+        "J" : "map_TE",
+        "e" : "logs/map_TE/map_TE%j.err",
+        "o" : "logs/map_TE/map_TE%j.out",
+        "c" : 12,
+        "mem" : 64000
+    },
+    "TEtranscripts" :
+    {
+        "J" : "TEtranscripts",
+        "e" : "logs/TEtranscripts/TEtranscripts_%j.err",
+        "o" : "logs/TEtranscripts/TEtranscripts_%j.out",
+        "c" : 8,
+        "mem":80000
+    },
     "deseq2_init" :
     {
         "J" : "deseq2_init",
