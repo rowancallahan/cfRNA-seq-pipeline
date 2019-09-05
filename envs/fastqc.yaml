@@ -15,4 +15,3 @@ dependencies:
   - libgcc-ng=8.2.0
   - openjdk=8.0.152
   - perl=5.26.2
-

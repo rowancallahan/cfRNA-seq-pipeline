@@ -1,4 +1,4 @@
-name: omic-qc-wf
+name: omic_qc_wf
 channels:
   - defaults
   - conda-forge
