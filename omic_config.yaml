@@ -13,6 +13,8 @@ star_index:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/
 exon_gtf:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.housekeeping_genes.exon.gtf
+TE_gtf:
+  /home/groups/CEDAR/anno/gtf/hg38_rmsk_TE.gtf
 genome:
   /home/exacloud/lustre1/CEDAR/anurpa/genomes/GRCh38.primary_assembly.genome.fa
 ens2geneID:
@@ -41,16 +43,19 @@ bamstats_tool:
 
 # Metadata needed for differential expression analysis
 omic_meta_data:
-  /home/groups/CEDAR/roskamsh/projects/cfRNA-seq-pipeline/data/PP_metadata_final.txt
+  /home/groups/CEDAR/roskamsh/projects/cfRNA-seq-pipeline/data/PP_metadata_keep_FINAL_updated.txt
+#  /home/groups/CEDAR/roskamsh/projects/cfRNA-seq-pipeline/data/PP_metadata_final.txt
 
 #############################################################################################
 # Project-specific specifications you will need to make prior to submission of the pipeline
 #############################################################################################
 
 project_id:
-  PP_cohort_Run2
+  PP_cohort_Run3
 assembly:
   hg38.90
+TE_baseline:
+  HD
 # option to print GO term tree (0/1)
 printTree:
   1
