@@ -12,7 +12,7 @@ rule deseq2_init:
         linear_model = config["linear_model"],
         contrast = get_contrast
     conda:
-        "../envs/permutation.yaml"
+        "../envs/deseq2.yaml"
     threads: get_deseq2_threads()
     script:
         "../scripts/deseq2-init.R"
@@ -166,7 +166,7 @@ rule permutation:
         sample_id = config["sample_id"],
         linear_model = config["linear_model"]
     conda:
-        "../envs/permutation.yaml"
+        "../envs/deseq2.yaml"
     script:
         "../scripts/permutation_test.R"
 
