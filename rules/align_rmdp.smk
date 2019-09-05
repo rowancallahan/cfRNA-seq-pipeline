@@ -11,35 +11,35 @@ rule trimming:
 
         shell("{sickle} pe -f {input.fwd} -r {input.rev}  -l 40 -q 20 -t sanger  -o {output.fwd} -p {output.rev} -s {output.single} &> {input.fwd}.log")
 
-rule fastqc:
-    input:
-        fwd = "samples/trimmed/{sample}_R1_t.fq",
-        rev = "samples/trimmed/{sample}_R2_t.fq"
-    output:
-        fwd = "samples/fastqc/{sample}/{sample}_R1_t_fastqc.zip",
-        rev = "samples/fastqc/{sample}/{sample}_R2_t_fastqc.zip"
-    conda:
-        "../envs/fastqc.yaml"
-    shell:
-        """fastqc --outdir samples/fastqc/{wildcards.sample} --extract  -f fastq {input.fwd} {input.rev}"""
+#rule fastqc:
+#    input:
+#        fwd = "samples/trimmed/{sample}_R1_t.fq",
+#        rev = "samples/trimmed/{sample}_R2_t.fq"
+#    output:
+#        fwd = "samples/fastqc/{sample}/{sample}_R1_t_fastqc.zip",
+#        rev = "samples/fastqc/{sample}/{sample}_R2_t_fastqc.zip"
+#    conda:
+#        "../envs/fastqc.yaml"
+#    shell:
+#        """fastqc --outdir samples/fastqc/{wildcards.sample} --extract  -f fastq {input.fwd} {input.rev}"""
 
-rule fastqscreen:
-    input:
-        fwd = "samples/trimmed/{sample}_R1_t.fq",
-        rev = "samples/trimmed/{sample}_R2_t.fq"
-    output:
-        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.html",
-        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.png",
-        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.txt",
-        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.html",
-        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.png",
-        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.txt"
-    params:
-        conf = config["conf"]
-    conda:
-        "../envs/fastqscreen.yaml"
-    shell:
-        """fastq_screen --aligner bowtie2 --conf {params.conf} --outdir samples/fastqscreen/{wildcards.sample} {input.fwd} {input.rev}"""
+#rule fastqscreen:
+#    input:
+#        fwd = "samples/trimmed/{sample}_R1_t.fq",
+#        rev = "samples/trimmed/{sample}_R2_t.fq"
+#    output:
+#        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.html",
+#        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.png",
+#        "samples/fastqscreen/{sample}/{sample}_R1_t_screen.txt",
+#        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.html",
+#        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.png",
+#        "samples/fastqscreen/{sample}/{sample}_R2_t_screen.txt"
+#    params:
+#        conf = config["conf"]
+#    conda:
+#        "../envs/fastqscreen.yaml"
+#    shell:
+#        """fastq_screen --aligner bowtie2 --conf {params.conf} --outdir samples/fastqscreen/{wildcards.sample} {input.fwd} {input.rev}"""
 
 rule star:
     input:
