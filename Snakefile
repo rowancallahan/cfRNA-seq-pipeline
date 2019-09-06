@@ -18,10 +18,12 @@ project_id = config["project_id"]
 SAMPLES, = glob_wildcards("samples/raw/{sample}_R1.fq")
 
 md = pd.read_table(config["omic_meta_data"], index_col="PP_ID",dtype=str)
+condition = config["linear_model"]
+baseline = config["TE_baseline"]
 
 # TO FILTER 
 #md =  md[md['Filter'] == 'TRUE']
-control = md[md['Status']=='HD']
+control = md[md[condition]==baseline]
 treat = md.loc[~md.index.isin(control.index)] 
 
 #control_paths = ' '.join(['samples/star_TE/{}/Aligned.out.bam'.format(x) for x in control.index])
@@ -29,7 +31,7 @@ control_paths = ['samples/star_TE/{}/Aligned.out.bam'.format(x) for x in control
 
 treat['cond_paths'] = ['samples/star_TE/{}/Aligned.out.bam'.format(x) for x in treat.index]
 #cond_paths = {key:' '.join(x['cond_paths'].values) for key,x in treat.groupby('Status')}
-cond_paths = {key:x['cond_paths'].values.tolist() for key,x in treat.groupby('Status')}
+cond_paths = {key:x['cond_paths'].values.tolist() for key,x in treat.groupby(condition)}
 CONDITIONS = cond_paths.keys()
 
 # Wildcard function to grab proper condition
