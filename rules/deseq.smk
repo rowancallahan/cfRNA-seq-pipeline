@@ -85,7 +85,7 @@ rule deseq2_QC:
         colors = config['colors']['rcolorbrewer'],
         discrete = config['colors']['discrete']
     conda:
-        "../envs/deseq2_QC.yaml"
+        "../envs/deseq2.yaml"
     script:
         "../scripts/QC.R"
 
