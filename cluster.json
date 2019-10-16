@@ -5,8 +5,8 @@
         "N" : 1,
         "partition" : "exacloud",
         "J" : "{rule}.{wildcards}",
-        "o" : "logs/{rule}/{wildcards}_{rule}%j.out",
-        "e" : "logs/{rule}/{wildcards}_{rule}%j.err",
+        "o" : "logs/__default__/{wildcards}_{rule}%j.out",
+        "e" : "logs/__default__/{wildcards}_{rule}%j.err",
         "c" : 4,
         "mem" : 45000
     },
