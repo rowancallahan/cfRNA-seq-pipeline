@@ -31,7 +31,6 @@ subdata <- read.table(counts, header=TRUE, row.names=1, sep="\t")
 subdata <- subdata[,order(colnames(subdata))]
 
 # Extract only the Types that we want in further analysis & only the PP_ID and Status informative columns
-md <- select(md, sampleID, Type)
 md <- filter(md, !!as.name(Type) == baseline | !!as.name(Type) == target, !!as.name(sampleID) %in% colnames(subdata))
 
 # Keep only the PP_IDs of the types we have chosen in the metadata table above
