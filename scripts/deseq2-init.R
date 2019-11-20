@@ -56,18 +56,11 @@ dds <- DESeqDataSetFromMatrix(countData=subdata,
 dds <- estimateSizeFactors(dds)
 
 # Remove uninformative columns
-dds <- dds[ rowSums(counts(dds)) >= 1, ]
+dds <- dds[ rowSums(counts(dds)) > 1, ]
 
 # Normalization and pre-processing
 dds <- DESeq(dds, parallel=parallel)
 
-saveRDS(dds, file=output)
-
-# colData and countData must have the same sample order, but this is ensured
-# by the way we create the count matrix
-dds <- dds[ rowSums(counts(dds)) > 1, ]
-# normalization and preprocessing
-dds <- DESeq(dds, parallel=parallel)
 saveRDS(dds, file=output)
 
 # obtain normalized counts
