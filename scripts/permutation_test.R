@@ -72,7 +72,7 @@ for (i in 1:number_of_try)
   dds = estimateSizeFactors(dds)
   
   # Remove genes with zero counts over all samples
-  dds <- dds[ rowSums(counts(dds)) >= 1, ]
+  dds <- dds[ rowSums(counts(dds)) > 1, ]
   
   # Make sure of reference, set it by rlevel
   dds$type = relevel(dds$type, ref = 1)
@@ -97,7 +97,7 @@ dds <- DESeqDataSetFromMatrix(countData=subdata,
 dds <- estimateSizeFactors(dds)
 
 # Remove uninformative columns
-dds <- dds[ rowSums(counts(dds)) >= 1, ]
+dds <- dds[ rowSums(counts(dds)) > 1, ]
 
 # Normalization and pre-processing
 dds <- DESeq(dds)
