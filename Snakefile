@@ -16,8 +16,11 @@ configfile:"omic_config.yaml"
 project_id = config["project_id"]
 
 SAMPLES, = glob_wildcards("samples/raw/{sample}_R1.fq")
+print(SAMPLES)
 
-md = pd.read_table(config["omic_meta_data"], index_col="PP_ID",dtype=str)
+#removed the index col for our metadata no longer needed it
+sample_id = config["sample_id"]
+md = pd.read_table(config["omic_meta_data"], index_col=sample_id, dtype=str)
 condition = config["linear_model"]
 baseline = config["TE_baseline"]
 
@@ -82,8 +85,10 @@ for sample in SAMPLES:
 
 for condition in CONDITIONS:
     message("Condition " + condition + " will be processed")
-#print(control_paths)
-#print(cond_paths)
+print(control_paths)
+print(cond_paths)
+print(SAMPLES)
+
 
 rule all:
     input:
@@ -91,27 +96,28 @@ rule all:
         expand("samples/fastqc/{sample}/{sample}_{fastq_ext}_t_fastqc.zip", sample = SAMPLES, fastq_ext = fastq_ext),
         expand("samples/fastqscreen/{sample}/{sample}_{fastq_ext}_t_screen.{fastqscreen_ext}", sample=SAMPLES, fastq_ext=fastq_ext, fastqscreen_ext=fastqscreen_ext),
         "data/{project_id}_counts_w_stats.txt".format(project_id=config['project_id']),
+        "data/{project_id}_counts.txt".format(project_id=config['project_id']),
         "data/{project_id}_exon_counts.txt".format(project_id = config["project_id"]),
-        expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
-        expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
-        expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
-        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
-        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
+#        expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
+#        expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
+#        expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
+#        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
+#        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
         "results/tables/read_coverage.txt",
         expand("samples/star_TE/{sample}/Aligned.out.bam", sample = SAMPLES),
         expand("results/TEtranscripts/{condition}.cntTable", condition = CONDITIONS),
-        expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
-        "results/diffexp/group/LRT_pca.pdf",
-        "results/diffexp/group/MDS_table.txt",
-        "results/diffexp/group/LRT_density_plot.pdf",
-        expand(["results/diffexp/pairwise/{contrast}.qplot.pdf","results/diffexp/pairwise/{contrast}.qhist.pdf","results/diffexp/pairwise/{contrast}.qvalue_diffexp.tsv"],contrast=config["diffexp"]["contrasts"]),
-        expand(["results/diffexp/pairwise/GOterms/{contrast}.diffexp.downFC.{FC}.adjp.{adjp}_BP_GO.txt", "results/diffexp/pairwise/GOterms/{contrast}.diffexp.upFC.{FC}.adjp.{adjp}_BP_GO.txt"], contrast = config["diffexp"]["contrasts"], FC=config['FC'], adjp=config['adjp']),
-        expand("results/diffexp/pairwise/{contrast}.diffexp.{adjp}.VolcanoPlot.pdf", contrast = config["diffexp"]["contrasts"], adjp = config['adjp']),
-        expand("results/diffexp/pairwise/permutationTest/Histogram.{contrast}.Permutation.Test.pdf", contrast = config["diffexp"]["contrasts"]),
-        expand(["results/diffexp/glimma-plots/{contrast}.ma_plot.html", "results/diffexp/glimma-plots/{contrast}.volcano_plot.html"],contrast = config["diffexp"]["contrasts"]),
-        "results/diffexp/glimma-plots/{project_id}.mds_plot.html".format(project_id=project_id)
+##        expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
+#        "results/diffexp/group/LRT_pca.pdf",
+#        "results/diffexp/group/MDS_table.txt",
+#        "results/diffexp/group/LRT_density_plot.pdf",
+#        expand(["results/diffexp/pairwise/{contrast}.qplot.pdf","results/diffexp/pairwise/{contrast}.qhist.pdf","results/diffexp/pairwise/{contrast}.qvalue_diffexp.tsv"],contrast=config["diffexp"]["contrasts"]),
+#        expand(["results/diffexp/pairwise/GOterms/{contrast}.diffexp.downFC.{FC}.adjp.{adjp}_BP_GO.txt", "results/diffexp/pairwise/GOterms/{contrast}.diffexp.upFC.{FC}.adjp.{adjp}_BP_GO.txt"], contrast = config["diffexp"]["contrasts"], FC=config['FC'], adjp=config['adjp']),
+#        expand("results/diffexp/pairwise/{contrast}.diffexp.{adjp}.VolcanoPlot.pdf", contrast = config["diffexp"]["contrasts"], adjp = config['adjp']),
+#        expand("results/diffexp/pairwise/permutationTest/Histogram.{contrast}.Permutation.Test.pdf", contrast = config["diffexp"]["contrasts"]),
+#        expand(["results/diffexp/glimma-plots/{contrast}.ma_plot.html", "results/diffexp/glimma-plots/{contrast}.volcano_plot.html"],contrast = config["diffexp"]["contrasts"]),
+#        "results/diffexp/glimma-plots/{project_id}.mds_plot.html".format(project_id=project_id)
 
 include: "rules/align_rmdp.smk"
 include: "rules/omic_qc.smk"
 include: "rules/TE.smk"
-include: "rules/deseq.smk"
+#include: "rules/deseq.smk"
