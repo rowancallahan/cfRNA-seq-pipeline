@@ -1,3 +1,17 @@
+rule insert_size:
+    input:
+        "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam"
+    output:
+        metrics="samples/insert_size/{sample}_insert_size_metrics.txt",
+        hist="samples/insert_size/{sample}_insert_size_histogram"
+    run:
+        picard_insert_size=config["insert_size_tool"]
+        
+        shell("java -jar {picard_insert_size} \
+               I={input} \
+               O={output.metrics} \
+               H={output.hist}")
+
 rule trimming:
     input:
         fwd = "samples/raw/{sample}_R1.fq",
@@ -18,6 +32,7 @@ rule fastqc:
     output:
         fwd = "samples/fastqc/{sample}/{sample}_R1_t_fastqc.zip",
         rev = "samples/fastqc/{sample}/{sample}_R2_t_fastqc.zip"
+
     conda:
         "../envs/fastqc.yaml"
     shell:
@@ -51,6 +66,7 @@ rule star:
         "samples/star/{sample}_bam/Log.final.out"
     params:
         gtf=config["gtf_file"]
+
     run:
          STAR=config["star_tool"],
          pathToGenomeIndex = config["star_index"]
@@ -71,6 +87,7 @@ rule index:
         "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam"
     output:
         "samples/star/{sample}_bam/Aligned.sortedByCoord.out.bam.bai"
+
     conda:
         "../envs/omic_qc_wf.yaml"
     shell:
@@ -83,6 +100,7 @@ rule star_statistics:
         "results/tables/{project_id}_STAR_mapping_statistics.txt".format(project_id = config["project_id"])
     script:
         "../scripts/compile_star_log.py"
+
 
 
 rule picard:
@@ -111,6 +129,7 @@ rule sort:
     params:
       name = "sort_{sample}",
       mem = "6400"
+
     conda:
       "../envs/omic_qc_wf.yaml"
     shell:
@@ -124,6 +143,7 @@ rule samtools_stats:
         "samples/samtools_stats/{sample}.txt"
     log:
         "logs/samtools_stats/{sample}_samtools_stats.log"
+
     conda:
         "../envs/omic_qc_wf.yaml"
     wrapper:
@@ -135,6 +155,7 @@ rule genecount:
         "samples/genecounts_rmdp/{sample}_bam/{sample}_sort.rmd.bam"
     output:
         "samples/htseq_count/{sample}_htseq_gene_count.txt",
+
     log:
         "logs/genecount/{sample}_genecount.log"
     params:
@@ -174,13 +195,13 @@ rule count_exons:
                {params.exon_gtf} > {output}"""
 
 
-rule compile_counts:
-    input:
-        expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
-    output:
-        "data/{project_id}_counts.txt".format(project_id=config["project_id"])
-    script:
-        "../scripts/compile_counts_table.py"
+#rule compile_counts:
+#    input:
+#        expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
+#    output:
+#        "data/{project_id}_counts.txt".format(project_id=config["project_id"])
+#    script:
+#        "../scripts/compile_counts_table.py"
 
 
 rule compile_counts_and_stats:
@@ -197,6 +218,7 @@ rule compile_exon_counts:
         expand("samples/htseq_exon_count/{sample}_htseq_exon_count.txt", sample=SAMPLES)
     output:
         "data/{project_id}_exon_counts.txt".format(project_id = config["project_id"])
+
     script:
         "../scripts/compile_exon_counts.R"
 
