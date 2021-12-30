@@ -3,14 +3,21 @@
 ##############################################################################
 
 # GTF file for the genome build you would like to use
+#gtf_file:
+#  /home/groups/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf
+#This next file is an ERCC  version of the gencod gtf annotation
 gtf_file:
-  /home/groups/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf
+  /home/groups/CEDAR/anno/gtf/hg38_ens94_ERCC.gtf
+
 # Bed file for rseqc function read_distribution
 bed_file:
   /home/groups/CEDAR/anurpa/genomes/gencode_v27.bed
 # Pre-built star indexes for hg38
 star_index:
-  /home/groups/CEDAR/anno/indices/star/cfRNA_star_index
+   /home/groups/CEDAR/anno/indices/star/hg38_ERCC 
+#non ERCC version
+#  /home/groups/CEDAR/anno/indices/star/cfRNA_star_index
+
 exon_gtf:
   /home/groups/CEDAR/anurpa/genomes/gencode.housekeeping_genes.exon.gtf
 TE_gtf:
