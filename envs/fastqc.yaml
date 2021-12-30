@@ -11,7 +11,8 @@ channels:
   - https://repo.anaconda.com/pkgs/pro/linux-64
   - https://repo.anaconda.com/pkgs/pro/noarch
 dependencies:
-  - fastqc=0.11.7
-  - libgcc-ng=8.2.0
-  - openjdk=8.0.152
-  - perl=5.26.2
+  - fastqc
+  - libgcc-ng
+  - openjdk
+  - perl
+prefix: /home/groups/CEDAR/callahro/miniconda3/envs/fastqc

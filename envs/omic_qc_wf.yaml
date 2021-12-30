@@ -154,5 +154,4 @@ dependencies:
   - pip:
     - pyqt5-sip==4.19.18
     - pyqtwebengine==5.12.1
-prefix: /home/groups/CEDAR/roskamsh/tools/miniconda3/envs/omic_qc_wf
 

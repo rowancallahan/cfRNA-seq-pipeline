@@ -47,5 +47,4 @@ dependencies:
   - xz=5.2.4
   - zlib=1.2.11
   - zstd=1.4.4
-prefix: /home/groups/CEDAR/roskamsh/tools/miniconda3/envs/fastqscreen
 
