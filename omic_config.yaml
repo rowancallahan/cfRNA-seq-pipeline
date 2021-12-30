@@ -4,19 +4,19 @@
 
 # GTF file for the genome build you would like to use
 gtf_file:
-  /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf
+  /home/groups/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf
 # Bed file for rseqc function read_distribution
 bed_file:
-  /home/exacloud/lustre1/CEDAR/roskamsh/projects/Omics-QC-pipeline/data/gencode_v27.bed
+  /home/groups/CEDAR/anurpa/genomes/gencode_v27.bed
 # Pre-built star indexes for hg38
 star_index:
-  /home/exacloud/lustre1/CEDAR/anurpa/genomes/
+  /home/groups/CEDAR/anno/indices/star/cfRNA_star_index
 exon_gtf:
-  /home/exacloud/lustre1/CEDAR/anurpa/genomes/gencode.housekeeping_genes.exon.gtf
+  /home/groups/CEDAR/anurpa/genomes/gencode.housekeeping_genes.exon.gtf
 TE_gtf:
   /home/groups/CEDAR/anno/gtf/hg38_rmsk_TE.gtf
 genome:
-  /home/exacloud/lustre1/CEDAR/anurpa/genomes/GRCh38.primary_assembly.genome.fa
+  /home/groups/CEDAR/anurpa/genomes/GRCh38.primary_assembly.genome.fa
 ens2geneID:
   /home/groups/CEDAR/roskamsh/projects/cfRNA-seq-pipeline/data/biomart_ensembl_geneid.txt
 
@@ -43,14 +43,14 @@ bamstats_tool:
 
 # Metadata needed for differential expression analysis
 omic_meta_data:
-  /home/groups/CEDAR/callahro/projects/outside_cfRNA_data/cfRNA-seq-pipeline/yu_fastq_list_better_groups.txt 
+  ./combined_PCX_data.txt  
 
 #############################################################################################
 # Project-specific specifications you will need to make prior to submission of the pipeline
 #############################################################################################
 
 project_id:
-  outside_data_set 
+  PCX_cohort 
 assembly:
   hg38.90
 #whatever name is the basline name in the column used for the linear model

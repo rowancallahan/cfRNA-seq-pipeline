@@ -8,7 +8,8 @@
         "o" : "logs/__default__/{wildcards}_{rule}%j.out",
         "e" : "logs/__default__/{wildcards}_{rule}%j.err",
         "c" : 4,
-        "mem" : 45000
+        "mem" : 45000,
+        "qos" : ""
     },
     "trimming" :
     {
@@ -40,7 +41,9 @@
         "e" : "logs/star/star%j.err",
         "o" : "logs/star/star%j.out",
         "c" : 12,
-        "mem" : 64000
+        "mem" : 64000,
+        "qos" : " --qos long_jobs",
+        "t" : "10-0"
     },
     "star_statistics" :
     {
