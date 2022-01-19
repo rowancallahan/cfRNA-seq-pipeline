@@ -104,6 +104,13 @@ rule all:
 #        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
 #        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
         "results/tables/read_coverage.txt",
+#        expand("{project_id}_QC/Exon.Fraction.pdf", project_id=config["project_id"]),
+#        expand("{project_id}_QC/Input.Reads.Barplot.pdf", project_id=config["project_id"]),
+#        expand("{project_id}_QC/Unique.Reads.Barplot.pdf", project_id=config["project_id"]),
+#        expand("{project_id}_QC/Scatter.Plot.LibSize.ExonFraction.pdf", project_id=config["project_id"]),
+#        expand("{project_id}_QC/{project_id}_Metadata_W_QC_Metrics.txt", project_id=config["project_id"]),
+#        expand("{project_id}_QC/{project_id}_PCA_potential_batch_grid.pdf", project_id=config["project_id"]),
+#        expand("{project_id}_QC/{project_id}_subset_counts.txt", project_id=config["project_id"]),
         expand("samples/star_TE/{sample}/Aligned.out.bam", sample = SAMPLES),
         expand("results/TEtranscripts/{condition}.cntTable", condition = CONDITIONS),
 ##        expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
@@ -119,5 +126,6 @@ rule all:
 
 include: "rules/align_rmdp.smk"
 include: "rules/omic_qc.smk"
+include: "rules/QC_init.smk"
 include: "rules/TE.smk"
 #include: "rules/deseq.smk"
