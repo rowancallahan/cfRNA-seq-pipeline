@@ -74,53 +74,56 @@ TE_baseline:
 #  0.01
 ## The column name of the characteristic you would like to do DE on. Example: Diagnosis, genotype, etc. This must be a column in your omic_meta_data. 
 linear_model:
-  status
+  A2Group
 seq_layout:
   PE
 #column name of whatever the sample id column is
 sample_id:
-  sample 
+  RNA_ID 
 #meta_columns_to_plot:
-#  Status: Status
+#  Status: A2Group
 #  Lib_Conc: Lib_Conc
 #diffexp:
 #  # contrasts for the deseq2 results method
 #  contrasts:
-#    LuCa-vs-HD:
-#      - LuCa
-#      - HD
-#    HCC-vs-HD:
-#      - HCC
-#      - HD
-#    Cirr-vs-HD:
-#      - Cirr
-#      - HD
-#    MM-vs-HD:
-#      - MM
-#      - HD
-#    MGUS-vs-HD:
-#      - MGUS
-#      - HD
-#    LuCa-vs-MM:
-#      - LuCa
-#      - MM
-#    MM-vs-HCC:
-#      - MM
-#      - HCC
-#    LuCa-vs-HCC:
-#      - LuCa
-#      - HCC
+#    Cancer_PDAC-vs-Benign:
+#      - Cancer_PDAC
+#      - Benign
+#    Pancreatitis-vs-Benign:
+#      - Pancreatitis
+#      - Benign
+#    Cancer_other-vs-Benign:
+#      - Cancer_other
+#      - Benign
+#    IPMN-vs-Benign:
+#      - IPMN
+#      - Benign
+#    Cancer_PDAC-vs-Pancreatitis:
+#      - Cancer_PDAC
+#      - Pancreatitis
+#    Cancer_PDAC-vs-IPMN:
+#      - Cancer_PDAC
+#      - IPMN
+#    Cancer_PDAC-vs-Cancer_other:
+#      - Cancer_PDAC
+#      - Cancer_other
+#    Cancer_PDAC-vs-Normal:
+#      - Cancer_PDAC
+#      - Normal
+#    Pancreatitis-vs-IPMN:
+#      - Pancreatitis
+#      - IPMN
 #  LRT:
-#    - HD
-#    - LuCa
-#    - MM
-#    - MGUS
-#    - HCC
-#    - Cirr
+#    - Cancer_PDAC
+#    - Cancer_other
+#    - Pancreatitis
+#    - IPMN
+#    - Benign
+#    - Normal
 #pca:
 #  labels:
 #    # columns of sample sheet to use for PCA
-#    - Status
+#    - A2Group
 ## If you would like to colour your QC plots by an RColorBrewer palette, list that palette under the rcolorbrewer parameter, otherwise, write "NA"
 ## If you would like to colour your QC plots by specific colours, please list them under the discrete category, with one colour for each bullet point
 ### The discrete colours will be assigned to your Conditions (ie. linear_model) in the order that they show up in your metadata table, when it is ordered alphabetically by sample ID
