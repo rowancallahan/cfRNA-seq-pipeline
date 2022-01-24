@@ -80,57 +80,75 @@ seq_layout:
 #column name of whatever the sample id column is
 sample_id:
   RNA_ID 
-#meta_columns_to_plot:
-#  Status: A2Group
-#  Lib_Conc: Lib_Conc
-#diffexp:
-#  # contrasts for the deseq2 results method
-#  contrasts:
-#    Cancer_PDAC-vs-Benign:
-#      - Cancer_PDAC
-#      - Benign
-#    Pancreatitis-vs-Benign:
-#      - Pancreatitis
-#      - Benign
-#    Cancer_other-vs-Benign:
-#      - Cancer_other
-#      - Benign
-#    IPMN-vs-Benign:
-#      - IPMN
-#      - Benign
-#    Cancer_PDAC-vs-Pancreatitis:
-#      - Cancer_PDAC
-#      - Pancreatitis
-#    Cancer_PDAC-vs-IPMN:
-#      - Cancer_PDAC
-#      - IPMN
-#    Cancer_PDAC-vs-Cancer_other:
-#      - Cancer_PDAC
-#      - Cancer_other
-#    Cancer_PDAC-vs-Normal:
-#      - Cancer_PDAC
-#      - Normal
-#    Pancreatitis-vs-IPMN:
-#      - Pancreatitis
-#      - IPMN
-#  LRT:
-#    - Cancer_PDAC
-#    - Cancer_other
-#    - Pancreatitis
-#    - IPMN
-#    - Benign
-#    - Normal
-#pca:
-#  labels:
-#    # columns of sample sheet to use for PCA
-#    - A2Group
+meta_columns_to_plot:
+  Status: A2Group
+  Lib_Conc: Lib_Conc
+diffexp:
+  #contrasts for the deseq2 results method
+  contrasts:
+    Cancer_PDAC-vs-Benign:
+      - Cancer_PDAC
+      - Benign
+    Pancreatitis-vs-Benign:
+      - Pancreatitis
+      - Benign
+    Cancer_other-vs-Benign:
+      - Cancer_other
+      - Benign
+    IPMN-vs-Benign:
+      - IPMN
+      - Benign
+    Normal-vs-Benign:
+      - Normal
+      - Benign
+    Cancer_PDAC-vs-Pancreatitis:
+      - Cancer_PDAC
+      - Pancreatitis
+    Cancer_PDAC-vs-IPMN:
+      - Cancer_PDAC
+      - IPMN
+    Cancer_PDAC-vs-Cancer_other:
+      - Cancer_PDAC
+      - Cancer_other
+    Cancer_PDAC-vs-Normal:
+      - Cancer_PDAC
+      - Normal
+    Pancreatitis-vs-IPMN:
+      - Pancreatitis
+      - IPMN
+    Pancreatitis-vs-Cancer_other:
+      - Pancreatitis
+      - Cancer_other
+    Pancreatitis-vs-Normal:
+      - Pancreatitis
+      - Normal
+    Cancer_other-vs-IPMN:
+      - Cancer_other
+      - IPMN
+    Cancer_other-vs-Normal:
+      - Cancer_other
+      - Normal
+    IPMN-vs-Normal:
+      - IPMN
+      - Normal
+  LRT:
+    - Cancer_PDAC
+    - Cancer_other
+    - Pancreatitis
+    - IPMN
+    - Benign
+    - Normal
+pca:
+  labels:
+    # columns of sample sheet to use for PCA
+    - A2Group
 ## If you would like to colour your QC plots by an RColorBrewer palette, list that palette under the rcolorbrewer parameter, otherwise, write "NA"
 ## If you would like to colour your QC plots by specific colours, please list them under the discrete category, with one colour for each bullet point
 ### The discrete colours will be assigned to your Conditions (ie. linear_model) in the order that they show up in your metadata table, when it is ordered alphabetically by sample ID
 ### There must be the same number of colours listed as there are Conditions
 ## If no options are specified, the default ggplot2 colours are used
-#colors:
-#  rcolorbrewer:
-#    - Paired
-#  discrete:
-#    - NA
+colors:
+  rcolorbrewer:
+    - Paired
+  discrete:
+    - NA
