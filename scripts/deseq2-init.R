@@ -101,7 +101,7 @@ dds <- DESeqDataSetFromMatrix(countData=subdata,
                               design= as.formula(paste('~',Type)))
 
 ERCC_rows <- which(rownames(dds) %like% "ERCC")
-dds <- estimateSizeFactors(dds)
+dds <- estimateSizeFactors(dds, controlGenes = ERCC_rows)
 
 # Remove uninformative columns
 dds <- dds[ rowSums(counts(dds)) > 1, ]
