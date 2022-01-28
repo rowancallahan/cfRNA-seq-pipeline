@@ -45,6 +45,26 @@
         "qos" : " --qos long_jobs",
         "t" : "10-0"
     },
+    "bwa" :
+    {
+        "J" : "star",
+        "e" : "logs/bwa/bwa%j.err",
+        "o" : "logs/bwa/bwa%j.out",
+        "c" : 12,
+        "mem" : 64000,
+        "qos" : " --qos long_jobs",
+        "t" : "4-0"
+    },
+    "ciri2" :
+    {
+        "J" : "ciri2",
+        "e" : "logs/ciri2/ciri2%j.err",
+        "o" : "logs/ciri2/ciri2%j.out",
+        "c" : 12,
+        "mem" : 64000,
+        "qos" : " --qos long_jobs",
+        "t" : "4-0"
+    },
     "star_statistics" :
     {
         "J" : "star_statistics",

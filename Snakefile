@@ -98,11 +98,11 @@ rule all:
         "data/{project_id}_counts_w_stats.txt".format(project_id=config['project_id']),
         "data/{project_id}_counts.txt".format(project_id=config['project_id']),
         "data/{project_id}_exon_counts.txt".format(project_id = config["project_id"]),
-#        expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
-#        expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
-#        expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
-#        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
-#        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
+        expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
+        expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
+        expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
+        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
+        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
         "results/tables/read_coverage.txt",
 #        expand("{project_id}_QC/Exon.Fraction.pdf", project_id=config["project_id"]),
 #        expand("{project_id}_QC/Input.Reads.Barplot.pdf", project_id=config["project_id"]),
@@ -113,7 +113,8 @@ rule all:
 #        expand("{project_id}_QC/{project_id}_subset_counts.txt", project_id=config["project_id"]),
         expand("samples/star_TE/{sample}/Aligned.out.bam", sample = SAMPLES),
         expand("results/TEtranscripts/{condition}.cntTable", condition = CONDITIONS),
-##        expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
+         expand("ciri2_output/ciri2out_bwa_map_{sample}.txt", sample = SAMPLES)
+#        expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
 #        "results/diffexp/group/LRT_pca.pdf",
 #        "results/diffexp/group/MDS_table.txt",
 #        "results/diffexp/group/LRT_density_plot.pdf",
@@ -125,7 +126,8 @@ rule all:
 #        "results/diffexp/glimma-plots/{project_id}.mds_plot.html".format(project_id=project_id)
 
 include: "rules/align_rmdp.smk"
+include: "rules/circ.smk"
 include: "rules/omic_qc.smk"
-include: "rules/QC_init.smk"
+#include: "rules/QC_init.smk"
 include: "rules/TE.smk"
 #include: "rules/deseq.smk"
