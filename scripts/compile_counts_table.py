@@ -10,7 +10,7 @@ Returns:
     Compiled STAR gene counts table as tab delimited file.
 """
 
-tables = [pd.read_csv(fh, sep='\t', index_col=0, names=[fh.split('/')[-1].split('_')[0]]) for fh in snakemake.input]
+tables = [pd.read_csv(fh, sep='\t', index_col=0, names=[fh.split('/')[-1]]) for fh in snakemake.input]
 joined_table = pd.concat(tables, axis=1)
 filtered_joined = joined_table.iloc[:-5, :]
 filtered_joined_sorted = filtered_joined.reindex(sorted(filtered_joined.columns), axis = 1)
