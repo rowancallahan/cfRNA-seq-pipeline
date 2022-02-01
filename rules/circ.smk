@@ -1,6 +1,6 @@
 rule bwa: 
-        input: "/home/groups/CEDAR/callahro/projects/cfRNA_PCX/cfRNA-seq-pipeline/samples/raw/{sample}_R1.fq" 
-        output:"/home/groups/CEDAR/spilioto/new_cfrna_with_ERCC/data/sam/bwa_map_{sample}.sam"  
+        input: "samples/raw/{sample}_R1.fq" 
+        output: "data/sam/bwa_map_{sample}.sam"  
 
         params: name="bwa_{sample}", partition="exacloud", mem="64000" 
         threads: 12  
@@ -15,8 +15,8 @@ rule bwa:
                         """)
 
 rule ciri2:
-        input:"/home/groups/CEDAR/spilioto/new_cfrna_with_ERCC/data/sam/bwa_map_{sample}.sam"
-        output:"/home/groups/CEDAR/spilioto/new_cfrna_with_ERCC/ciri2_output/ciri2out_bwa_map_{sample}.txt"
+        input:"data/sam/bwa_map_{sample}.sam"
+        output:"ciri2_output/ciri2out_bwa_map_{sample}.txt"
 
         params:name="ciri2_{sample}", partition="long_jobs", mem="6000"
         threads:4
@@ -24,7 +24,7 @@ rule ciri2:
         run:
                 ciri2="/home/groups/CEDAR/tools/CIRI2.pl"
                 ref_fa="/home/groups/CEDAR/anurpa/genomes/GRCh38.primary_assembly.genome.fa"
-                ref_anno="/home/groups/CEDAR/anurpa/genomes/gencode.v27.annotation.gtf"  
+                ref_anno="/home/groups/CEDAR/callahro/cfrna_references/combined_gencode_v27_ercc.gtf"  
 
                 shell ("""
                         perl {ciri2} -T 12 -I {input} -O {output} -F {ref_fa} -A {ref_anno}

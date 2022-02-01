@@ -195,13 +195,13 @@ rule count_exons:
                {params.exon_gtf} > {output}"""
 
 
-#rule compile_counts:
-#    input:
-#        expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
-#    output:
-#        "data/{project_id}_counts.txt".format(project_id=config["project_id"])
-#    script:
-#        "../scripts/compile_counts_table.py"
+rule compile_counts:
+    input:
+        expand("samples/htseq_count/{sample}_htseq_gene_count.txt",sample=SAMPLES)
+    output:
+        "data/{project_id}_counts.txt".format(project_id=config["project_id"])
+    script:
+        "../scripts/compile_counts_table.py"
 
 
 rule compile_counts_and_stats:
