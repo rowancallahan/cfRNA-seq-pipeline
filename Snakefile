@@ -20,7 +20,7 @@ print(SAMPLES)
 
 #removed the index col for our metadata no longer needed it
 sample_id = config["sample_id"]
-md = pd.read_table(config["omic_meta_data"], index_col=sample_id, dtype=str)
+md = pd.read_table(config["omic_meta_data"], index_col = sample_id, dtype=str)
 condition = config["linear_model"]
 baseline = config["TE_baseline"]
 
@@ -98,11 +98,11 @@ rule all:
         "data/{project_id}_counts_w_stats.txt".format(project_id=config['project_id']),
         "data/{project_id}_counts.txt".format(project_id=config['project_id']),
         "data/{project_id}_exon_counts.txt".format(project_id = config["project_id"]),
-#        expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
-#        expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
-#        expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
-#        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
-#        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
+        expand("rseqc/insertion_profile/{sample}/{sample}.insertion_profile.{ext}",sample=SAMPLES, ext=insertion_and_clipping_prof_ext),
+        expand("rseqc/inner_distance/{sample}/{sample}.inner_distance{ext}", sample = SAMPLES, ext = inner_distance_ext),
+        expand("rseqc/clipping_profile/{sample}/{sample}.clipping_profile.{ext}", sample = SAMPLES, ext = insertion_and_clipping_prof_ext),
+        expand("rseqc/read_distribution/{sample}/{sample}.read_distribution.{ext}", sample = SAMPLES, ext = read_dist_ext),
+        expand("rseqc/read_GC/{sample}/{sample}.GC{ext}", sample = SAMPLES, ext = read_gc_ext),
         "results/tables/read_coverage.txt",
 #        expand("{project_id}_QC/Exon.Fraction.pdf", project_id=config["project_id"]),
 #        expand("{project_id}_QC/Input.Reads.Barplot.pdf", project_id=config["project_id"]),
@@ -110,22 +110,45 @@ rule all:
 #        expand("{project_id}_QC/Scatter.Plot.LibSize.ExonFraction.pdf", project_id=config["project_id"]),
 #        expand("{project_id}_QC/{project_id}_Metadata_W_QC_Metrics.txt", project_id=config["project_id"]),
 #        expand("{project_id}_QC/{project_id}_PCA_potential_batch_grid.pdf", project_id=config["project_id"]),
-#        expand("{project_id}_QC/{project_id}_subset_counts.txt", project_id=config["project_id"]),
+#        expand("{project_id}_QC/{project_id}_subset_counts_RPM.txt", project_id=config["project_id"]),
+#        expand("{project_id}_QC/{project_id}_subset_counts_pass.txt", project_id=config["project_id"]),
         expand("samples/star_TE/{sample}/Aligned.out.bam", sample = SAMPLES),
         expand("results/TEtranscripts/{condition}.cntTable", condition = CONDITIONS),
-##        expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
+        expand("results/TEtranscripts/{condition}_sigdiff_gene_TE.txt", condition = CONDITIONS),
+        expand("ciri2_output/ciri2out_bwa_map_{sample}.txt", sample = SAMPLES),
+#        expand("results/diffexp/pairwise/{contrast}.pca_plot.pdf", contrast = config["diffexp"]["contrasts"]),
+#        expand("results/diffexp/pairwise/{contrast}.pca_plot.listnorm.pdf", contrast = config["diffexp"]["contrasts"]),
+#        expand("results/diffexp/pairwise/{contrast}.pca_plot.ERCCnorm.pdf", contrast = config["diffexp"]["contrasts"]),
 #        "results/diffexp/group/LRT_pca.pdf",
+#        "results/diffexp/group/LRT_pca_listnorm.pdf",
+#        "results/diffexp/group/LRT_pca_ERCCnorm.pdf",
 #        "results/diffexp/group/MDS_table.txt",
+#        "results/diffexp/group/MDS_table_listnorm.txt",
+#        "results/diffexp/group/MDS_table_ERCCnorm.txt",
 #        "results/diffexp/group/LRT_density_plot.pdf",
+#        "results/diffexp/group/LRT_density_plot_listnorm.pdf",
+#        "results/diffexp/group/LRT_density_plot_ERCCnorm.pdf",
 #        expand(["results/diffexp/pairwise/{contrast}.qplot.pdf","results/diffexp/pairwise/{contrast}.qhist.pdf","results/diffexp/pairwise/{contrast}.qvalue_diffexp.tsv"],contrast=config["diffexp"]["contrasts"]),
+#        expand(["results/diffexp/pairwise/{contrast}.qplot.listnorm.pdf","results/diffexp/pairwise/{contrast}.qhist.listnorm.pdf","results/diffexp/pairwise/{contrast}.qvalue_diffexp.listnorm.tsv"],contrast=config["diffexp"]["contrasts"]),
+#        expand(["results/diffexp/pairwise/{contrast}.qplot.ERCCnorm.pdf","results/diffexp/pairwise/{contrast}.qhist.ERCCnorm.pdf","results/diffexp/pairwise/{contrast}.qvalue_diffexp.ERCCnorm.tsv"],contrast=config["diffexp"]["contrasts"]),
 #        expand(["results/diffexp/pairwise/GOterms/{contrast}.diffexp.downFC.{FC}.adjp.{adjp}_BP_GO.txt", "results/diffexp/pairwise/GOterms/{contrast}.diffexp.upFC.{FC}.adjp.{adjp}_BP_GO.txt"], contrast = config["diffexp"]["contrasts"], FC=config['FC'], adjp=config['adjp']),
+#        expand(["results/diffexp/pairwise/GOterms/{contrast}.diffexp.downFC.{FC}.adjp.{adjp}_BP_GO_listnorm.txt", "results/diffexp/pairwise/GOterms/{contrast}.diffexp.upFC.{FC}.adjp.{adjp}_BP_GO_listnorm.txt"], contrast = config["diffexp"]["contrasts"], FC=config['FC'], adjp=config['adjp']),
+#        expand(["results/diffexp/pairwise/GOterms/{contrast}.diffexp.downFC.{FC}.adjp.{adjp}_BP_GO_ERCCnorm.txt", "results/diffexp/pairwise/GOterms/{contrast}.diffexp.upFC.{FC}.adjp.{adjp}_BP_GO_ERCCnorm.txt"], contrast = config["diffexp"]["contrasts"], FC=config['FC'], adjp=config['adjp']),
 #        expand("results/diffexp/pairwise/{contrast}.diffexp.{adjp}.VolcanoPlot.pdf", contrast = config["diffexp"]["contrasts"], adjp = config['adjp']),
+#        expand("results/diffexp/pairwise/{contrast}.diffexp.{adjp}.VolcanoPlot.listnorm.pdf", contrast = config["diffexp"]["contrasts"], adjp = config['adjp']),
+#        expand("results/diffexp/pairwise/{contrast}.diffexp.{adjp}.VolcanoPlot.ERCCnorm.pdf", contrast = config["diffexp"]["contrasts"], adjp = config['adjp']),
 #        expand("results/diffexp/pairwise/permutationTest/Histogram.{contrast}.Permutation.Test.pdf", contrast = config["diffexp"]["contrasts"]),
+#        expand("results/diffexp/pairwise/permutationTest/Histogram.{contrast}.Permutation.Test.listnorm.pdf", contrast = config["diffexp"]["contrasts"]),
+#        expand("results/diffexp/pairwise/permutationTest/Histogram.{contrast}.Permutation.Test.ERCCnorm.pdf", contrast = config["diffexp"]["contrasts"]),
 #        expand(["results/diffexp/glimma-plots/{contrast}.ma_plot.html", "results/diffexp/glimma-plots/{contrast}.volcano_plot.html"],contrast = config["diffexp"]["contrasts"]),
-#        "results/diffexp/glimma-plots/{project_id}.mds_plot.html".format(project_id=project_id)
-
+#        expand(["results/diffexp/glimma-plots/{contrast}.ma_plot_listnorm.html", "results/diffexp/glimma-plots/{contrast}.volcano_plot_listnorm.html"],contrast = config["diffexp"]["contrasts"]),
+#        expand(["results/diffexp/glimma-plots/{contrast}.ma_plot_ERCCnorm.html", "results/diffexp/glimma-plots/{contrast}.volcano_plot_ERCCnorm.html"],contrast = config["diffexp"]["contrasts"]),
+#        "results/diffexp/glimma-plots/{project_id}.mds_plot.html".format(project_id=project_id),
+#        "results/diffexp/glimma-plots/{project_id}.mds_plot_listnorm.html".format(project_id=project_id),
+#        "results/diffexp/glimma-plots/{project_id}.mds_plot_ERCCnorm.html".format(project_id=project_id)
 include: "rules/align_rmdp.smk"
 include: "rules/omic_qc.smk"
-include: "rules/QC_init.smk"
+#include: "rules/QC_init.smk"
 include: "rules/TE.smk"
+include: "rules/circ.smk"
 #include: "rules/deseq.smk"
