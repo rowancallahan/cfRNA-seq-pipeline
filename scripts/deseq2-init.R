@@ -37,11 +37,13 @@ if (snakemake@threads > 1) {
 }
 
 # Read in metadata table and order according to sampleID
-md <- read.delim(file=metadata, sep = "\t", stringsAsFactors = FALSE)
+md <- read.delim(file=metadata, stringsAsFactors = FALSE)
 md <- md[order(md[sampleID]),]
 
 # Read in counts table
-subdata <- read.table(counts, header=TRUE, row.names=1, sep="\t", check.names=FALSE)
+subdata <- read.table(counts, row.names=1)
+counts_ens <- rownames(subdata)
+rownames(subdata) <- gsub("\\..*","",counts_ens)
 subdata <- subdata[,order(colnames(subdata))]
 
 # Extract only the Types that we want in further analysis & only the PP_ID and Status informative columns
@@ -53,7 +55,7 @@ md[[sampleID]] <- NULL
 keep <- colnames(subdata)[colnames(subdata) %in% rownames(md)]
 subdata <- subdata[, keep]
 dim(subdata)
-
+subdata <- as.matrix(subdata)
 # Check
 stopifnot(rownames(md)==colnames(subdata))
 
@@ -70,18 +72,19 @@ dds <- dds[ rowSums(counts(dds)) > 1, ]
 # Normalization and pre-processing
 dds <- DESeq(dds, parallel=parallel)
 
-saveRDS(dds, file=output)
+saveRDS(dds, file=output, version = 2)
 
 # obtain normalized counts
 rld <- rlog(dds, blind=FALSE)
-saveRDS(rld, file=rld_out)
+saveRDS(rld, file=rld_out, version = 2)
 
 ## Normalizing to gene List
 dds <- DESeqDataSetFromMatrix(countData=subdata,
                               colData=md,
                               design= as.formula(paste('~',Type)))
 genelist <- c("ENSG00000198888", "ENSG00000198763", "ENSG00000198899", "ENSG00000274012", "ENSG00000161016", "ENSG00000244734", "ENSG00000034510", "ENSG00000108298", "ENSG00000142541", "ENSG00000167526", "ENSG00000142937", "ENSG00000177954", "ENSG00000168298", "ENSG00000177600", "ENSG00000205542", "ENSG00000115268", "ENSG00000188536", "ENSG00000149806", "ENSG00000133112", "ENSG00000140988")
-dds <- estimateSizeFactors(dds, controlGenes = genelist)
+genenums <- which(rownames(counts(dds)) %in% genelist)
+dds <- estimateSizeFactors(dds, controlGenes = genenums)
 
 # Remove uninformative columns
 dds <- dds[ rowSums(counts(dds)) > 1, ]
@@ -89,11 +92,11 @@ dds <- dds[ rowSums(counts(dds)) > 1, ]
 # Normalization and pre-processing
 dds <- DESeq(dds, parallel=parallel)
 
-saveRDS(dds, file=list_output)
+saveRDS(dds, file=list_output, version=2)
 
 # obtain normalized counts
 list_rld <- rlog(dds, blind=FALSE)
-saveRDS(list_rld, file=list_rld_out)
+saveRDS(list_rld, file=list_rld_out, version=2)
 
 ## Normalizing to ERCC counts
 dds <- DESeqDataSetFromMatrix(countData=subdata,
@@ -109,9 +112,9 @@ dds <- dds[ rowSums(counts(dds)) > 1, ]
 # Normalization and pre-processing
 dds <- DESeq(dds, parallel=parallel)
 
-saveRDS(dds, file=ERCC_output)
+saveRDS(dds, file=ERCC_output, version=2)
 
 # obtain normalized counts
 ERCC_rld <- rlog(dds, blind=FALSE)
-saveRDS(ERCC_rld, file=ERCC_rld_out)
+saveRDS(ERCC_rld, file=ERCC_rld_out, version=2)
 

@@ -1,6 +1,7 @@
 library(DESeq2)
 library(dplyr)
 library(ggplot2)
+library(data.table)
 
 # Generate subdata 
 counts <- snakemake@input[['counts']]
@@ -15,6 +16,18 @@ numGenes <- snakemake@output[['numGenes']]
 
 permList <- snakemake@output[['permList']]
 
+list_hist <- snakemake@output[['list_histogram']]
+
+list_numGenes <- snakemake@output[['list_numGenes']]
+
+list_permList <- snakemake@output[['list_permList']]
+
+ERCC_hist <- snakemake@output[['ERCC_histogram']]
+
+ERCC_numGenes <- snakemake@output[['ERCC_numGenes']]
+
+ERCC_permList <- snakemake@output[['ERCC_permList']]
+
 Type <- snakemake@params[['linear_model']]
 
 contrast <- snakemake@params[['contrast']]
@@ -27,7 +40,9 @@ md <- read.delim(file=metadata, sep = "\t", stringsAsFactors = FALSE)
 md <- md[order(md[[sampleID]]),]
 
 # Read in counts table
-subdata <- read.table(counts, header=TRUE, row.names=1, sep="\t")
+subdata <- read.table(counts, row.names=1)
+counts_ens <- rownames(subdata)
+rownames(subdata) <- gsub("\\..*","",counts_ens)
 subdata <- subdata[,order(colnames(subdata))]
 
 # Extract only the Types that we want in further analysis & only the PP_ID and Status informative columns
@@ -39,6 +54,7 @@ md[[sampleID]] <- NULL
 keep <- colnames(subdata)[colnames(subdata) %in% rownames(md)]
 subdata <- subdata[, keep]
 dim(subdata)
+subdata <- as.matrix(subdata)
 
 # Check
 stopifnot(rownames(md)==colnames(subdata))
@@ -140,3 +156,192 @@ for (i in 1:number_of_try) {
 
 write.csv(number_of_diff_genes, numGenes)
 write.csv(df, permList)
+
+###############################Permute using the gene list normalization ######################
+start_group = c(One_vector, Two_vector)
+cutoff=0.01
+number_of_diff_genes=c()
+group_list = list()
+number_of_try = 500
+
+for (i in 1:number_of_try)
+{
+  print(i)
+  group = data.frame(type=factor(sample(start_group)))
+  
+  dds = DESeqDataSetFromMatrix(countData = subdata,
+                               colData = group,
+                               design = ~ type)
+  
+  # Extract normalized counts
+  
+  genelist <- c("ENSG00000198888", "ENSG00000198763", "ENSG00000198899", "ENSG00000274012", "ENSG00000161016", "ENSG00000244734", "ENSG00000034510", "ENSG00000108298", "ENSG00000142541", "ENSG00000167526", "ENSG00000142937", "ENSG00000177954", "ENSG00000168298", "ENSG00000177600", "ENSG00000205542", "ENSG00000115268", "ENSG00000188536", "ENSG00000149806", "ENSG00000133112", "ENSG00000140988")
+  genenums <- which(rownames(counts(dds)) %in% genelist)
+  dds = estimateSizeFactors(dds, controlGenes = genenums)
+  
+  # Remove genes with zero counts over all samples
+  dds <- dds[ rowSums(counts(dds)) > 1, ]
+  
+  # Make sure of reference, set it by rlevel
+  dds$type = relevel(dds$type, ref = 1)
+  
+  # The standard differential expression analysis steps are wrapped into a single function, DESeq
+  dds = DESeq(dds)
+  
+  # Extract results
+  res = results(dds, contrast = c("type", "1", "2"), independentFiltering = FALSE,cooksCutoff = Inf)
+  
+  tmp=sum(res$padj < cutoff, na.rm=TRUE)
+  number_of_diff_genes = c(number_of_diff_genes,tmp)
+  group_list[[i]] <- group
+  
+}
+
+# Obtain the number of genes that meet padj<0.01 for reference line in histogram
+dds <- DESeqDataSetFromMatrix(countData=subdata,
+                              colData=md,
+                              design= as.formula(paste('~',Type)))
+
+genelist <- c("ENSG00000198888", "ENSG00000198763", "ENSG00000198899", "ENSG00000274012", "ENSG00000161016", "ENSG00000244734", "ENSG00000034510", "ENSG00000108298", "ENSG00000142541", "ENSG00000167526", "ENSG00000142937", "ENSG00000177954", "ENSG00000168298", "ENSG00000177600", "ENSG00000205542", "ENSG00000115268", "ENSG00000188536", "ENSG00000149806", "ENSG00000133112", "ENSG00000140988")
+genenums <- which(rownames(counts(dds)) %in% genelist)
+
+dds <- estimateSizeFactors(dds, controlGenes=genenums)
+
+# Remove uninformative columns
+dds <- dds[ rowSums(counts(dds)) > 1, ]
+
+# Normalization and pre-processing
+dds <- DESeq(dds)
+
+# Extract results and the number of significant genes with padj<0.01
+results = results(dds, contrast = c(Type, target, baseline), independentFiltering = FALSE,cooksCutoff = Inf)
+numSig <- sum(results$padj < cutoff, na.rm=TRUE)
+number_of_diff_genes <- as.data.frame(number_of_diff_genes)
+names(number_of_diff_genes) <- "NumDiffGenes"
+number_of_diff_genes$Actual <- numSig
+
+p <- ggplot(number_of_diff_genes, aes(x=NumDiffGenes)) +
+  geom_histogram(bins=100) +
+  geom_vline(data=number_of_diff_genes, mapping=aes(xintercept = numSig, color = "Correct Labels"), 
+             linetype="longdash", size=0.6, show.legend = T) +
+  scale_color_manual(values = "gray75", name = "Number of DE genes") +
+  ggtitle(paste(number_of_try, "Random Permutations:", baseline, "vs", target)) +
+  xlab("Number of significant genes") +
+  theme(aspect.ratio=1,
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_text(size=10, hjust = 0.5))
+
+pdf(list_hist)
+print({
+  p
+})
+dev.off()
+
+df <- data.frame(stringsAsFactors = FALSE)
+
+for (i in 1:number_of_try) {
+  if (i==1) {
+    df = group_list[[i]]
+  }
+  else {
+    df = cbind(df, group_list[[i]])
+  }
+  colnames(df)[i] = paste("perm",i, sep = "_")
+}
+
+write.csv(number_of_diff_genes, list_numGenes)
+write.csv(df, list_permList)
+
+##################################ERCC Normalized permutation##############
+
+start_group = c(One_vector, Two_vector)
+cutoff=0.01
+number_of_diff_genes=c()
+group_list = list()
+number_of_try = 500
+
+for (i in 1:number_of_try)
+{
+  print(i)
+  group = data.frame(type=factor(sample(start_group)))
+  
+  dds = DESeqDataSetFromMatrix(countData = subdata,
+                               colData = group,
+                               design = ~ type)
+  
+  # Extract normalized counts
+  
+  genenums <- which(rownames(counts(dds)) %like% "ERCC")
+  dds = estimateSizeFactors(dds, controlGenes = genenums)
+  
+  # Remove genes with zero counts over all samples
+  dds <- dds[ rowSums(counts(dds)) > 1, ]
+  
+  # Make sure of reference, set it by rlevel
+  dds$type = relevel(dds$type, ref = 1)
+  
+  # The standard differential expression analysis steps are wrapped into a single function, DESeq
+  dds = DESeq(dds)
+  
+  # Extract results
+  res = results(dds, contrast = c("type", "1", "2"), independentFiltering = FALSE,cooksCutoff = Inf)
+  
+  tmp=sum(res$padj < cutoff, na.rm=TRUE)
+  number_of_diff_genes = c(number_of_diff_genes,tmp)
+  group_list[[i]] <- group
+  
+}
+
+# Obtain the number of genes that meet padj<0.01 for reference line in histogram
+dds <- DESeqDataSetFromMatrix(countData=subdata,
+                              colData=md,
+                              design= as.formula(paste('~',Type)))
+
+genenums <- which(rownames(counts(dds)) %like% "ERCC")
+
+dds <- estimateSizeFactors(dds, controlGenes=genenums)
+
+# Remove uninformative columns
+dds <- dds[ rowSums(counts(dds)) > 1, ]
+
+# Normalization and pre-processing
+dds <- DESeq(dds)
+
+# Extract results and the number of significant genes with padj<0.01
+results = results(dds, contrast = c(Type, target, baseline), independentFiltering = FALSE,cooksCutoff = Inf)
+numSig <- sum(results$padj < cutoff, na.rm=TRUE)
+number_of_diff_genes <- as.data.frame(number_of_diff_genes)
+names(number_of_diff_genes) <- "NumDiffGenes"
+number_of_diff_genes$Actual <- numSig
+
+p <- ggplot(number_of_diff_genes, aes(x=NumDiffGenes)) +
+  geom_histogram(bins=100) +
+  geom_vline(data=number_of_diff_genes, mapping=aes(xintercept = numSig, color = "Correct Labels"), 
+             linetype="longdash", size=0.6, show.legend = T) +
+  scale_color_manual(values = "gray75", name = "Number of DE genes") +
+  ggtitle(paste(number_of_try, "Random Permutations:", baseline, "vs", target)) +
+  xlab("Number of significant genes") +
+  theme(aspect.ratio=1,
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_text(size=10, hjust = 0.5))
+
+pdf(ERCC_hist)
+print({
+  p
+})
+dev.off()
+
+df <- data.frame(stringsAsFactors = FALSE)
+
+for (i in 1:number_of_try) {
+  if (i==1) {
+    df = group_list[[i]]
+  }
+  else {
+    df = cbind(df, group_list[[i]])
+  }
+  colnames(df)[i] = paste("perm",i, sep = "_")
+}
+
+write.csv(number_of_diff_genes, ERCC_numGenes)
+write.csv(df, ERCC_permList)

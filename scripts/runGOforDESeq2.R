@@ -1,5 +1,9 @@
 degFile = snakemake@input[['degFile']]
 
+list_degFile = snakemake@input[['list_degFile']]
+
+ERCC_degFile = snakemake@input[['ERCC_degFile']]
+
 assembly <- snakemake@params[['assembly']]
 
 FC <- snakemake@params[['FC']]
@@ -177,3 +181,194 @@ down_out = snakemake@output[[2]]
 write.table('No Significant Genes', file=down_out)
 }
 
+
+############################################################## List normalized
+
+
+##----------load differentially expressed genes --------#
+print("Loading differential expressed gene table")
+print(list_degFile)
+
+deg <- read.delim(file=list_degFile,header=TRUE,sep="\t")
+rownames(deg) <- sub("\\.[0-9]*","",rownames(deg))
+
+##---------load correct Biomart------------------------#
+if (assembly == "hg19") {
+  organismStr <- "hsapiens"
+  geneID2GO <- get(load("/home/groups/CEDAR/anno/biomaRt/hg19.Ens_75.biomaRt.GO.geneID2GO.RData"))
+  xx <- get(load("/home/groups/CEDAR/anno/biomaRt/GO.db.Term.list.rda"))
+}
+if (assembly == "hg38.89") {
+  organismStr <- "hsapiens"
+  ### to get to hg38 mappings ensembl 89!
+  geneID2GO <- get(load("/home/groups/CEDAR/anno/biomaRt/hg38.Ens_89.biomaRt.GO.geneID2GO.RData"))
+  xx <- get(load("/home/groups/CEDAR/anno/biomaRt/GO.db.Term.list.rda"))
+}
+if (assembly == "hg38.90") {
+  organismStr <- "hsapiens"
+  ### to get to hg38 mappings ensembl 90!
+  geneID2GO <- get(load("/home/groups/CEDAR/anno/biomaRt/hg38.Ens_90.biomaRt.GO.geneID2GO.RData"))
+  xx <- get(load("/home/groups/CEDAR/anno/biomaRt/GO.db.Term.list.rda"))
+}
+if (assembly == "mm10") {
+  organismStr <- "mmusculus"
+  ### to get to hg38 mappings ensembl 90!
+  geneID2GO <- get(load("./anno/biomaRt/hg38.Ens_90.biomaRt.GO.external.geneID2GO.RData"))
+  xx <- get(load("./anno/biomaRt/GO.db.Term.list.rda"))
+}
+
+
+
+print("get up genes and make geneList")
+up <- deg$padj < adjp & deg$log2FoldChange >= log2(FC)
+up <- unique(rownames(deg[up,]))
+all <-unique(names(geneID2GO))
+up.geneList <-  factor(as.integer(all %in% up))
+names(up.geneList) <- all
+
+up.setsize <- sum(as.numeric(levels(up.geneList))[up.geneList])
+print("setsize for significant genes") 
+up.setsize
+
+adjplabel <- gsub("^0\\.","",adjp)
+comparison <- gsub("\\.tsv$|\\.txt$|\\.rda$|\\.RData$","",degFile)
+
+Dir <- sub("$", "/GOterms", dirname(comparison))
+if(!(file.exists(Dir))) {
+  dir.create(Dir,FALSE,TRUE)
+}
+
+if (up.setsize >=2) {
+  
+  print("make GO table for the up genes")
+  #################################
+  go.UP.BP <- runGO(geneList=up.geneList,xx=xx,otype="BP",setName=paste(basename(comparison),"upFC",FC, "adjp", adjp, sep="."))
+  #go.UP.MF <- runGO(geneList=up.geneList,xx=xx,otype="MF",setName=paste(comparison,"up",sep="."))
+  
+  print("make the png for the up genes")
+  drawBarplot(go=go.UP.BP,ontology="BP",setName=paste(basename(comparison),"upFC",FC, "adjp", adjp, sep="."))
+  
+} else {
+  up_out = snakemake@output[[3]]
+  write.table('No Significant Genes', file=up_out)
+}
+
+print("get down genes and make geneList")
+dn <- deg$padj < adjp & deg$log2FoldChange <= -log2(FC)
+dn <- unique(rownames(deg[dn,]))
+all <-unique(names(geneID2GO))
+dn.geneList <-  factor(as.integer(all %in% dn))
+names(dn.geneList) <- all
+
+dn.setsize <- sum(as.numeric(levels(dn.geneList))[dn.geneList])
+print("setsize for significant genes") 
+dn.setsize
+
+if(dn.setsize >= 2){
+  
+  print("make GO table for down genes")
+  go.DN.BP <- runGO(geneList=dn.geneList,xx=xx,otype="BP",setName=paste(basename(comparison),"downFC",FC, "adjp", adjp, sep="."))
+  
+  print("make barplot for down genes")
+  drawBarplot(go=go.DN.BP,ontology="BP",setName=paste(basename(comparison),"downFC",FC, "adjp", adjp, sep="."))
+  
+}else{
+  down_out = snakemake@output[[4]]
+  write.table('No Significant Genes', file=down_out)
+}
+
+########################################################### ERCC normalized ################
+
+
+
+##----------load differentially expressed genes --------#
+print("Loading differential expressed gene table")
+print(ERCC_degFile)
+
+deg <- read.delim(file=ERCC_degFile,header=TRUE,sep="\t")
+rownames(deg) <- sub("\\.[0-9]*","",rownames(deg))
+
+##---------load correct Biomart------------------------#
+if (assembly == "hg19") {
+  organismStr <- "hsapiens"
+  geneID2GO <- get(load("/home/groups/CEDAR/anno/biomaRt/hg19.Ens_75.biomaRt.GO.geneID2GO.RData"))
+  xx <- get(load("/home/groups/CEDAR/anno/biomaRt/GO.db.Term.list.rda"))
+}
+if (assembly == "hg38.89") {
+  organismStr <- "hsapiens"
+  ### to get to hg38 mappings ensembl 89!
+  geneID2GO <- get(load("/home/groups/CEDAR/anno/biomaRt/hg38.Ens_89.biomaRt.GO.geneID2GO.RData"))
+  xx <- get(load("/home/groups/CEDAR/anno/biomaRt/GO.db.Term.list.rda"))
+}
+if (assembly == "hg38.90") {
+  organismStr <- "hsapiens"
+  ### to get to hg38 mappings ensembl 90!
+  geneID2GO <- get(load("/home/groups/CEDAR/anno/biomaRt/hg38.Ens_90.biomaRt.GO.geneID2GO.RData"))
+  xx <- get(load("/home/groups/CEDAR/anno/biomaRt/GO.db.Term.list.rda"))
+}
+if (assembly == "mm10") {
+  organismStr <- "mmusculus"
+  ### to get to hg38 mappings ensembl 90!
+  geneID2GO <- get(load("./anno/biomaRt/hg38.Ens_90.biomaRt.GO.external.geneID2GO.RData"))
+  xx <- get(load("./anno/biomaRt/GO.db.Term.list.rda"))
+}
+
+
+
+print("get up genes and make geneList")
+up <- deg$padj < adjp & deg$log2FoldChange >= log2(FC)
+up <- unique(rownames(deg[up,]))
+all <-unique(names(geneID2GO))
+up.geneList <-  factor(as.integer(all %in% up))
+names(up.geneList) <- all
+
+up.setsize <- sum(as.numeric(levels(up.geneList))[up.geneList])
+print("setsize for significant genes") 
+up.setsize
+
+adjplabel <- gsub("^0\\.","",adjp)
+comparison <- gsub("\\.tsv$|\\.txt$|\\.rda$|\\.RData$","",degFile)
+
+Dir <- sub("$", "/GOterms", dirname(comparison))
+if(!(file.exists(Dir))) {
+  dir.create(Dir,FALSE,TRUE)
+}
+
+if (up.setsize >=2) {
+  
+  print("make GO table for the up genes")
+  #################################
+  go.UP.BP <- runGO(geneList=up.geneList,xx=xx,otype="BP",setName=paste(basename(comparison),"upFC",FC, "adjp", adjp, sep="."))
+  #go.UP.MF <- runGO(geneList=up.geneList,xx=xx,otype="MF",setName=paste(comparison,"up",sep="."))
+  
+  print("make the png for the up genes")
+  drawBarplot(go=go.UP.BP,ontology="BP",setName=paste(basename(comparison),"upFC",FC, "adjp", adjp, sep="."))
+  
+} else {
+  up_out = snakemake@output[[5]]
+  write.table('No Significant Genes', file=up_out)
+}
+
+print("get down genes and make geneList")
+dn <- deg$padj < adjp & deg$log2FoldChange <= -log2(FC)
+dn <- unique(rownames(deg[dn,]))
+all <-unique(names(geneID2GO))
+dn.geneList <-  factor(as.integer(all %in% dn))
+names(dn.geneList) <- all
+
+dn.setsize <- sum(as.numeric(levels(dn.geneList))[dn.geneList])
+print("setsize for significant genes") 
+dn.setsize
+
+if(dn.setsize >= 2){
+  
+  print("make GO table for down genes")
+  go.DN.BP <- runGO(geneList=dn.geneList,xx=xx,otype="BP",setName=paste(basename(comparison),"downFC",FC, "adjp", adjp, sep="."))
+  
+  print("make barplot for down genes")
+  drawBarplot(go=go.DN.BP,ontology="BP",setName=paste(basename(comparison),"downFC",FC, "adjp", adjp, sep="."))
+  
+}else{
+  down_out = snakemake@output[[6]]
+  write.table('No Significant Genes', file=down_out)
+}

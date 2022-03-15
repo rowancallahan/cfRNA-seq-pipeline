@@ -17,72 +17,83 @@ lib_size <- snakemake@output[["lib_size"]]
 md_stats <- snakemake@output[["md_stats"]]
 batch_pca <- snakemake@output[["batch_pca"]]
 sub_counts <- snakemake@output[["sub_counts"]]
+subset_cts <- snakemake@output[["subset_cts"]]
 
 # parameters
 samples <- snakemake@params[['samples']]
 sample_id <- snakemake@params[['sample_id']]
 ens2geneID <- snakemake@params[['ens2geneID']]
 
-md <- samples
+md <- read.delim(samples)
 
 #inputs
 counts <- snakemake@input[['counts']]
 coverage <- snakemake@input[['coverage']]
 st_stats <- snakemake@input[['st_stats']]
+meta_data <- md
 
-PCX_counts <- counts
+PCX_counts <- read.delim(counts, row.names=1)
+cts <- read.delim(counts, header=TRUE, row.names=1)
+cvge <- read.delim(file = coverage)
+st_sts <- read.delim(file = st_stats)
+
 #cleaning and pre-processing
-counts_ens <- rownames(counts)
+counts_ens <- rownames(cts)
 counts_ens <- gsub("\\..*","",counts_ens)
-counts$gene <- counts_ens
-col1 <- colnames(counts)
+
+cts$gene <- counts_ens
+col1 <- colnames(cts)
 BR <- col1[1:18]
 BR <- gsub('.{21}$',"",BR)
 col1 <- gsub("\\_.*","",col1)
-colnames(counts) <- col1
-colnames(counts)[1:18] <- BR
+colnames(cts) <- col1
+colnames(cts)[1:18] <- BR
 
-col2 <- colnames(st_stats)
+col2 <- colnames(st_sts)
 col2 <- gsub("_bam","",col2)
-colnames(st_stats) <- col2
-
-#putting stats in metadata
-colnames(st_stats)[2:ncol(st_stats)] <- stringr::str_replace(colnames(st_stats)[2:ncol(st_stats)],"_bam","")
-fullst <- st_stats[,1]
-fullst <- as.data.frame(fullst)
-ordered_st <- st_stats[,md$SeqID]
-st_stats <- cbind(fullst, ordered_st)
-stopifnot(colnames(st_stats)[2:ncol(st_stats)]==md$SeqID)
-md$input_reads <- as.vector(t(st_stats[5,2:ncol(st_stats)]))
-md$input_reads <- as.numeric(md$input_reads)
-rownames(md) <- md$SeqID
+colnames(st_sts) <- col2
+print(colnames(st_sts))
 
 #filtering for selected samples
 pull_sets <- c("CEDAR_REP0158", "BCC_EUS_2019")
 md <- md[md$Set %in% pull_sets,]
-coverage <- coverage[coverage$Sample %in% md$SeqID,]
-rownames(coverage) <- coverage$Sample
+cvge <- cvge[cvge$Sample %in% md$SeqID,]
+rownames(cvge) <- cvge$Sample
 rownames(md) <- md$SeqID
-counts <- data.frame(gene = counts$gene, counts[,colnames(counts) %in% md$SeqID])
+#cts <- data.frame(gene = cts$gene, cts[,colnames(cts) %in% md$SeqID])
+
+md <- md[which(colnames(cts) %in% md$SeqID),]
+
+#putting stats in metadata
+#colnames(st_sts)[2:ncol(st_sts)] <- stringr::str_replace(colnames(st_sts)[2:ncol(st_sts)],"_bam","")
+#fullst <- st_sts[,1]
+#fullst <- as.data.frame(fullst)
+#ordered_st <- st_sts[,md$SeqID]
+#st_sts <- cbind(fullst, ordered_st)
+st_sts[,2:ncol(st_sts)] <- st_sts[,md$SeqID]
+stopifnot(colnames(st_sts)[2:ncol(st_sts)] %in% md$SeqID)
+md$input_reads <- t(st_sts[5,2:ncol(st_sts)])
+md$input_reads <- as.numeric(md$input_reads)
+rownames(md) <- md$SeqID
 
 ## Format data ##
-counts <- counts[!is.na(counts$gene),]
-counts$gene <- as.character(counts$gene)
+cts <- cts[!is.na(cts$gene),]
+cts$gene <- as.character(cts$gene)
 
 # Consolidate duplicate gene names
-datam <- melt(counts,id="gene")
+datam <- melt(cts,id="gene")
 datac <- dcast(datam,gene~variable,fun.aggregate = mean)
 rownames(datac) <- datac[,1]
-counts <- datac[,-1]
+cts <- datac[,-1]
 
 ## Order data the same
-counts <- counts[,order(colnames(counts))]
+cts <- cts[,order(colnames(cts))]
 md <- md[order(md$SeqID),]
-coverage <- coverage[order(coverage$Sample),]
+cvge <- cvge[order(cvge$Sample),]
 
 
 #check the names are matched up
-stopifnot(colnames(counts)==rownames(md) & rownames(md)==rownames(coverage))
+stopifnot(colnames(cts)==rownames(md) & rownames(md)==rownames(cvge))
 
 # New graph theme
 blank_theme <- theme_minimal()+
@@ -107,10 +118,10 @@ dodge <- position_dodge(width = 0.6)
 theme_update(plot.title = element_text(hjust = 0.5))
 
 # Import intron and exon fraction results into md table
-iv <- match(md$SeqID, coverage$Sample)
-md$exon_fraction <- round(coverage[iv,]$Exon, 3)
-md$intron_fraction <- round(coverage[iv,]$Intron, 3)
-md$intergenic_fraction <- round(coverage[iv,]$Intergenic, 3)
+iv <- match(md$SeqID, cvge$Sample)
+md$exon_fraction <- round(cvge[iv,]$Exon, 3)
+md$intron_fraction <- round(cvge[iv,]$Intron, 3)
+md$intergenic_fraction <- round(cvge[iv,]$Intergenic, 3)
 
 # Now visualize in a different way, retaining the intergenic fraction as well, representing as a stacked barplot
 df1 <- dplyr::select(md, intron_fraction)
@@ -224,7 +235,7 @@ dev.off()
 write.table(md, md_stats, sep = "\t", row.names = F, quote = F)
 
 ## PCA plot
-genecount <- log(counts+1,2)
+genecount <- log(cts+1,2)
 # Which values in genecount are greater than 1.5?
 thresh <- genecount  > 1.5
 # This produces a logical matrix with TRUEs and FALSEs
@@ -302,6 +313,9 @@ pdf(batch_pca, width = 22, height = 12)
 plot_grid(plotlist = plots, labels = potential_batch)
 dev.off()
 
-tmp <- sweep(counts, 2, colSums(counts), '/') * 1e6
+tmp <- sweep(cts, 2, colSums(raw), '/') * 1e6
 PCX_RPM <- tmp
 write.csv(PCX_RPM, sub_counts)
+sub_cts <- cts[,md$SeqID[which(md$PASS == TRUE)]]
+sub_cts <- round(sub_cts)
+write.table(sub_cts, subset_cts)
